@@ -505,7 +505,16 @@
       color: var(--bx-muted);
       line-height: 1.6;
     }
-  </style>
+  
+    /* Prevent mobile overflow */
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    * {
+      max-width: 100vw;
+    }
+</style>
 </head>
 <body>
   
@@ -515,7 +524,7 @@
   <div class="lk-bg" id="lkBg">
     <video
       src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise.mp4"
-      muted loop playsinline autoplay></video>
+      muted loop playsinline ></video>
   </div>
 
   <div class="lk lk-brutal">
@@ -523,7 +532,7 @@
     <header class="bx-nav" data-rise="0">
       <div class="bx-menu">
         <a class="bx-brand" href="index.html">
-          <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Homes Network" />
+          <img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Homes Network" />
         </a>
         <a class="bx-link" href="index.html">Home</a>
         <a class="bx-link" href="index.html#book">Book a Stay</a>
@@ -1003,6 +1012,37 @@ Property in mind: ${prop}`;
 
   const statSection = document.querySelector('.stat-section');
   if (statSection) statObserver.observe(statSection);
+
+
+  // Performance: Video Lazy Loading & Play/Pause
+  document.addEventListener('DOMContentLoaded', () => {
+    const isMobile = window.innerWidth < 768;
+    const lazyVideos = document.querySelectorAll('.lazy-video');
+    
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          if (isMobile) {
+            // On mobile, just load metadata for the first frame if we want a static poster
+            // Or better, we can just load and pause immediately
+            video.setAttribute('preload', 'metadata');
+          } else {
+            video.setAttribute('preload', 'auto');
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(e => console.warn("Auto-play prevented", e));
+            }
+          }
+        } else {
+          // Pause when off-screen to save CPU
+          video.pause();
+        }
+      });
+    }, { rootMargin: '200px' });
+    
+    lazyVideos.forEach(v => videoObserver.observe(v));
+  });
 
 </script>
 
