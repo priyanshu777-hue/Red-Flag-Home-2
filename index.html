@@ -252,12 +252,10 @@
     
     #b3-left-para { position: absolute; left: 1.5rem; top: calc(50% - 2rem); max-width: 15rem; color: var(--foreground-accent-soft); opacity: 0; }
     #b3-right-para { position: absolute; right: 1.5rem; top: calc(50% - 2rem); max-width: 15rem; text-align: right; color: var(--foreground-accent-soft); opacity: 0; }
-    #b3-collage { position: absolute; left: calc(50% + 20rem); top: calc(50% - 15rem); width: 22rem; transform: rotate(7deg); opacity: 0; pointer-events: none; }
     #b3-signoff { position: absolute; bottom: 3rem; text-align: center; font-family: var(--typeface-display); font-style: italic; font-size: 2rem; opacity: 0; }
 
     @media (max-width: 1024px) {
       #b3-left-para, #b3-right-para { position: relative; left: auto; right: auto; top: auto; text-align: center; margin: 1.5rem 0; }
-      #b3-collage { display: none; }
       #b3-signoff { position: relative; bottom: auto; margin-top: 2rem; }
     }
 
@@ -1025,8 +1023,6 @@
       <a href="#contact">Contact</a>
     </div>
 
-    <div class="chrome caption uppercase hero-group" id="explore-btn" data-group="explore">explore Destinations</div>
-
     <div id="titles" class="hero-group" data-group="titles">
       <div id="hero-headline" class="display text-trim">
         <div><span class="italic">S</span>tay <span class="italic">S</span>omewhere</div>
@@ -1128,8 +1124,7 @@
       </div>
       <div id="b3-left-para">Every home is handpicked and<br/>fully managed by our team.</div>
       <div id="b3-right-para">Curated properties designed<br/>for the perfect managed stay.</div>
-      <img id="b3-collage" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 3/Collage.png" />
-      <div id="b3-signoff">Less ticking places off a list.<br/>More actually being there.</div>
+      <div id="b3-signoff">Every home, personally chosen.</div>
     </div>
   </div>
 </section>
@@ -1141,7 +1136,7 @@
   </div>
   <div id="b4-panels">
     <div class="b4-panel active">
-      <div class="b4-panel-img-wrap"><img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block4/OpenedImage1.png" class="b4-panel-img" alt="A luxurious living room" /></div>
+      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/handpicked.jpeg" class="b4-panel-img" alt="Handpicked Homes" loading="lazy" /></div>
       <div class="b4-panel-scrim"></div>
       <div class="b4-panel-content">
         <div class="wordmark text-trim"><span class="italic">H</span>andpicked <span class="italic">H</span>omes</div>
@@ -1150,7 +1145,7 @@
       </div>
     </div>
     <div class="b4-panel">
-      <div class="b4-panel-img-wrap"><img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block4/OpenedImage2.png" class="b4-panel-img" alt="A well-appointed bedroom" /></div>
+      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/cleaning.JPEG" class="b4-panel-img" alt="Fully Managed" loading="lazy" /></div>
       <div class="b4-panel-scrim"></div>
       <div class="b4-panel-content">
         <div class="wordmark text-trim"><span class="italic">F</span>ully <span class="italic">M</span>anaged</div>
@@ -1159,7 +1154,7 @@
       </div>
     </div>
     <div class="b4-panel">
-      <div class="b4-panel-img-wrap"><img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block4/OpenedImage3.png" class="b4-panel-img" alt="A host welcoming a guest" /></div>
+      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/guest.JPEG" class="b4-panel-img" alt="Guest-First Service" loading="lazy" /></div>
       <div class="b4-panel-scrim"></div>
       <div class="b4-panel-content">
         <div class="wordmark text-trim"><span class="italic">G</span>uest-First <span class="italic">S</span>ervice</div>
@@ -1404,7 +1399,12 @@
   function startHero() {
     heroStartedAt = performance.now();
     heroActive = true;
-    vidBase.play();
+    const playPromise = vidBase.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.warn("Video playback interrupted or paused by browser:", error);
+      });
+    }
     requestAnimationFrame(tickHero);
   }
 
@@ -1497,7 +1497,6 @@
   const b3Others = [
     document.getElementById('b3-left-para'),
     document.getElementById('b3-right-para'),
-    document.getElementById('b3-collage'),
     document.getElementById('b3-signoff')
   ];
   
