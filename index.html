@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Red Flag Homes Network</title>
+  <script type="importmap">
+  { "imports": {
+      "lenis": "https://unpkg.com/lenis@1.3.19/dist/lenis.mjs"
+  } }
+
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@500&family=Michroma&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --raw-color-white: #ffffff;
+      --raw-color-neutral-100: #ededed;
+      --raw-color-neutral-900: #171717;
+      --raw-color-neutral-950: #0a0a0a;
+      --raw-color-black: #000000;
+      
+      /* Dark Velvet specific variables */
+      --raw-color-velvet-950: #0A0505;
+      --raw-color-velvet-900: #1A0A0C;
+      --raw-color-velvet-700: #5C1220;
+      --raw-color-velvet-500: #A31621;
+      
+      --raw-color-cream-100: #F2E4E1;
+      --raw-color-cream-100-alpha-40: rgba(242, 228, 225, 0.4);
+      --raw-color-cream-100-alpha-50: rgba(242, 228, 225, 0.5);
+      --raw-color-cream-100-alpha-80: rgba(242, 228, 225, 0.8);
+      
+      --raw-color-black-alpha-50: rgba(0, 0, 0, 0.5);
+      --raw-color-black-alpha-40: rgba(0, 0, 0, 0.4);
+      --raw-color-black-alpha-15: rgba(0, 0, 0, 0.15);
+      --raw-color-signal-red: #A31621;
+      --raw-color-ink-950: #0c0c0c;
+      --raw-color-ink-950-alpha-10: rgba(12, 12, 12, 0.1);
+
+      --raw-duration-fast: 150ms;
+      --raw-duration-normal: 250ms;
+      --raw-radius-xs: 0.25rem;
+
+      --raw-text-display: 5.625rem;
+      --raw-text-wordmark: 1.5rem;
+      --raw-text-body: 0.875rem;
+      --raw-text-caption: 0.75rem;
+
+      --raw-leading-title: 4.5rem;
+      --raw-leading-wordmark: 1.35rem;
+      --raw-leading-body: 0.7rem;
+      --raw-leading-caption: 0.6rem;
+
+      --raw-spacing-page: 1.5rem;
+      --raw-spacing-md: 0.75rem;
+      --raw-spacing-sm: 0.625rem;
+      --raw-spacing-xs: 0.375rem;
+
+      /* Map roles to Dark Velvet values */
+      --background: var(--raw-color-velvet-950);
+      --foreground: var(--raw-color-cream-100);
+      --surface-cinema: var(--raw-color-velvet-950);
+      --surface-glass: var(--raw-color-ink-950-alpha-10);
+      --surface-gallery: var(--raw-color-velvet-900);
+      
+      --foreground-accent: var(--raw-color-cream-100);
+      --foreground-accent-muted: var(--raw-color-cream-100-alpha-40);
+      --foreground-accent-soft: var(--raw-color-cream-100-alpha-50);
+      --foreground-accent-strong: var(--raw-color-cream-100-alpha-80);
+      
+      /* Make foreground ink also cream since the whole page is dark */
+      --foreground-ink: var(--raw-color-cream-100);
+      --foreground-ink-muted: var(--raw-color-cream-100-alpha-40);
+      
+      --foreground-signal: var(--raw-color-signal-red);
+      --scrim-page: var(--raw-color-black-alpha-50);
+      --scrim-media: var(--raw-color-black-alpha-40);
+      --scrim-scene: var(--raw-color-black-alpha-40);
+      --scrim-cta: var(--raw-color-black-alpha-15);
+      --scrim-panel: var(--raw-color-black-alpha-50);
+      --rounding-media: var(--raw-radius-xs);
+
+      --typeface-display: "Instrument Serif", serif;
+      --typeface-ui: "Inter Tight", sans-serif;
+
+      --ease-entrance: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    html { font-size: 16px; }
+    @media (max-width: 1440px) { html { font-size: 1.111111vw; } }
+    @media (max-width: 1024px) { html { font-size: 1.5625vw; } }
+    @media (max-width: 640px)  { html { font-size: 4.444444vw; } }
+
+    body {
+      background: var(--background);
+      color: var(--foreground);
+      min-height: 100vh;
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      font-family: var(--typeface-ui);
+      font-size: var(--raw-text-body);
+      line-height: var(--raw-leading-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .text-trim { text-box-trim: trim-both; text-box-edge: cap alphabetic; }
+    .min-h-viewport { min-height: 100vh; min-height: 100dvh; }
+
+    .italic { font-style: italic; }
+    .uppercase { text-transform: uppercase; }
+
+    /* General Layout */
+    h1, h2, h3, h4, h5, h6, p, .display, .wordmark { overflow-wrap: break-word; }
+    .display { font-family: var(--typeface-display); font-size: clamp(2rem, 9vw, var(--raw-text-display)); line-height: 1.1; }
+    .wordmark { font-family: var(--typeface-display); font-size: var(--raw-text-wordmark); line-height: var(--raw-leading-wordmark); }
+    .caption { font-size: var(--raw-text-caption); line-height: var(--raw-leading-caption); letter-spacing: 0.05em; }
+
+    /* Hero */
+    #hero {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      background: var(--surface-cinema);
+      color: var(--foreground-accent);
+      overflow: hidden;
+    }
+    #vid-base {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+      filter: brightness(0.5);
+    }
+    #hero-veil {
+      position: absolute; inset: 0; background: var(--scrim-page); pointer-events: none; opacity: 0;
+    }
+    #hero-grain {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0.15;
+      background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="n"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23n)"/%3E%3C/svg%3E');
+    }
+
+    /* Fixed chrome */
+    .chrome { position: fixed; z-index: 100; pointer-events: none; }
+    
+    #site-header {
+      position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem; box-sizing: border-box;
+      display: flex; justify-content: center; align-items: flex-start; z-index: 200; pointer-events: none;
+    }
+    #site-header > * { pointer-events: auto; }
+    
+    #wordmark-top { position: relative; left: 0; top: 0; font-family: 'Michroma', sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.75rem; }
+    
+    #right-rail {
+      position: fixed; right: 0; top: 0; z-index: 300; display: flex; flex-direction: column;
+      max-height: 30vh; width: 2.5rem;
+    }
+    .rail-btn {
+      background: var(--raw-color-velvet-700); color: var(--foreground);
+      writing-mode: vertical-rl; text-orientation: mixed; border: none; cursor: pointer;
+      padding: 1.5rem 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;
+      font-size: 0.7rem; font-weight: 500; text-decoration: none; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s ease, color 0.2s ease; pointer-events: auto; font-family: inherit;
+      min-width: 2.5rem; min-height: 4rem; box-sizing: border-box; flex: 1;
+    }
+    .rail-btn.secondary {
+      background: var(--raw-color-velvet-700);
+    }
+    .rail-btn:hover { background: var(--raw-color-velvet-500); }
+    
+    #mobile-menu {
+      position: fixed; inset: 0; background: var(--background); color: var(--foreground);
+      z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    #mobile-menu.active { opacity: 1; pointer-events: auto; }
+    #mobile-menu-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: inherit; cursor: pointer; padding: 0.5rem; }
+    #mobile-menu a { font-size: 2rem; text-decoration: none; color: inherit; margin: 1rem 0; font-family: var(--font-display); text-transform: uppercase; transition: opacity 0.2s ease; }
+    #mobile-menu a:hover { opacity: 0.6; }
+
+    #explore-btn { right: 1.5rem; top: 5rem; width: 11.3125rem; text-align: right; }
+    
+    .hero-group { opacity: 0; transform: translateY(1.25rem); pointer-events: none; will-change: transform, opacity; }
+    
+    #titles { 
+      position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; 
+      align-items: center; justify-content: center; text-align: center; gap: 1.5rem;
+      padding: 0 1.5rem; box-sizing: border-box;
+    }
+    #hero-headline { width: 100%; font-size: clamp(2.5rem, 13vw, var(--raw-text-display)); word-break: normal; overflow-wrap: break-word; }
+    #hero-subtitle { font-size: 0.9rem; color: var(--foreground-accent-muted); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    
+    #hero-actions { display: flex; justify-content: center; gap: 1rem; pointer-events: auto; }
+    .btn-pill { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.5rem; border-radius: 9999px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.8rem; font-weight: 500; transition: all 0.2s ease; }
+    .btn-pill.btn-fill { background: var(--raw-color-velvet-700); color: var(--foreground); }
+    .btn-pill.btn-fill:hover { background: var(--raw-color-velvet-500); }
+    .btn-pill.btn-outline { background: transparent; border: 1px solid var(--raw-color-velvet-700); color: var(--foreground); }
+    .btn-pill.btn-outline:hover { background: var(--raw-color-velvet-700); }
+
+    @media (max-width: 1024px) {
+      #explore-btn { display: none; }
+    }
+    @media (max-width: 640px), (max-height: 700px) {
+      #hero-actions { flex-direction: column; width: 100%; max-width: 300px; margin: 0 auto; }
+      .btn-pill { width: 100%; box-sizing: border-box; }
+      .rail-btn { padding: 1rem 0.5rem; font-size: 0.65rem; min-width: 2rem; }
+    }
+
+    /* Book Section */
+    #book::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 20%;
+      background: linear-gradient(to bottom, var(--background) 0%, transparent 100%);
+      z-index: 1; pointer-events: none;
+    }
+    #book::after {
+      content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 20%;
+      background: linear-gradient(to top, var(--background) 0%, transparent 100%);
+      z-index: 1; pointer-events: none;
+    }
+    #book-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; }
+    #book-overlay { position: absolute; inset: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: 0; pointer-events: none; }
+    #book { background: var(--background); color: var(--foreground); padding: 8rem 1.5rem; display: flex; align-items: center; justify-content: center; width: 100vw; overflow: hidden; box-sizing: border-box;  position: relative; }
+    #book-container { width: 100%; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; align-items: center;  position: relative; z-index: 1; }
+    
+    .book-card { background: transparent; border: 1px solid var(--foreground-accent-muted); border-radius: 12px; padding: 2.5rem; width: 100%; display: flex; flex-direction: column; gap: 2rem; align-items: stretch; box-sizing: border-box; }
+    .book-fields-row { display: flex; width: 100%; gap: 1.5rem; }
+    .field-group { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+    .field-group label { font-size: 0.85rem; font-family: var(--typeface-ui); color: var(--foreground-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    .book-input { width: 100%; height: 52px; min-height: 52px; background: transparent; border: 1px solid var(--foreground-accent-muted); color: var(--foreground); padding: 0 1rem; border-radius: 6px; font-family: var(--typeface-ui); font-size: 1rem; outline: none; transition: border-color 0.2s ease; box-sizing: border-box; }
+    .book-input[type="date"] { position: relative; }
+    .book-input[type="date"]::-webkit-calendar-picker-indicator { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .book-input:focus { border-color: var(--foreground); }
+    .book-input option { background: var(--background); color: var(--foreground); }
+    
+    .book-submit-btn { width: 100%; height: 56px; padding: 0 2.5rem; background: var(--raw-color-velvet-700); color: var(--foreground); font-family: var(--typeface-ui); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; border: none; border-radius: 999px; cursor: pointer; transition: background 0.2s ease, opacity 0.2s ease; display: flex; justify-content: center; align-items: center; }
+    .book-submit-btn:hover { background: var(--raw-color-velvet-500); }
+    
+    @media (max-width: 768px) {
+      .book-card { padding: 1.5rem; gap: 1.5rem; }
+      .book-fields-row { flex-direction: column; gap: 1.25rem; }
+    }
+
+    /* Block 3 Philosophy */
+    #block3 { position: relative; width: 100vw; height: 100vh; overflow: hidden; color: var(--foreground-accent); }
+    #b3-pin-container { position: sticky; top: 0; width: 100%; height: 100vh; overflow: hidden; }
+    #b3-bg-img { position: absolute; inset: -50% 0; width: 100%; height: 200%; object-fit: cover; z-index: 1; will-change: transform; }
+    #b3-scrim { position: absolute; inset: 0; background: var(--scrim-scene); z-index: 2; }
+    #b3-content { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    
+    #b3-headline { text-align: center; max-width: 60rem; z-index: 10; }
+    .b3-word { display: inline-block; opacity: 0; transform: translateY(0.28em); will-change: opacity, transform; }
+    
+    #b3-left-para { position: absolute; left: 1.5rem; top: calc(50% - 2rem); max-width: 15rem; color: var(--foreground-accent-soft); opacity: 0; }
+    #b3-right-para { position: absolute; right: 1.5rem; top: calc(50% - 2rem); max-width: 15rem; text-align: right; color: var(--foreground-accent-soft); opacity: 0; }
+    #b3-collage { position: absolute; left: calc(50% + 20rem); top: calc(50% - 15rem); width: 22rem; transform: rotate(7deg); opacity: 0; pointer-events: none; }
+    #b3-signoff { position: absolute; bottom: 3rem; text-align: center; font-family: var(--typeface-display); font-style: italic; font-size: 2rem; opacity: 0; }
+
+    @media (max-width: 1024px) {
+      #b3-left-para, #b3-right-para { position: relative; left: auto; right: auto; top: auto; text-align: center; margin: 1.5rem 0; }
+      #b3-collage { display: none; }
+      #b3-signoff { position: relative; bottom: auto; margin-top: 2rem; }
+    }
+
+    /* Block 4 How We Travel */
+    #block4 { background: var(--surface-cinema); color: var(--foreground-accent); width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
+    #b4-header { padding: 4rem 1.5rem; text-align: center; }
+    #b4-panels { display: flex; width: 100vw; height: 75vh; }
+    .b4-panel { flex: 1; position: relative; overflow: hidden; cursor: pointer; border-left: 1px solid var(--scrim-scene); transition: flex 0.6s cubic-bezier(0.2, 0, 0, 1); }
+    .b4-panel-img-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .b4-panel-img { position: absolute; height: 100%; width: calc(100% + 101px); left: -50.5px; object-fit: cover; }
+    .b4-panel-scrim { position: absolute; inset: 0; background: linear-gradient(to top, var(--scrim-panel), transparent); pointer-events: none; opacity: 1; transition: opacity 0.6s; }
+    .b4-panel-content { position: absolute; bottom: 2rem; left: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; opacity: 0; transform: translateY(1rem); transition: all 0.6s; color: var(--foreground-accent-strong); }
+    .b4-panel.active { flex: 2.5; }
+    .b4-panel.active .b4-panel-content { opacity: 1; transform: translateY(0); }
+    .b4-panel:not(.active) .b4-panel-scrim { opacity: 0.7; }
+    .b4-panel:not(.active) { filter: brightness(0.6); }
+    
+    @media (max-width: 1024px) {
+      #block4 { background: #0c0c0c; margin-top: -100dvh; position: relative; z-index: 10; }
+      #b4-header { padding-top: 104px; padding-bottom: 48px; }
+      #b4-panels { flex-direction: column; height: auto; }
+      .b4-panel { flex: none !important; height: 62dvh; min-height: 26rem; filter: none !important; margin-bottom: 1px; }
+      .b4-panel-img { top: -10%; height: 120%; width: 100%; left: 0; transform: translateY(0); will-change: transform; }
+      .b4-panel-content { inset: 0; bottom: auto; left: 1.5rem; right: 1.5rem; height: 100%; align-items: center; justify-content: center; text-align: center; gap: 2rem; opacity: 1; transform: none; z-index: 2; }
+    }
+    @media (max-width: 640px) {
+      #b4-header { padding-top: 88px; }
+      .b4-panel { height: 56dvh; min-height: 22rem; }
+      .b4-panel-content { gap: 1.5rem; }
+    }
+
+    /* Franchise Section */
+    #franchise-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; }
+    #franchise-overlay { position: absolute; inset: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 0; pointer-events: none; }
+    #franchise { background: var(--background); color: var(--foreground); padding: 8rem 1.5rem; text-align: center;  position: relative; overflow: hidden; }
+    .franchise-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: center;  position: relative; z-index: 1; }
+    .franchise-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--raw-color-velvet-500); margin-bottom: 1rem; font-family: var(--typeface-ui); font-weight: 600; }
+    .franchise-header { margin-bottom: 1.5rem; }
+    .franchise-subtitle { margin-bottom: 4rem; max-width: 600px; line-height: 1.5; }
+    .franchise-stats { display: flex; align-items: center; justify-content: center; gap: 2rem; margin-bottom: 1rem; width: 100%; }
+    .stat-box { display: flex; flex-direction: column; align-items: center; }
+    .stat-val { font-size: 2.5rem; font-family: var(--typeface-display); line-height: 1.1; }
+    .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--foreground-accent-muted); margin-top: 0.5rem; }
+    .stat-arrow { font-size: 2rem; font-weight: 300; }
+    .stat-yield { font-size: 1.25rem; font-family: var(--typeface-ui); font-weight: 500; margin-bottom: 0.5rem; }
+    .stat-disclaimer { font-size: 0.8rem; font-style: italic; color: var(--foreground-accent-muted); margin-bottom: 4rem; font-family: var(--typeface-display); letter-spacing: 0.05em;}
+    .franchise-points { display: flex; justify-content: center; gap: 2rem; margin-bottom: 4rem; flex-wrap: wrap; }
+    .point-item { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid var(--foreground-accent-muted); padding: 0.5rem 1rem; border-radius: 2rem; }
+    
+    @media (max-width: 768px) {
+      .franchise-stats { flex-direction: column; gap: 1rem; }
+      .stat-arrow { transform: rotate(90deg); margin: 0.5rem 0; }
+      .franchise-points { flex-direction: column; gap: 1rem; align-items: center; }
+    }
+
+    /* Journal Section */
+    #journal { background: var(--background); color: var(--foreground); padding: 8rem 1.5rem; }
+    .journal-container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 4rem; }
+    .journal-header { text-align: center; }
+    .journal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
+    .journal-card { display: flex; flex-direction: column; gap: 1rem; text-decoration: none; color: inherit; group; cursor: pointer; }
+    .journal-img-wrap { width: 100%; aspect-ratio: 4/3; overflow: hidden; border-radius: 8px; }
+    .journal-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .journal-card:hover .journal-img { transform: scale(1.05); }
+    .journal-date { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--foreground-accent-muted); font-family: var(--typeface-ui); }
+    .journal-title { font-size: 1.5rem; font-family: var(--typeface-display); margin: 0; font-weight: normal; color: var(--foreground); }
+    .journal-excerpt { font-size: 1rem; color: var(--foreground-accent); line-height: 1.5; font-family: var(--typeface-ui); margin: 0; }
+    
+    @media (max-width: 768px) {
+      .journal-grid { grid-template-columns: 1fr; gap: 3rem; }
+    }
+
+    /* Contact Section */
+    #contact { background: var(--background); color: var(--foreground); padding: 8rem 1.5rem; }
+    .contact-container { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4rem; }
+    .contact-header { text-align: center; }
+    .contact-direct { text-align: center; font-family: var(--typeface-ui); color: var(--foreground-accent); }
+    .contact-direct p { margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--foreground-accent-muted); }
+    .contact-links { display: flex; justify-content: center; gap: 2.5rem; }
+    .contact-links a { color: var(--foreground); text-decoration: none; font-size: 1.1rem; border-bottom: 1px solid var(--foreground-accent-muted); padding-bottom: 0.25rem; transition: border-color 0.2s ease; }
+    .contact-links a:hover { border-color: var(--foreground); }
+    
+    @media (max-width: 768px) {
+      .contact-links { flex-direction: column; gap: 1.5rem; align-items: center; }
+    }
+
+    /* Footer */
+    #footer { background: var(--background); padding: 4rem 1.5rem 2rem; position: relative; z-index: 20; }
+    
+    
+    @media (max-width: 1024px) {
+      /* Fix mobile text overflow for the top-right fixed rail */
+      #titles {
+        padding-right: 1.5rem !important;
+        box-sizing: border-box !important;
+      }
+    }
+    #vignette { position: fixed; inset: 0; pointer-events: none; z-index: 50; background: radial-gradient(ellipse at center, transparent 40%, rgba(10,5,5,0.85) 100%); }
+  
+    /* Chatbot CSS */
+    #chatbot-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 285;
+      display: none;
+      background: rgba(0,0,0,0.4);
+    }
+    #chat-trigger-btn {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--raw-color-velvet-700);
+      color: var(--foreground);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 290;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    #chat-trigger-btn:hover {
+      background: var(--raw-color-velvet-500);
+      transform: scale(1.05);
+    }
+    #chat-trigger-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+    #chatbot-close-btn {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--foreground);
+      cursor: pointer;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #chatbot-close-btn:hover {
+      color: #fff;
+    }
+
+    #chatbot-container {
+      position: fixed;
+      bottom: 80px;
+      left: 1.5rem;
+      width: 350px;
+      max-width: calc(100vw - 3rem);
+      height: 500px;
+      max-height: calc(100vh - 100px);
+      background: var(--surface-glass);
+      border-radius: 12px;
+      border: 1px solid var(--foreground-accent-muted);
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: 295;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    #chatbot-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--foreground-accent-muted); background: var(--raw-color-velvet-900); font-family: var(--typeface-ui); font-weight: 500; font-size: 1rem; color: var(--foreground); display: flex; align-items: center; gap: 0.5rem; }
+    #chatbot-header svg { width: 20px; height: 20px; color: var(--foreground-accent); }
+    #chatbot-messages { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; font-family: var(--typeface-ui); font-size: 0.9rem; }
+    .chat-msg { padding: 1rem; border-radius: 8px; max-width: 80%; line-height: 1.5; white-space: pre-wrap; }
+    .chat-msg.user { align-self: flex-end; background: var(--raw-color-velvet-700); color: var(--foreground); border-bottom-right-radius: 2px; }
+    .chat-msg.model { align-self: flex-start; background: rgba(0,0,0,0.4); color: var(--foreground-accent); border: 1px solid var(--foreground-accent-muted); border-bottom-left-radius: 2px; }
+    #chatbot-input-area { display: flex; padding: 1rem; border-top: 1px solid var(--foreground-accent-muted); background: var(--raw-color-velvet-900); }
+    #chatbot-input { flex: 1; background: transparent; border: none; color: var(--foreground); font-family: var(--typeface-ui); font-size: 0.9rem; padding: 0.5rem; outline: none; }
+    #chatbot-input::placeholder { color: var(--foreground-accent-muted); }
+    #chatbot-submit { background: var(--raw-color-velvet-700); color: var(--foreground); border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; transition: background 0.2s ease; }
+    #chatbot-submit:hover { background: var(--raw-color-velvet-500); }
+    #chatbot-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .typing-indicator { display: flex; gap: 4px; padding: 1rem; align-items: center; }
+    .typing-indicator span { width: 6px; height: 6px; background: var(--foreground-accent); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+  
+
+/* ══ Tokens ══════════════════════════════════════════════════════════
+ * Footer-scoped. Every number is a pixel measurement at the 1920 design
+ * width. The RESPONSIVE block is the only other place these are written,
+ * and it only ever restates them. */
+.ft {
+  --ft-pad-x: 30px;
+  --ft-pad-top: 80px;
+  --ft-pad-bottom: 60px;
+  --gap: 20px;
+  --radius: 12px;
+  --card-pad: 24px;
+
+  --r1: 200px;
+  --r2: 80px;
+  --r3: 200px;
+
+  --fs-mark: 28px;
+  --fs-tag: 14px;
+  --fs-body: 16px;
+  --fs-stat: 56px;
+  --fs-cap: 16px;
+  --fs-legal: 12px;
+
+  --row-gap: 28px;
+  --chip: 48px;
+  --chip-gap: 14px;
+  --chip-radius: 12px;
+  --stat-gap: 12px;
+  --dot: 6px;
+  --dot-gap: 12px;
+  --tag-gap: 12px;
+
+  --on-dark: var(--foreground-accent);
+  --on-dark-dim: var(--foreground-accent-muted);
+  --hairline: rgba(242, 228, 225, 0.1);
+
+  --grad: linear-gradient(
+    160deg,
+    #0A0505 0%,
+    #12070A 17%,
+    #2A0D14 34%,
+    #45121C 50%,
+    #5C1220 66%,
+    #7E1620 83%,
+    #A31621 100%
+  );
+
+  position: relative;
+  padding: var(--ft-pad-top) var(--ft-pad-x) var(--ft-pad-bottom);
+  background: transparent;
+  color: var(--on-dark);
+}
+
+/* ── The card block ───────────────────────────────────────────────────
+ * 1860 × 520 at the design size. Three equal columns; three row tracks
+ * so the middle and right columns can split at different heights inside
+ * one grid. Unlike the reference, nothing stretches — a footer has no
+ * leftover viewport height to distribute. */
+.ft-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: var(--r1) var(--r2) var(--r3);
+  gap: var(--gap);
+}
+
+.ft-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--card-pad);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* The asset window is the card's own backdrop, so everything else in it
+ * has to be lifted over the top. */
+.ft-card > *:not(.ft-asset) {
+  position: relative;
+  z-index: 1;
+}
+
+.ft-card--light {
+  background: var(--surface-gallery);
+  color: var(--foreground-accent);
+  border: 1px solid var(--hairline);
+}
+
+/* ── One video, three cells ───────────────────────────────────────────
+ * Identical paint, identical size, only the origin differs. `--win-w` /
+ * `--win-h` are the union box measured from inside the card. `--bg-x` /
+ * `--bg-y` exploit the fact that a background-position percentage
+ * resolves against (box − image), so 0% / 50% / 100% land the three
+ * columns exactly. */
+.ft-card--union {
+  color: var(--on-dark);
+  background-image: var(--grad);
+  background-repeat: no-repeat;
+  background-size: var(--win-w) var(--win-h);
+  background-position: var(--bg-x) var(--bg-y);
+  --win-w: calc(300% + var(--gap) * 2);
+}
+
+/* ── The asset window ─────────────────────────────────────────────────
+ * A copy of the same video laid into the same union box as the gradient
+ * — same size, same origin — so the three cells show one continuous
+ * background rather than three crops of it. The gradient stays
+ * underneath as the ground the design ships with. */
+.ft-asset {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ft-asset > video {
+  position: absolute;
+  left: var(--win-x);
+  top: var(--win-y);
+  width: var(--win-w);
+  height: var(--win-h);
+  max-width: none;
+  object-fit: cover;
+  opacity: 0.55;
+}
+
+/* ── Placement ────────────────────────────────────────────────────────
+ * BRAND is the whole union; STAT sits one light card down the middle
+ * column; FOLLOW sits at the top of the right one. */
+.ft-brand {
+  grid-column: 1; grid-row: 1 / 4;
+  --win-h: 100%;
+  --bg-x: 0%; --bg-y: 0%;
+  --win-x: 0px; --win-y: 0px;
+}
+
+.ft-news { grid-column: 2; grid-row: 1 / 2; }
+
+.ft-stat {
+  grid-column: 2; grid-row: 2 / 4;
+  --win-h: calc(100% + var(--r1) + var(--gap));
+  --bg-x: 50%; --bg-y: 100%;
+  --win-x: calc(-100% - var(--gap));
+  --win-y: calc(-1 * (var(--r1) + var(--gap)));
+}
+
+.ft-follow {
+  grid-column: 3; grid-row: 1 / 3;
+  --win-h: calc(100% + var(--r3) + var(--gap));
+  --bg-x: 100%; --bg-y: 0%;
+  --win-x: calc(-200% - var(--gap) * 2);
+  --win-y: 0px;
+}
+
+.ft-contact { grid-column: 3; grid-row: 3 / 4; }
+
+/* ── Card label ───────────────────────────────────────────────────── */
+.ft-tag {
+  font-size: var(--fs-tag);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--on-dark-dim);
+}
+
+.ft-card--light .ft-tag { color: var(--foreground-accent-muted); }
+
+/* ── BRAND ────────────────────────────────────────────────────────────
+ * Wordmark pinned top, the three nav rows pinned bottom. */
+.ft-mark {
+  font-family: "Michroma", var(--typeface-ui), sans-serif;
+  font-size: var(--fs-mark);
+  line-height: 1.3;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--on-dark);
+}
+
+.ft-nav {
+  font-size: var(--fs-body);
+  line-height: 1.2;
+}
+
+.ft-nav-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--gap);
+  color: var(--on-dark-dim);
+  text-decoration: none;
+}
+
+.ft-nav-row + .ft-nav-row { margin-top: var(--row-gap); }
+
+/* A 1px rule at exactly half the row gap. */
+.ft-nav-row + .ft-nav-row::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(var(--row-gap) / -2);
+  height: 1px;
+  background: var(--hairline);
+}
+
+.ft-nav-row em {
+  font-style: normal;
+  color: var(--on-dark);
+  white-space: nowrap;
+}
+
+.ft-nav-row:hover em { text-decoration: underline; }
+
+/* ── NEWSLETTER ───────────────────────────────────────────────────── */
+.ft-news-body {
+  font-size: var(--fs-body);
+  line-height: 1.2;
+  color: var(--foreground-accent-strong);
+}
+
+.ft-news-form {
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-end;
+}
+
+#newsletter-input {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 10px 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  color: var(--foreground-accent);
+  font: inherit;
+  outline: none;
+}
+
+#newsletter-btn {
+  flex: none;
+  min-height: 44px;
+  padding: 10px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--raw-color-velvet-700);
+  color: var(--foreground-accent);
+  font: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+/* ── STAT ─────────────────────────────────────────────────────────── */
+.ft-stat {
+  justify-content: center;
+  align-items: center;
+}
+
+.ft-stat-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stat-gap);
+  align-items: center;
+}
+
+.ft-stat-num {
+  font-size: var(--fs-stat);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ft-stat-cap {
+  font-size: var(--fs-cap);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--on-dark-dim);
+}
+
+/* ── FOLLOW ───────────────────────────────────────────────────────── */
+.ft-chips {
+  display: flex;
+  align-self: flex-start;
+  gap: var(--chip-gap);
+}
+
+.ft-chips a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--chip);
+  height: var(--chip);
+  border: 1px solid var(--hairline);
+  border-radius: var(--chip-radius);
+  color: var(--on-dark);
+  text-decoration: none;
+}
+
+.ft-chips a:hover { border-color: var(--on-dark); }
+
+.ft-chips img,
+.ft-chips svg {
+  height: 20px;
+  width: 20px;
+}
+
+/* ── CONTACT ──────────────────────────────────────────────────────── */
+.ft-contact { justify-content: space-between; }
+
+.ft-contact-row {
+  display: flex;
+  align-items: center;
+  gap: var(--dot-gap);
+  font-size: var(--fs-body);
+  line-height: 1.2;
+  flex-wrap: wrap;
+}
+
+.ft-contact-row b {
+  flex: none;
+  width: var(--dot);
+  height: var(--dot);
+  border: 1px solid var(--foreground-accent-muted);
+  border-radius: 50%;
+}
+
+/* ── Legal strip ──────────────────────────────────────────────────── */
+.ft-legal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hairline);
+  font-size: var(--fs-legal);
+  color: var(--on-dark-dim);
+}
+
+.ft-legal-links {
+  display: flex;
+  gap: 20px;
+}
+
+.ft-legal-links a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ft-legal-links a:hover { color: var(--on-dark); }
+
+/* ══ RESPONSIVE ══════════════════════════════════════════════════════
+ * Three steps. The first keeps the 3-column composition and only
+ * rescales it; the second folds to two columns; the third stacks. Every
+ * step restates the union box so the video stays continuous — where the
+ * geometry stops being a clean 3 × N grid the offsets go to plain
+ * pixels. */
+
+@media (max-width: 1279px) {
+  .ft {
+    --gap: 18px;
+    --card-pad: 20px;
+    --r1: 180px;
+    --r2: 72px;
+    --r3: 180px;
+    --fs-mark: 22px;
+    --fs-body: 15px;
+    --fs-stat: 46px;
+    --fs-cap: 15px;
+    --row-gap: 24px;
+    --chip: 44px;
+    --chip-gap: 12px;
+  }
+}
+
+/* ── Two columns ──────────────────────────────────────────────────────
+ * Left: BRAND over FOLLOW. Right: NEWSLETTER over STAT over CONTACT.
+ * Rows 200 / 260 / 180 with an 18px gutter → the union box is
+ * (200% + gap) × 676. The row gutters become `fr` tracks so every ratio
+ * inside the union stays constant and the offsets can be written as
+ * percentages of the cell. */
+@media (max-width: 1023px) {
+  .ft {
+    --gap: 18px;
+    --card-pad: 20px;
+    --ft-pad-top: 64px;
+    --fs-mark: 20px;
+    --fs-body: 15px;
+    --fs-stat: 44px;
+  }
+
+  .ft-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 200fr 18fr 260fr 18fr 180fr;
+    min-height: 676px;
+    column-gap: var(--gap);
+    row-gap: 0;
+  }
+
+  .ft-card--union { --win-w: calc(200% + var(--gap)); }
+
+  .ft-brand {
+    grid-column: 1; grid-row: 1 / 4;
+    --win-h: 143.2203%;                 /* 676 / 472 */
+    --bg-x: 0%; --bg-y: 0%;
+    --win-x: 0px; --win-y: 0%;
+  }
+  .ft-news { grid-column: 2; grid-row: 1 / 2; }
+  .ft-stat {
+    grid-column: 2; grid-row: 3 / 4;
+    --win-h: 260%;                      /* 676 / 260 */
+    --bg-x: 100%; --bg-y: 52.4038%;     /* 218 / (676 − 260) */
+    --win-x: calc(-100% - var(--gap));
+    --win-y: -83.8462%;                 /* −218 / 260 */
+  }
+  .ft-follow {
+    grid-column: 1; grid-row: 5 / 6;
+    --win-h: 375.5556%;                 /* 676 / 180 */
+    --bg-x: 0%; --bg-y: 100%;
+    --win-x: 0px;
+    --win-y: -275.5556%;                /* −496 / 180 */
+  }
+  .ft-contact { grid-column: 2; grid-row: 5 / 6; }
+}
+
+/* ── One column ───────────────────────────────────────────────────────
+ * 280 / 200 / 180 / 160 / 160 with a 16px gutter — the union box is the
+ * full stack, 936 tall, and each dark card offsets into it. */
+@media (max-width: 767px) {
+  .ft {
+    --gap: 16px;
+    --card-pad: 20px;
+    --ft-pad-x: 20px;
+    --ft-pad-top: 56px;
+    --ft-pad-bottom: 40px;
+    --fs-mark: 18px;
+    --fs-tag: 13px;
+    --fs-body: 15px;
+    --fs-stat: 40px;
+    --fs-cap: 15px;
+    --row-gap: 22px;
+    --chip: 44px;
+    --chip-gap: 12px;
+  }
+
+  .ft-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 280px 200px 180px 160px 160px;
+    min-height: 0;
+    gap: var(--gap);
+  }
+
+  .ft-card--union {
+    --win-w: 100%;
+    --win-h: 936px;      /* 280 + 16 + 200 + 16 + 180 + 16 + 160 + 16 + 160 */
+    --bg-x: 0%;
+    --win-x: 0px;
+  }
+
+  .ft-brand   { grid-column: 1; grid-row: 1 / 2; --bg-y: 0px;    --win-y: 0px; }
+  .ft-news    { grid-column: 1; grid-row: 2 / 3; }
+  .ft-stat    { grid-column: 1; grid-row: 3 / 4; --bg-y: -496px; --win-y: -496px; }
+  .ft-follow  { grid-column: 1; grid-row: 4 / 5; --bg-y: -692px; --win-y: -692px; }
+  .ft-contact { grid-column: 1; grid-row: 5 / 6; }
+
+  .ft-news-form { flex-direction: column; align-items: stretch; }
+  #newsletter-btn { width: 100%; }
+
+  .ft-legal {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 479px) {
+  .ft {
+    --card-pad: 16px;
+    --fs-mark: 16px;
+    --fs-body: 14px;
+    --fs-stat: 34px;
+    --fs-cap: 14px;
+    --chip: 40px;
+    --chip-gap: 10px;
+    --dot-gap: 8px;
+  }
+}
+
+
+    #site-logo {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 300;
+      display: block;
+    }
+    #site-logo img {
+      width: auto;
+      max-height: 40px;
+      display: block;
+    }
+    @media (max-width: 640px) {
+      #site-logo {
+        top: 1rem;
+        left: 1rem;
+      }
+      #site-logo img {
+        max-height: 32px;
+      }
+    }
+
+  
+    .whatsapp-btn {
+      background: #25D366 !important;
+      color: #000 !important;
+      box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);
+      font-weight: 600;
+    }
+    .whatsapp-btn:hover {
+      background: #20BA56 !important;
+    }
+    .book-benefits {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 1.5rem;
+      gap: 1rem;
+    }
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--typeface-ui);
+      font-size: 0.85rem;
+      color: var(--foreground-accent);
+    }
+    @media (max-width: 768px) {
+      .book-benefits {
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .benefit-item {
+        width: calc(50% - 0.5rem);
+      }
+    }
+
+  </style>
+</head>
+<body>
+    <a href="index.html" id="site-logo" aria-label="Go to homepage">
+      <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Logo" />
+    </a>
+
+<div id="vignette"></div>
+
+<section id="hero">
+  <video id="vid-base" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/hero.mp4" muted playsinline autoplay loop></video>
+  <div id="hero-grain"></div>
+  <div id="hero-veil"></div>
+
+  <div id="hero-ui-container">
+    <header id="site-header" class="chrome caption hero-group" data-group="nav">
+      <div class="wordmark" id="wordmark-top">Red Flag Homes Network</div>
+    </header>
+    
+    <div id="right-rail" class="chrome hero-group" data-group="nav">
+      <button class="rail-btn" id="mobile-menu-btn">Menu</button>
+      <a href="franchise.html" class="rail-btn" style="border-top: 1px solid rgba(0,0,0,0.1);">Partner</a>
+      <a href="#journal" class="rail-btn" style="border-top: 1px solid rgba(0,0,0,0.1);">Explore</a>
+    </div>
+
+    <div id="mobile-menu">
+      <button id="mobile-menu-close" aria-label="Close menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <a href="#book">Book Now</a>
+      <a href="franchise.html">Partner With Us</a>
+      <a href="#journal">Explore</a>
+      <a href="#contact">Contact</a>
+    </div>
+
+    <div class="chrome caption uppercase hero-group" id="explore-btn" data-group="explore">explore Destinations</div>
+
+    <div id="titles" class="hero-group" data-group="titles">
+      <div id="hero-headline" class="display text-trim">
+        <div><span class="italic">S</span>tay <span class="italic">S</span>omewhere</div>
+        <div><span class="italic">W</span>orth <span class="italic">R</span>emembering</div>
+      </div>
+      <div id="hero-subtitle">A Curated Collection of Extraordinary Homes</div>
+      <div id="hero-actions">
+        <a href="#book" class="btn-pill btn-fill">Book a Stay</a>
+      </div>
+    </div>
+    
+    
+    <div class="book-benefits">
+      <div class="benefit-item">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Zero platform fees
+      </div>
+      <div class="benefit-item">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Best price guaranteed
+      </div>
+      <div class="benefit-item">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Instant WhatsApp response
+      </div>
+      <div class="benefit-item">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Personalised service
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="book">
+  <video id="book-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/pool.mp4" autoplay muted loop playsinline></video>
+  <div id="book-overlay"></div>
+  <div id="book-container">
+    <div class="book-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--raw-color-velvet-500); margin-bottom: 1rem; font-family: var(--typeface-ui); font-weight: 600;">RED FLAG HOMES</div>
+    <div class="display text-trim" style="text-align: center; margin-bottom: 1rem; font-size: 3rem;">Book Direct & Save Up to 10%</div>
+    <div class="caption" style="text-align: center; margin-bottom: 3rem; max-width: 600px;">Book directly with Red Flag Homes for the best prices, exclusive offers and personalised hospitality.</div>
+    
+    <form id="booking-form" class="book-card">
+      <div class="book-fields-row">
+        <div class="field-group">
+          <label for="book-location">Where to?</label>
+          <input type="text" id="book-location" class="book-input" placeholder="Type any city" />
+        </div>
+        <div class="field-group">
+          <label for="book-checkin">Check-in</label>
+          <input type="date" id="book-checkin" class="book-input" />
+        </div>
+        <div class="field-group">
+          <label for="book-checkout">Check-out</label>
+          <input type="date" id="book-checkout" class="book-input" />
+        </div>
+        <div class="field-group">
+          <label for="book-guests">Guests</label>
+          <select id="book-guests" class="book-input">
+            <option value="1">1 Guest</option>
+            <option value="2" selected>2 Guests</option>
+            <option value="3">3 Guests</option>
+            <option value="4">4 Guests</option>
+            <option value="5">5 Guests</option>
+            <option value="6">6 Guests</option>
+            <option value="7">7 Guests</option>
+            <option value="8">8 Guests</option>
+            <option value="9">9 Guests</option>
+            <option value="10">10 Guests</option>
+            <option value="11">11 Guests</option>
+            <option value="12">12 Guests</option>
+            <option value="13">13 Guests</option>
+            <option value="14">14 Guests</option>
+            <option value="15">15 Guests</option>
+            <option value="16">16 Guests</option>
+            <option value="17">17 Guests</option>
+            <option value="18">18 Guests</option>
+            <option value="19">19 Guests</option>
+            <option value="20">20 Guests</option>
+          </select>
+        </div>
+      </div>
+      <div id="booking-error" style="display: none; color: var(--foreground-accent); margin-top: -0.5rem; font-family: var(--typeface-ui); font-size: 0.9rem; width: 100%;">Please select both check-in and check-out dates.</div>
+      <button type="button" id="book-submit-btn" class="book-submit-btn whatsapp-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Check Availability
+        </button>
+    </form>
+  </div>
+</section>
+
+<section id="block3" style="height: 100vh;">
+  <div id="b3-pin-container">
+    <img id="b3-bg-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 3/pexels-arthousestudio-4344885.jpg" />
+    <div id="b3-scrim"></div>
+    <div id="b3-content">
+      <div id="b3-headline" class="display text-trim">
+        <div><span class="b3-word"><span class="italic">H</span>omes</span> <span class="b3-word"><span class="italic">W</span>ith</span> </div>
+        <div><span class="b3-word"><span class="italic">A</span></span> <span class="b3-word"><span class="italic">S</span>ignature</span> </div>
+      </div>
+      <div id="b3-left-para">Every home is handpicked and<br/>fully managed by our team.</div>
+      <div id="b3-right-para">Curated properties designed<br/>for the perfect managed stay.</div>
+      <img id="b3-collage" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 3/Collage.png" />
+      <div id="b3-signoff">Less ticking places off a list.<br/>More actually being there.</div>
+    </div>
+  </div>
+</section>
+
+<section id="block4">
+  <div id="b4-header">
+    <div class="display text-trim"><span class="italic">H</span>ow <span class="italic">W</span>e <span class="italic">H</span>ost</div>
+    <div class="caption" style="margin-top: 1rem;">Every home, the same standard.</div>
+  </div>
+  <div id="b4-panels">
+    <div class="b4-panel active">
+      <div class="b4-panel-img-wrap"><img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block4/OpenedImage1.png" class="b4-panel-img" alt="A luxurious living room" /></div>
+      <div class="b4-panel-scrim"></div>
+      <div class="b4-panel-content">
+        <div class="wordmark text-trim"><span class="italic">H</span>andpicked <span class="italic">H</span>omes</div>
+        <div style="max-width: 390px;">We select only the most exceptional properties, ensuring every stay meets our rigorous standards for design and comfort.</div>
+        <div style="font-family: var(--typeface-display); font-style: italic; font-size: 1.5rem;">Spaces with soul.</div>
+      </div>
+    </div>
+    <div class="b4-panel">
+      <div class="b4-panel-img-wrap"><img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block4/OpenedImage2.png" class="b4-panel-img" alt="A well-appointed bedroom" /></div>
+      <div class="b4-panel-scrim"></div>
+      <div class="b4-panel-content">
+        <div class="wordmark text-trim"><span class="italic">F</span>ully <span class="italic">M</span>anaged</div>
+        <div style="max-width: 420px;">We manage every aspect of the property for owners, from professional cleaning to maintenance, keeping homes pristine.</div>
+        <div style="font-family: var(--typeface-display); font-style: italic; font-size: 1.5rem;">We handle the details.</div>
+      </div>
+    </div>
+    <div class="b4-panel">
+      <div class="b4-panel-img-wrap"><img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block4/OpenedImage3.png" class="b4-panel-img" alt="A host welcoming a guest" /></div>
+      <div class="b4-panel-scrim"></div>
+      <div class="b4-panel-content">
+        <div class="wordmark text-trim"><span class="italic">G</span>uest-First <span class="italic">S</span>ervice</div>
+        <div style="max-width: 400px;">Our dedicated team provides 24/7 support for guests, ensuring a seamless experience from check-in to check-out.</div>
+        <div style="font-family: var(--typeface-display); font-style: italic; font-size: 1.5rem;">Always here for you.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="franchise">
+  <video id="franchise-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/host.mp4" autoplay muted loop playsinline></video>
+  <div id="franchise-overlay"></div>
+  <div class="franchise-container">
+    <div class="franchise-label">RED FLAG OUTPOST</div>
+    <div class="franchise-header display text-trim">
+      <span class="italic">N</span>o property? <span class="italic">N</span>o problem.
+    </div>
+    <div class="franchise-subtitle caption">You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.</div>
+
+    <div class="franchise-stats">
+      <div class="stat-box">
+        <div class="stat-val">₹75,000</div>
+        <div class="stat-label">monthly lease cost</div>
+      </div>
+      <div class="stat-arrow">→</div>
+      <div class="stat-box">
+        <div class="stat-val">₹1,48,500</div>
+        <div class="stat-label">gross monthly revenue</div>
+      </div>
+    </div>
+    <div class="stat-yield">≈ 2x yield spread</div>
+    <div class="stat-disclaimer">Illustrative, 3-key Villa at 55% occupancy.</div>
+
+    <div class="franchise-points">
+      <div class="point-item">Zero staff</div>
+      <div class="point-item">No experience needed</div>
+      <div class="point-item">AI-run operations</div>
+      <div class="point-item">Lifetime support</div>
+    </div>
+
+    <div class="franchise-action">
+      <a href="franchise.html" class="btn-pill btn-fill">View The Blueprint</a>
+    </div>
+  </div>
+</section>
+
+<section id="journal">
+  <div class="journal-container">
+    <div class="journal-header display text-trim">
+      <span class="italic">E</span>xplore
+    </div>
+    <div class="journal-grid">
+      <article class="journal-card">
+        <div class="journal-img-wrap">
+          <img class="journal-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block2/Iceland.png" alt="Journal 1" loading="lazy" />
+        </div>
+        <div class="journal-date">October 12, 2026</div>
+        <h2 class="journal-title">Designing the Perfect Alpine Retreat</h2>
+        <p class="journal-excerpt">Discover how we blend local materials with modern minimalism.</p>
+      </article>
+      <article class="journal-card">
+        <div class="journal-img-wrap">
+          <img class="journal-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block2/Norway.png" alt="Journal 2" loading="lazy" />
+        </div>
+        <div class="journal-date">September 28, 2026</div>
+        <h2 class="journal-title">The Future of AI-Managed Hospitality</h2>
+        <p class="journal-excerpt">How automation is redefining the guest experience from check-in to check-out.</p>
+      </article>
+      <article class="journal-card">
+        <div class="journal-img-wrap">
+          <img class="journal-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block2/Japan.png" alt="Journal 3" loading="lazy" />
+        </div>
+        <div class="journal-date">September 15, 2026</div>
+        <h2 class="journal-title">A Culinary Journey Through Kyoto</h2>
+        <p class="journal-excerpt">Exploring the hidden gems and local flavors around our latest signature property.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-container">
+    <div class="contact-header display text-trim">
+      <span class="italic">G</span>et in <span class="italic">T</span>ouch
+    </div>
+    
+    <form id="contact-form" class="book-card">
+      <div class="book-fields-row">
+        <div class="field-group">
+          <label for="contact-name">Name</label>
+          <input type="text" id="contact-name" class="book-input" placeholder="Your name" />
+        </div>
+        <div class="field-group">
+          <label for="contact-phone">Phone</label>
+          <input type="tel" id="contact-phone" class="book-input" placeholder="Your phone number" />
+        </div>
+      </div>
+      <div class="book-fields-row">
+        <div class="field-group">
+          <label for="contact-email">Email</label>
+          <input type="email" id="contact-email" class="book-input" placeholder="Your email" />
+        </div>
+        <div class="field-group">
+          <label for="contact-intent">I want to</label>
+          <select id="contact-intent" class="book-input">
+            <option value="book">Book a stay</option>
+            <option value="list">List my property</option>
+            <option value="franchise">Franchise enquiry</option>
+          </select>
+        </div>
+      </div>
+      <div class="book-fields-row" style="flex-direction: column;">
+        <div class="field-group">
+          <label for="contact-message">Message</label>
+          <textarea id="contact-message" class="book-input" style="min-height: 120px; padding-top: 1rem; resize: vertical;" placeholder="How can we help?"></textarea>
+        </div>
+      </div>
+      <button type="button" class="book-submit-btn">Send Message</button>
+    </form>
+
+    <div class="contact-direct">
+      <p>Or reach us directly</p>
+      <div class="contact-links">
+        <a href="https://wa.me/918881306632" target="_blank" rel="noopener noreferrer">WhatsApp Us</a>
+        <a href="mailto:hello@redflaghomes.com">hello@redflaghomes.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer id="footer" class="ft">
+  <!-- The shared video, one copy per dark cell, kept in step by the offsets -->
+
+  <div class="ft-grid">
+
+    <!-- BRAND — union cell, origin (0, 0) -->
+    <section class="ft-card ft-card--union ft-brand">
+      <span class="ft-asset" aria-hidden="true">
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4"
+               autoplay muted loop playsinline preload="metadata"></video>
+      </span>
+      <div class="ft-mark">RED FLAG HOMES NETWORK</div>
+      <nav class="ft-nav">
+        <a class="ft-nav-row" href="#book"><span>01</span><em>Book a Stay</em></a>
+        <a class="ft-nav-row" href="franchise.html"><span>02</span><em>Partner With Us</em></a>
+        <a class="ft-nav-row" href="#journal"><span>03</span><em>Explore</em></a>
+      </nav>
+    </section>
+
+    <!-- NEWSLETTER — opaque light cell -->
+    <section class="ft-card ft-card--light ft-news">
+      <div class="ft-tag"><span>NEWSLETTER</span></div>
+      <p class="ft-news-body">Stays, openings and the occasional good idea.</p>
+      <div class="ft-news-form">
+        <input type="email" id="newsletter-input" placeholder="Your e-mail" />
+        <button id="newsletter-btn">Subscribe</button>
+      </div>
+    </section>
+
+    <!-- STAT — union cell, origin (col + gap, r1 + gap) -->
+    <section class="ft-card ft-card--union ft-stat">
+      <span class="ft-asset" aria-hidden="true">
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4"
+               autoplay muted loop playsinline preload="metadata"></video>
+      </span>
+      <div class="ft-stat-box">
+        <span class="ft-stat-num">15+</span>
+        <span class="ft-stat-cap">homes managed</span>
+      </div>
+    </section>
+
+    <!-- FOLLOW — union cell, origin (2 col + 2 gap, 0) -->
+    <section class="ft-card ft-card--union ft-follow">
+      <span class="ft-asset" aria-hidden="true">
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4"
+               autoplay muted loop playsinline preload="metadata"></video>
+      </span>
+      <div class="ft-tag"><span>FOLLOW</span></div>
+      <div class="ft-chips">
+        <a href="https://wa.me/1234567890" aria-label="WhatsApp"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" /></a>
+        <a href="#" aria-label="Instagram"><img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 5/SocialMedia1.svg" alt="Instagram" /></a>
+        <a href="#" aria-label="Facebook"><img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 5/SocialMedia2.svg" alt="Facebook" /></a>
+        <a href="#" aria-label="YouTube"><img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 5/SocialMedia3.png" alt="YouTube" style="filter:invert(1)"/></a>
+      </div>
+    </section>
+
+    <!-- CONTACT — opaque light cell -->
+    <section class="ft-card ft-card--light ft-contact">
+      <div class="ft-tag"><span>CONTACT</span></div>
+      <div class="ft-contact-row">
+        <span>hello@redflaghomes.com</span>
+        <b aria-hidden="true"></b>
+        <span>+1 (800) 555-0199</span>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="ft-legal">
+    <span>&copy; 2026 Red Flag World Holdings Ltd. All rights reserved.</span>
+    <span class="ft-legal-links">
+      <a href="#privacy">Privacy</a>
+      <a href="#terms">Terms</a>
+      <a href="#cancellation">Cancellation</a>
+    </span>
+  </div>
+</footer>
+
+<script type="module">
+  import Lenis from 'lenis';
+  const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
+  const lenis = new Lenis({ lerp: 0.1 });
+  function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
+  
+  // Springs
+  class Spring {
+    constructor(tension, friction, val) {
+      this.t = tension; this.f = friction;
+      this.val = val; this.target = val; this.v = 0;
+    }
+    update(dt) {
+      let a = -this.t * (this.val - this.target) - this.f * this.v;
+      this.v += a * dt; this.val += this.v * dt;
+      return this.val;
+    }
+  }
+
+  // Initialize Hero immediately
+  const vidBase = document.getElementById('vid-base');
+  
+  vidBase.playbackRate = 2;
+
+  // Hero
+  const veil = document.getElementById('hero-veil');
+  const heroGroups = Array.from(document.querySelectorAll('.hero-group'));
+  
+  let heroStartedAt = 0;
+  let heroActive = false;
+  
+  function startHero() {
+    heroStartedAt = performance.now();
+    heroActive = true;
+    vidBase.play();
+    requestAnimationFrame(tickHero);
+  }
+
+  lenis.start();
+  startHero();
+
+  // Pointer
+  let mx = window.innerWidth / 2;
+  let my = window.innerHeight / 2;
+  window.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+  });
+  
+  const UI_ORDER = ["titles","wordmark","nav","explore"];
+  function smooth(t) { let x = Math.min(1, Math.max(0, t)); return x * x * (3 - 2 * x); }
+  
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenuClose = document.getElementById('mobile-menu-close');
+  const mobileMenu = document.getElementById('mobile-menu');
+  
+  if(mobileMenuBtn && mobileMenu && mobileMenuClose) {
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.add('active');
+      lenis.stop();
+    });
+    mobileMenuClose.addEventListener('click', () => {
+      mobileMenu.classList.remove('active');
+      lenis.start();
+    });
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        e.preventDefault();
+        if (mobileMenu && mobileMenu.classList.contains('active')) {
+          mobileMenu.classList.remove('active');
+          lenis.start();
+        }
+        lenis.scrollTo(targetElement);
+      }
+    });
+  });
+
+  let lastTime = performance.now();
+  
+  function tickHero(time) {
+    if (!heroActive) return;
+    let dt = (time - lastTime) / 1000;
+    if(dt > 0.1) dt = 0.016;
+    lastTime = time;
+
+    let t = time - heroStartedAt;
+    
+    // Veil
+    let veilP = t / 900;
+    veil.style.opacity = Math.min(1, veilP);
+
+    // Assembly
+    let duration = vidBase.duration || 4;
+    let timeToEnd = duration - vidBase.currentTime;
+    let assemblyStartMs = Math.max(0, (duration - 0.4) * 1000); // media seconds
+    if (t > 8000) assemblyStartMs = 0; // fallback
+    
+    let aP = Math.max(0, (time - (heroStartedAt + assemblyStartMs)) / 2400);
+    if(aP > 1) aP = 1;
+
+    heroGroups.forEach(el => {
+      let g = el.getAttribute('data-group');
+      let idx = UI_ORDER.indexOf(g);
+      if(idx < 0) return;
+      let uiStart = 0.3 + idx * 0.055;
+      let uiDur = 0.2;
+      let e = smooth((aP - uiStart) / uiDur);
+      
+      el.style.opacity = e;
+      el.style.transform = `translateY(${(1 - e) * 1.25}rem)`;
+    });
+
+    if (aP < 1 || timeToEnd > 0) requestAnimationFrame(tickHero);
+  }
+
+  // Block 3
+  const b3Pin = document.getElementById('b3-pin-container');
+  const b3Bg = document.getElementById('b3-bg-img');
+  const b3Words = Array.from(document.querySelectorAll('.b3-word'));
+  const b3Others = [
+    document.getElementById('b3-left-para'),
+    document.getElementById('b3-right-para'),
+    document.getElementById('b3-collage'),
+    document.getElementById('b3-signoff')
+  ];
+  
+  function tickB3() {
+    let rect = document.getElementById('block3').getBoundingClientRect();
+    let p = (window.innerHeight - rect.top) / window.innerHeight;
+    p = Math.max(0, Math.min(1, p));
+    
+    if(!isReduced) b3Bg.style.transform = `translateY(${p * -25}%)`;
+    
+    b3Words.forEach((w, i) => {
+      let start = i * 0.03;
+      let wp = (p - start) / 0.14;
+      wp = smooth(wp);
+      w.style.opacity = wp;
+      if(!isReduced) w.style.transform = `translateY(${(1 - wp) * 0.28}em)`;
+    });
+    
+    let op = (p - 0.14) / 0.86;
+    b3Others.forEach((el, i) => {
+      if(!el) return;
+      let ep = smooth((op - i * 0.05) / 0.28);
+      el.style.opacity = ep;
+      if(!isReduced) el.style.transform = el.id.includes('collage') ? `rotate(7deg) translateY(${(1 - ep) * 2}rem)` : `translateY(${(1 - ep) * 1.25}rem)`;
+    });
+  }
+
+  // Block 4
+  const panels = Array.from(document.querySelectorAll('.b4-panel'));
+  panels.forEach(p => {
+    p.addEventListener('mouseenter', () => {
+      panels.forEach(op => op.classList.remove('active'));
+      p.classList.add('active');
+    });
+  });
+
+  let lastT = performance.now();
+  function masterTick(t) {
+    let dt = (t - lastT) / 1000;
+    if(dt > 0.1) dt = 0.016;
+    lastT = t;
+    tickB3();
+    
+    requestAnimationFrame(masterTick);
+  }
+  requestAnimationFrame(masterTick);
+
+  // Booking Form Logic
+  const bookSubmitBtn = document.getElementById('book-submit-btn');
+  const bookLocation = document.getElementById('book-location');
+  const bookCheckin = document.getElementById('book-checkin');
+  const bookCheckout = document.getElementById('book-checkout');
+  const bookGuests = document.getElementById('book-guests');
+  const bookError = document.getElementById('booking-error');
+
+  if (bookSubmitBtn) {
+    // Set min dates
+    const today = new Date().toISOString().split('T')[0];
+    bookCheckin.min = today;
+    
+    bookCheckin.addEventListener('change', () => {
+      bookCheckout.min = bookCheckin.value;
+      if (bookCheckout.value && bookCheckout.value <= bookCheckin.value) {
+        bookCheckout.value = '';
+      }
+    });
+
+    bookSubmitBtn.addEventListener('click', () => {
+      const checkin = bookCheckin.value;
+      const checkout = bookCheckout.value;
+      
+      if (!checkin || !checkout) {
+        bookError.style.display = 'block';
+        return;
+      }
+      
+      bookError.style.display = 'none';
+      
+      let locLabel = bookLocation.value || 'Any location';
+      const guests = bookGuests.value;
+      
+      const msg = `Hi! I'd like to check availability for a stay.\n\nLocation: ${locLabel}\nCheck-in: ${checkin}\nCheck-out: ${checkout}\nGuests: ${guests}\n\nPlease let me know if you have options available.`;
+      
+      const whatsappUrl = `https://wa.me/918881306632?text=${encodeURIComponent(msg)}`;
+      window.open(whatsappUrl, '_blank');
+    });
+  }
+
+
+    // Chatbot Logic
+    const chatBtn = document.getElementById('chat-trigger-btn');
+    const chatOverlay = document.getElementById('chatbot-overlay');
+    const chatContainer = document.getElementById('chatbot-container');
+    const chatClose = document.getElementById('chatbot-close-btn');
+
+    function toggleChat() {
+      const isVisible = chatContainer.style.display === 'flex';
+      if (isVisible) {
+        chatContainer.style.display = 'none';
+        chatOverlay.style.display = 'none';
+      } else {
+        chatContainer.style.display = 'flex';
+        chatOverlay.style.display = 'block';
+        if (typeof chatInput !== 'undefined') chatInput.focus();
+      }
+    }
+
+    if (chatBtn) chatBtn.addEventListener('click', toggleChat);
+    if (chatClose) chatClose.addEventListener('click', toggleChat);
+    if (chatOverlay) chatOverlay.addEventListener('click', toggleChat);
+
+    const chatForm = document.getElementById('chatbot-input-area');
+    const chatInput = document.getElementById('chatbot-input');
+    const chatMessages = document.getElementById('chatbot-messages');
+    const chatSubmit = document.getElementById('chatbot-submit');
+    
+    let chatHistory = [];
+
+    function addMessage(role, text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `chat-msg ${role}`;
+      msgDiv.textContent = text;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addTypingIndicator() {
+      const ind = document.createElement('div');
+      ind.className = 'chat-msg model typing-indicator';
+      ind.id = 'typing-indicator';
+      ind.innerHTML = '<span></span><span></span><span></span>';
+      chatMessages.appendChild(ind);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+      const ind = document.getElementById('typing-indicator');
+      if (ind) ind.remove();
+    }
+
+    if(chatForm) {
+      chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = chatInput.value.trim();
+        if (!text) return;
+        
+        chatInput.value = '';
+        addMessage('user', text);
+        addTypingIndicator();
+        
+        chatSubmit.disabled = true;
+        
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              history: chatHistory,
+              message: text
+            })
+          });
+          
+          removeTypingIndicator();
+          
+          if (!res.ok) {
+            addMessage('model', 'Sorry, I encountered an error connecting to the server.');
+          } else {
+            const data = await res.json();
+            addMessage('model', data.text);
+            chatHistory.push({ role: 'user', parts: [{ text }] });
+            chatHistory.push({ role: 'model', parts: [{ text: data.text }] });
+          }
+        } catch (err) {
+          removeTypingIndicator();
+          addMessage('model', 'Sorry, an error occurred.');
+        }
+        
+        chatSubmit.disabled = false;
+        chatInput.focus();
+      });
+    }
+  </script>
+
+
+<div id="chatbot-overlay"></div>
+<button id="chat-trigger-btn" aria-label="Open chat">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 11.996c0 2.29.9 4.36 2.373 5.86l-1.07 3.32a.75.75 0 0 0 .937.937l3.32-1.07A8.956 8.956 0 0 0 12 20.25Z" /></svg>
+</button>
+<div id="chatbot-container">
+      <div id="chatbot-header">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 11.996c0 2.29.9 4.36 2.373 5.86l-1.07 3.32a.75.75 0 0 0 .937.937l3.32-1.07A8.956 8.956 0 0 0 12 20.25Z" /></svg>
+        Red Flag Assistant
+        <button id="chatbot-close-btn" aria-label="Close chat"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div id="chatbot-messages">
+        <div class="chat-msg model">Hello! I'm your Red Flag Homes concierge. Ask me anything about our destinations, properties, or franchising opportunities.</div>
+      </div>
+      <form id="chatbot-input-area">
+        <input type="text" id="chatbot-input" placeholder="Ask a question..." autocomplete="off" />
+        <button type="submit" id="chatbot-submit">Send</button>
+      </form>
+    </div>
+</body>
+</html>
