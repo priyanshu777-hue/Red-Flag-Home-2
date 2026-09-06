@@ -512,90 +512,342 @@
       max-width: 100vw;
       overflow-x: hidden;
     }
-    * {
-      max-width: 100vw;
+
+    /* Container for horizontal table scroll with subtle right-edge fade */
+    .math-table-outer,
+    .vs-table-outer {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      margin: 24px 0;
+      box-sizing: border-box;
+    }
+    .math-table-scroll,
+    .vs-table-scroll {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
     }
 
     @media (max-width: 768px) {
-      /* Reset massive heights and padding */
-      #block3, #block4, #book, #franchise, #journal, .journal-container {
-        height: auto !important;
-        min-height: auto !important;
-        margin-top: 0 !important;
-      }
-      #b3-pin-container { position: relative !important; height: auto !important; }
-      #journal, #franchise, #contact, #book, #block4 { padding: 4rem 1.5rem !important; }
-      .journal-container { gap: 2rem !important; }
-      
-      
-      #wordmark-top {
-        display: none !important;
-      }
-    
-      
-      #book-container .display.text-trim {
-        font-size: clamp(2rem, 8vw, 3rem) !important;
-      }
-    
-      
-      .journal-img-wrap {
-        aspect-ratio: 16/9 !important;
-      }
-    
-      
-      .prog-section {
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
+      /* Shared Gutters: exactly 20px left and right padding */
+      .section-container {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
         box-sizing: border-box !important;
-        overflow: hidden !important;
-      }
-      .prog-display {
-        font-size: clamp(1.5rem, 8vw, 6rem) !important;
-        word-break: break-word !important;
-      }
-      .vs-table-wrapper {
         width: 100% !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
+        max-width: 100% !important;
       }
-    
-      
-      #b4-panels, .b4-panel {
-        height: auto !important;
-        min-height: auto !important;
+      .prog-section {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        padding-top: 56px !important;
+        padding-bottom: 56px !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        width: 100% !important;
+        max-width: 100% !important;
       }
-      .b4-panel {
-        padding: 4rem 1.5rem !important;
+      .prog-section * {
+        box-sizing: border-box;
       }
-      .b4-panel-content {
-        position: relative !important;
-        inset: auto !important;
-        height: auto !important;
-        opacity: 1 !important;
-        transform: none !important;
+      .exec-grid,
+      .math-table-outer,
+      .vs-table-outer,
+      .form-wrap {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
       }
-    
-      /* Right Rail Shrink & Move */
-      #right-rail {
-        top: 4.5rem !important;
-        width: 2rem !important;
+
+      /* Consistent Alignment: Left-aligned on mobile */
+      .prog-section h2,
+      .prog-section h3,
+      .prog-section p,
+      .prog-section ul,
+      .prog-section li,
+      .prog-section .prog-h2,
+      .prog-section .prog-p,
+      .prog-section .exec-block,
+      .prog-section .exec-block h3,
+      .prog-section .exec-block p,
+      .prog-section .arrow-list,
+      .prog-section .arrow-list li,
+      .prog-section .caveats,
+      .prog-section .caveats li,
+      .prog-section form,
+      .prog-section .form-group,
+      .prog-section .form-group label {
+        text-align: left !important;
       }
-      
-      .rail-btn {
-        min-height: max-content !important;
-        margin-bottom: 2px !important;
-        border-bottom: 1px solid rgba(255,255,255,0.4) !important;
-        padding: 0.75rem 0 !important;
-        font-size: 0.55rem !important;
+
+      .stat-section {
+        text-align: left !important;
+        padding-top: 40px !important;
+        padding-bottom: 40px !important;
       }
-      #right-rail {
-        display: flex !important;
-        flex-direction: column !important;
+      .stat-row {
+        justify-content: flex-start !important;
+        gap: 16px !important;
+        margin-bottom: 12px !important;
       }
-    
+      .stat-number {
+        font-size: 24px !important;
+        line-height: 1.1 !important;
+      }
+      .stat-arrow {
+        font-size: 18px !important;
+      }
+      .stat-sub {
+        font-size: 18px !important;
+        text-align: left !important;
+        margin-bottom: 8px !important;
+      }
+      .stat-caption {
+        font-size: 12px !important;
+        text-align: left !important;
+        color: var(--bx-muted) !important;
+      }
+
+      /* Exception: Final CTA stays centred */
+      .cta-section,
+      .cta-section .cta-h1,
+      .cta-section .cta-p,
+      .cta-section a.interactive-btn {
+        text-align: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+      .cta-section {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        padding-top: 60px !important;
+        padding-bottom: 60px !important;
+      }
+
+      /* Type Sizing: Fixed mobile values (not clamp) */
+      /* Section headings to 22px */
+      .prog-h2,
+      .prog-display,
+      .exec-block h3,
+      h2.prog-h2 {
+        font-size: 22px !important;
+        line-height: 1.25 !important;
+        letter-spacing: 0.04em !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        margin-bottom: 1.25rem !important;
+      }
+
+      /* Sub-headings to 18px */
+      .prog-section h3:not(.exec-block h3),
+      .prog-subhead {
+        font-size: 18px !important;
+        line-height: 1.35 !important;
+        margin-bottom: 0.75rem !important;
+      }
+
+      /* Body text to 15px */
+      .prog-p,
+      .prog-section p,
+      .exec-block p,
+      .arrow-list li,
+      .caveats li,
+      .math-table th,
+      .math-table td,
+      .vs-table th,
+      .vs-table td,
+      .form-control,
+      .prog-section div[style*="font-size: 1.125rem"] {
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+      }
+
+      /* Small labels to 12px */
+      .form-group label,
+      .prog-p i,
+      .prog-p.italic[style*="font-size: 1rem"],
+      .small-label {
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+      }
+
+      /* Maths table scroll container with right edge fade */
+      .math-table-outer::after,
+      .vs-table-outer::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 32px !important;
+        pointer-events: none !important;
+        background: linear-gradient(to right, transparent, rgba(14, 7, 8, 0.95)) !important;
+        z-index: 2 !important;
+      }
+      .math-table {
+        min-width: 580px !important;
+        width: 100% !important;
+      }
+      .math-table th, .math-table td {
+        padding: 10px 8px !important;
+        font-size: 15px !important;
+      }
+      .vs-table {
+        min-width: 520px !important;
+        width: 100% !important;
+      }
+      .vs-table th, .vs-table td {
+        padding: 10px 8px !important;
+        font-size: 15px !important;
+      }
+
+      /* Form inputs */
+      .form-control {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
     }
     
-</style>
+
+  /* Meteor Effect */
+  :root {
+    --foreground-accent-muted: rgba(242, 228, 225, 0.4);
+  }
+  .meteor-shower {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .meteor-target {
+    position: relative;
+  }
+  .meteor-target > :not(.meteor-shower) {
+    position: relative;
+    z-index: 1;
+  }
+  .meteor {
+    position: absolute;
+    width: 1px;
+    height: 2px;
+    border-radius: 9999px;
+    background: var(--foreground-accent-muted);
+    box-shadow: 0 0 0 1px rgba(242,228,225,0.1);
+    opacity: 0;
+  }
+  .meteor::before {
+    content: "";
+    position: absolute;
+    width: 50px;
+    height: 1px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(90deg, var(--foreground-accent-muted), transparent);
+  }
+  @keyframes meteor {
+    from { transform: rotate(215deg) translateX(0); opacity: 1; }
+    to { transform: rotate(215deg) translateX(-500px); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .meteor-shower { display: none !important; }
+  }
+  
+  /* Interactive Buttons */
+  .interactive-btn {
+    position: relative !important;
+    overflow: hidden !important;
+    border: 1px solid var(--foreground-accent-muted, rgba(242, 228, 225, 0.4)) !important;
+    border-radius: 9999px !important;
+    background: transparent !important;
+    padding: 0.75rem 2rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: inherit;
+  }
+  .interactive-btn .btn-dot {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #A31621;
+    transform-origin: center;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+  }
+  .interactive-btn .btn-label-default,
+  .interactive-btn .btn-label-hover {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 12px;
+    display: flex;
+    align-items: center;
+  }
+  .interactive-btn .btn-label-default {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .interactive-btn .btn-label-hover {
+    position: absolute;
+    opacity: 0;
+    transform: translateX(6px);
+    color: #fff;
+    white-space: nowrap;
+  }
+  @media (hover: hover) {
+    .interactive-btn:hover .btn-dot {
+      transform: translateY(-50%) scale(56);
+    }
+    .interactive-btn:hover .btn-label-default {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+    .interactive-btn:hover .btn-label-hover {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .interactive-btn .btn-dot,
+    .interactive-btn .btn-label-default,
+    .interactive-btn .btn-label-hover {
+      transition: none !important;
+    }
+  }
+
+  
+  /* Newsletter Modal */
+  .nl-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transition: opacity 0.4s ease; }
+  .nl-modal.is-open { pointer-events: auto; opacity: 1; }
+  .nl-overlay { position: absolute; inset: 0; background: rgba(10, 5, 5, 0.8); backdrop-filter: blur(8px); }
+  .nl-content { position: relative; background: #1A0A0C; border: 1px solid var(--foreground-accent-muted, rgba(242,228,225,0.4)); border-radius: 16px; padding: 3rem 2.5rem; max-width: 440px; width: 90%; transform: translateY(20px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 24px 48px rgba(0,0,0,0.5); text-align: center; }
+  .nl-modal.is-open .nl-content { transform: translateY(0); }
+  .nl-close { position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: var(--foreground-accent-muted, rgba(242,228,225,0.4)); cursor: pointer; transition: color 0.2s ease; padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
+  .nl-close:hover { color: #f2f2f2; }
+  .nl-title { font-size: 2.5rem; color: #f2f2f2; margin-bottom: 0.5rem; line-height: 1.1; font-weight: 600; }
+  .nl-desc { font-size: 0.95rem; color: var(--foreground-accent-muted, rgba(242,228,225,0.4)); margin-bottom: 2rem; line-height: 1.5; }
+  .nl-form { display: flex; flex-direction: column; gap: 1rem; }
+  .nl-input { width: 100%; text-align: center; background: transparent; border: 1px solid var(--foreground-accent-muted, rgba(242,228,225,0.4)); color: #f2f2f2; padding: 1rem; border-radius: 6px; outline: none; transition: border-color 0.2s ease; box-sizing: border-box; }
+  .nl-input::placeholder { color: var(--foreground-accent-muted, rgba(242,228,225,0.4)); }
+  .nl-success { margin-top: 1rem; color: #f2f2f2; font-size: 0.95rem; display: none; }
+
+  </style>
 </head>
 <body>
   
@@ -660,7 +912,7 @@
         <div class="bx-cardbody">
           <em>Talk with Aria</em>
           <span class="bx-role">AI-Powered Partnership Representative, Red Flag Homes Network</span>
-          <a class="bx-book" href="#apply">Apply for Allocation</a>
+          <a class="bx-book interactive-btn" href="#apply"><span class="btn-dot"></span><span class="btn-label-default">Apply for Allocation</span><span class="btn-label-hover">Apply for Allocation →</span></a>
         </div>
       </aside>
     </div>
@@ -670,7 +922,7 @@
 <main class="prog-wrap">
   
   <!-- SECTION — THE STAT BAR -->
-  <section class="prog-section stat-section">
+  <section class="prog-section stat-section section-container">
     <div class="stat-row">
       <span class="stat-number" data-val="75000">₹75,000</span>
       <span class="stat-arrow">→</span>
@@ -689,13 +941,13 @@
   </section>
 
   <!-- SECTION — THE PITCH IN ONE LINE -->
-  <section class="prog-section">
+  <section class="meteor-target prog-section section-container">
     <h2 class="prog-h2">Most franchises hand you a business and leave you to run it. We hand you an asset and run it for you.</h2>
     <p class="prog-p">No staff to hire. No hospitality experience needed. No ops to learn.</p>
   </section>
 
   <!-- SECTION — THE EXECUTION MAP -->
-  <section class="prog-section">
+  <section class="meteor-target prog-section section-container">
     <p class="prog-p italic" style="margin-bottom: 2rem;">This is not a guessing game. It's a system. Here is exactly how your capital becomes a high-yield asset.</p>
     
     <div class="exec-grid">
@@ -744,7 +996,7 @@
   </section>
 
   <!-- SECTION — SETUP FLEX -->
-  <section class="prog-section">
+  <section class="meteor-target prog-section section-container">
     <h2 class="prog-h2 prog-display">SETUP FLEX</h2>
     <h3 style="font-size: 2rem; margin-bottom: 1rem; font-weight: 500;">You don't need it all on day one.</h3>
     <p class="prog-p" style="margin-bottom: 1.5rem;">Pay 50% of setup upfront. The balance comes out of your booking payouts across the first nine months.</p>
@@ -753,64 +1005,66 @@
   </section>
 
   <!-- SECTION — THE MATH -->
-  <section class="prog-section">
+  <section class="meteor-target prog-section section-container">
     <h2 class="prog-h2 prog-display">THE MATH</h2>
     <p class="prog-p italic" style="margin-bottom: 2rem;">A realistic projection. 3-key Villa, whole-property lets.</p>
     <p class="prog-p" style="color: #fff; margin-bottom: 0.5rem;"><strong>Capital deployed:</strong> deposit ₹4,50,000 + franchise ₹49,999 + setup ₹1,50,000 = <strong>₹6,49,999</strong></p>
     <p class="prog-p" style="font-size: 1rem;"><strong>Assumptions:</strong> ADR ₹9,000 · rent ₹75,000/mo · operating costs ₹30,000/mo</p>
     
-    <div class="math-table-wrap">
-      <div class="vs-table-wrapper"><table class="math-table">
-        <thead>
-          <tr>
-            <th>Occupancy</th>
-            <th>45%</th>
-            <th class="math-highlight-strong">55%</th>
-            <th>65%</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Monthly gross revenue</td>
-            <td>₹1,21,500</td>
-            <td class="math-highlight-strong">₹1,48,500</td>
-            <td>₹1,75,500</td>
-          </tr>
-          <tr class="blur-row">
-            <td><span>Less Red Flag 13.5%</span></td>
-            <td>
-              <span>₹16,403</span>
-              <a href="#apply" class="prog-btn blur-row-btn">Reveal</a>
-            </td>
-            <td class="math-highlight"><span>₹20,048</span></td>
-            <td><span>₹23,693</span></td>
-          </tr>
-          <tr>
-            <td>Less rent</td>
-            <td>₹75,000</td>
-            <td class="math-highlight">₹75,000</td>
-            <td>₹75,000</td>
-          </tr>
-          <tr>
-            <td>Less operating</td>
-            <td>₹30,000</td>
-            <td class="math-highlight">₹30,000</td>
-            <td>₹30,000</td>
-          </tr>
-          <tr class="total">
-            <td>Net monthly to you</td>
-            <td>₹97</td>
-            <td class="math-highlight-strong">₹23,452</td>
-            <td>₹46,807</td>
-          </tr>
-          <tr class="total">
-            <td>Return on capital</td>
-            <td>Breakeven</td>
-            <td class="math-highlight-strong">43%</td>
-            <td>86%</td>
-          </tr>
-        </tbody>
-      </table></div></div>
+    <div class="math-table-outer">
+      <div class="math-table-scroll">
+        <table class="math-table">
+          <thead>
+            <tr>
+              <th>Occupancy</th>
+              <th>45%</th>
+              <th class="math-highlight-strong">55%</th>
+              <th>65%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Monthly gross revenue</td>
+              <td>₹1,21,500</td>
+              <td class="math-highlight-strong">₹1,48,500</td>
+              <td>₹1,75,500</td>
+            </tr>
+            <tr class="blur-row">
+              <td><span>Less Red Flag 13.5%</span></td>
+              <td>
+                <span>₹16,403</span>
+                <a href="#apply" class="prog-btn blur-row-btn">Reveal</a>
+              </td>
+              <td class="math-highlight"><span>₹20,048</span></td>
+              <td><span>₹23,693</span></td>
+            </tr>
+            <tr>
+              <td>Less rent</td>
+              <td>₹75,000</td>
+              <td class="math-highlight">₹75,000</td>
+              <td>₹75,000</td>
+            </tr>
+            <tr>
+              <td>Less operating</td>
+              <td>₹30,000</td>
+              <td class="math-highlight">₹30,000</td>
+              <td>₹30,000</td>
+            </tr>
+            <tr class="total">
+              <td>Net monthly to you</td>
+              <td>₹97</td>
+              <td class="math-highlight-strong">₹23,452</td>
+              <td>₹46,807</td>
+            </tr>
+            <tr class="total">
+              <td>Return on capital</td>
+              <td>Breakeven</td>
+              <td class="math-highlight-strong">43%</td>
+              <td>86%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div style="font-size: 1.125rem; font-weight: 600; color: #fff; margin-bottom: 1rem;">Read this properly — we'd rather you understood it now than later:</div>
@@ -823,61 +1077,63 @@
   </section>
 
   <!-- SECTION — WHY NOT A TRADITIONAL BNB -->
-  <section class="prog-section">
+  <section class="meteor-target prog-section section-container">
     <h2 class="prog-h2 prog-display">WHY NOT A TRADITIONAL BNB</h2>
     
-    <div style="overflow-x: auto;">
-      <div class="vs-table-wrapper"><table class="vs-table" style="min-width: 600px;">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Example</th>
-            <th>RED FLAG OUTPOST</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Entry cost</td>
-            <td>₹2L – ₹50L</td>
-            <td>From ₹1,28,999</td>
-          </tr>
-          <tr>
-            <td>Staff to hire</td>
-            <td>10–15 people</td>
-            <td>Zero</td>
-          </tr>
-          <tr>
-            <td>Ops experience</td>
-            <td>Essential</td>
-            <td>None</td>
-          </tr>
-          <tr>
-            <td>Onboarding fee</td>
-            <td>Standard</td>
-            <td>Zero</td>
-          </tr>
-          <tr>
-            <td>Ongoing commission</td>
-            <td>17–20% typical</td>
-            <td>13.5–15%</td>
-          </tr>
-          <tr>
-            <td>Design</td>
-            <td>Template</td>
-            <td>Bespoke, brand-led</td>
-          </tr>
-          <tr>
-            <td>Marketing</td>
-            <td>Your problem</td>
-            <td>Creator-led, ours</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="vs-table-outer">
+      <div class="vs-table-scroll">
+        <table class="vs-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Example</th>
+              <th>RED FLAG OUTPOST</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Entry cost</td>
+              <td>₹2L – ₹50L</td>
+              <td>From ₹1,28,999</td>
+            </tr>
+            <tr>
+              <td>Staff to hire</td>
+              <td>10–15 people</td>
+              <td>Zero</td>
+            </tr>
+            <tr>
+              <td>Ops experience</td>
+              <td>Essential</td>
+              <td>None</td>
+            </tr>
+            <tr>
+              <td>Onboarding fee</td>
+              <td>Standard</td>
+              <td>Zero</td>
+            </tr>
+            <tr>
+              <td>Ongoing commission</td>
+              <td>17–20% typical</td>
+              <td>13.5–15%</td>
+            </tr>
+            <tr>
+              <td>Design</td>
+              <td>Template</td>
+              <td>Bespoke, brand-led</td>
+            </tr>
+            <tr>
+              <td>Marketing</td>
+              <td>Your problem</td>
+              <td>Creator-led, ours</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
 
   <!-- APPLICATION FORM -->
-  <section class="prog-section" id="apply">
+  <section class="prog-section section-container" id="apply">
     <h2 class="prog-h2 prog-display">Deploy Your Capital</h2>
     <p class="prog-p">Ready to build a hospitality portfolio? Request an allocation spot with our expansion team.</p>
     
@@ -917,22 +1173,44 @@
             <option value="Looking">Looking</option>
           </select>
         </div>
-        <button type="submit" class="prog-btn" style="width: 100%; border: none; margin-top: 20px;">Apply for Allocation</button>
+        <button type="submit" class="prog-btn interactive-btn" style="width: 100%; margin-top: 20px;"><span class="btn-dot"></span><span class="btn-label-default">Apply for Allocation</span><span class="btn-label-hover">Apply for Allocation →</span></button>
       </form>
     </div>
   </section>
 
   <!-- FINAL CTA -->
-  <section class="cta-section">
+  <section class="meteor-target cta-section section-container">
     <h1 class="cta-h1">Be part of the revolution.</h1>
     <p class="cta-p">Founding Partner allocation is limited.</p>
-    <a href="#apply" class="prog-btn">Apply for Allocation</a>
+    <a href="#apply" class="prog-btn interactive-btn"><span class="btn-dot"></span><span class="btn-label-default">Apply for Allocation</span><span class="btn-label-hover">Apply for Allocation →</span></a>
     
     <div class="footer-meta">
       <a href="mailto:partners@redflagworld.co.uk" style="text-decoration: underline; text-underline-offset: 4px;">partners@redflagworld.co.uk</a><br />
       <span style="display:inline-block; margin-top: 10px;">Red Flag Homes Network · a Red Flag World Holdings Ltd company</span>
     </div>
   </section>
+
+
+<!-- Newsletter Modal -->
+<div id="newsletter-modal" class="nl-modal" aria-hidden="true">
+  <div class="nl-overlay" id="nl-close-overlay"></div>
+  <div class="nl-content">
+    <button class="nl-close" id="nl-close-btn" aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+    </button>
+    <h2 class="nl-title">The Inner Circle</h2>
+    <p class="nl-desc">Subscribe to receive exclusive access to unlisted properties and investment insights.</p>
+    <form id="nl-form" class="nl-form">
+      <input type="email" placeholder="Your email address" required class="nl-input" />
+      <button type="submit" class="prog-btn interactive-btn nl-submit" style="width: 100%; border: none;">
+        <span class="btn-dot"></span>
+        <span class="btn-label-default">Subscribe</span>
+        <span class="btn-label-hover">Subscribe →</span>
+      </button>
+    </form>
+    <p id="nl-success" class="nl-success">Welcome to the network.</p>
+  </div>
+</div>
 
 </main>
 
@@ -1103,5 +1381,81 @@ Property in mind: ${prop}`;
 
 </script>
 
+<script>
+  // Meteor initialization
+  document.addEventListener("DOMContentLoaded", () => {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) return;
+    const targets = document.querySelectorAll('.meteor-target');
+    targets.forEach(section => {
+      const container = document.createElement('div');
+      container.className = 'meteor-shower';
+      for (let i = 0; i < 30; i++) {
+        const m = document.createElement('span');
+        m.className = 'meteor';
+        const left = Math.random() * 100;
+        const top = (Math.random() * 20) - 10;
+        const delay = Math.random() * 5;
+        const duration = 4 + (Math.random() * 6);
+        m.style.left = left + '%';
+        m.style.top = top + '%';
+        m.style.animation = `meteor ${duration}s linear ${delay}s infinite`;
+        container.appendChild(m);
+      }
+      section.appendChild(container);
+    });
+  });
+
+// Newsletter Modal Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('newsletter-modal');
+  const closeBtn = document.getElementById('nl-close-btn');
+  const overlay = document.getElementById('nl-close-overlay');
+  const form = document.getElementById('nl-form');
+  const success = document.getElementById('nl-success');
+  
+  if (!modal) return;
+  
+  let hasTriggered = sessionStorage.getItem('rf_newsletter_seen');
+  
+  const checkScroll = () => {
+    if (hasTriggered) return;
+    const scrollPos = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = scrollPos / docHeight;
+    
+    if (scrollPercent >= 0.75) {
+      openModal();
+    }
+  };
+  
+  const openModal = () => {
+    modal.classList.add('is-open');
+    modal.removeAttribute('aria-hidden');
+    hasTriggered = true;
+    sessionStorage.setItem('rf_newsletter_seen', 'true');
+    window.removeEventListener('scroll', checkScroll);
+  };
+  
+  const closeModal = () => {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+  
+  window.addEventListener('scroll', checkScroll, { passive: true });
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (overlay) overlay.addEventListener('click', closeModal);
+  
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      form.style.display = 'none';
+      success.style.display = 'block';
+      setTimeout(closeModal, 2500);
+    });
+  }
+});
+
+</script>
 </body>
 </html>

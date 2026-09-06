@@ -312,9 +312,25 @@
     .point-item { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid var(--foreground-accent-muted); padding: 0.5rem 1rem; border-radius: 2rem; }
     
     @media (max-width: 768px) {
-      .franchise-stats { flex-direction: column; gap: 1rem; }
-      .stat-arrow { transform: rotate(90deg); margin: 0.5rem 0; }
-      .franchise-points { flex-direction: column; gap: 1rem; align-items: center; }
+      .franchise-stats { 
+        flex-direction: row !important; 
+        gap: 12px !important; 
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+      }
+      .stat-val {
+        font-size: 20px !important;
+      }
+      .stat-label {
+        font-size: 10px !important;
+      }
+      .stat-arrow { 
+        transform: none !important; 
+        margin: 0 !important;
+        margin-top: 4px !important; /* Align slightly with the smaller text */
+        font-size: 16px !important;
+      }
+      .franchise-points { flex-direction: column !important; gap: 1rem !important; align-items: flex-start !important; }
     }
 
     /* Article Card Section */
@@ -1046,24 +1062,29 @@
   }
 
   .ft-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: 280px 200px 180px 160px 160px;
-    min-height: 0;
+    display: flex;
+    flex-direction: column;
     gap: var(--gap);
   }
 
   .ft-card--union {
+    --bg-x: 0;
+    --bg-y: 0;
+    --win-x: 0;
+    --win-y: 0;
     --win-w: 100%;
-    --win-h: 936px;      /* 280 + 16 + 200 + 16 + 180 + 16 + 160 + 16 + 160 */
-    --bg-x: 0%;
-    --win-x: 0px;
+    --win-h: 100%;
+    background-size: cover;
   }
 
-  .ft-brand   { grid-column: 1; grid-row: 1 / 2; --bg-y: 0px;    --win-y: 0px; }
-  .ft-news    { grid-column: 1; grid-row: 2 / 3; }
-  .ft-stat    { grid-column: 1; grid-row: 3 / 4; --bg-y: -496px; --win-y: -496px; }
-  .ft-follow  { grid-column: 1; grid-row: 4 / 5; --bg-y: -692px; --win-y: -692px; }
-  .ft-contact { grid-column: 1; grid-row: 5 / 6; }
+  .ft-asset,
+  .ft-asset > video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
   .ft-news-form { flex-direction: column; align-items: stretch; }
   #newsletter-btn { width: 100%; }
@@ -1152,73 +1173,412 @@
       max-width: 100vw;
       overflow-x: hidden;
     }
-    * {
-      max-width: 100vw;
-    }
 
     @media (max-width: 768px) {
-      /* Reset massive heights and padding */
-      #block3, #block4, #book, #franchise {
+      /* Shared Gutters: exactly 20px left and right padding */
+      .section-container {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      /* Reset massive heights and apply gutters */
+      #book,
+      #block3,
+      #block4,
+      #franchise,
+      #journal,
+      #contact,
+      #footer {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        padding-top: 56px !important;
+        padding-bottom: 56px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
         height: auto !important;
         min-height: auto !important;
         margin-top: 0 !important;
       }
-      #b3-pin-container { position: relative !important; height: auto !important; }
-      #franchise, #contact, #book, #block4 { padding: 4rem 1.5rem !important; }
-      
-      
-      
+
+      #book-container,
+      .franchise-container,
+      .contact-container,
+      .ac-grid,
+      #b3-content,
+      #b4-header {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+      }
+
       #wordmark-top {
         display: none !important;
       }
-    
-      
-      #book-container .display.text-trim {
-        font-size: clamp(2rem, 8vw, 3rem) !important;
+
+      /* Consistent Alignment: Left-aligned on mobile (hero remains centered) */
+      #book,
+      #book-container,
+      #book-container .display,
+      #book-container .caption,
+      .book-label,
+      .book-card,
+      .book-benefits,
+      .benefit-item,
+      #block3,
+      #b3-content,
+      #b3-headline,
+      #b3-headline *,
+      #b3-left-para,
+      #b3-right-para,
+      #b3-signoff,
+      #block4,
+      #b4-header,
+      #b4-header .display,
+      #b4-header .caption,
+      .b4-panel-content,
+      .b4-panel-content *,
+      #franchise,
+      .franchise-container,
+      .franchise-label,
+      .franchise-header,
+      .franchise-subtitle,
+      .franchise-stats,
+      .stat-box,
+      .stat-val,
+      .stat-label,
+      .stat-yield,
+      .stat-disclaimer,
+      .franchise-points,
+      .point-item,
+      .franchise-action,
+      #journal,
+      .ac-section-title,
+      .ac-card-content,
+      .ac-headline,
+      .ac-excerpt,
+      .ac-meta,
+      #contact,
+      .contact-container,
+      .contact-header,
+      .contact-caption,
+      .contact-form,
+      .contact-direct,
+      .contact-links,
+      #footer,
+      .ft-grid,
+      .ft-card,
+      .ft-mark,
+      .ft-nav,
+      .ft-nav-row,
+      .ft-news,
+      .ft-news-body,
+      .ft-tag {
+        text-align: left !important;
       }
-    
-      
-      
-    
-      
-      .prog-section {
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-        box-sizing: border-box !important;
-        overflow: hidden !important;
+
+      .franchise-container,
+      .franchise-stats,
+      .franchise-points,
+      .franchise-action,
+      .contact-container,
+      .contact-links,
+      .book-benefits {
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
       }
-      .prog-display {
-        font-size: clamp(1.5rem, 8vw, 6rem) !important;
+
+      /* Type Sizing: Fixed mobile values (not clamp) */
+      /* Section headings to 22px */
+      #book-container .display,
+      #b3-headline,
+      #b4-header .display,
+      .franchise-header,
+      .ac-section-title,
+      .contact-header,
+      #contact .display {
+        font-size: 22px !important;
+        line-height: 1.25 !important;
+        letter-spacing: 0.04em !important;
         word-break: break-word !important;
       }
-      .vs-table-wrapper {
-        width: 100% !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
+
+      /* Sub-headings to 18px */
+      .b4-panel-content .wordmark,
+      .ac-headline,
+      .stat-yield,
+      .contact-direct p {
+        font-size: 18px !important;
+        line-height: 1.35 !important;
       }
-    
-      
-      #b4-panels, .b4-panel {
+
+      /* Body text to 15px */
+      #book-container .caption,
+      .benefit-item,
+      #b3-left-para,
+      #b3-right-para,
+      #b3-signoff,
+      #b4-header .caption,
+      .b4-panel-content div,
+      .franchise-subtitle,
+      .point-item,
+      .ac-excerpt,
+      .book-input,
+      .ft-news-body,
+      #contact .caption {
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+      }
+
+      /* Small labels to 12px */
+      .book-label,
+      .field-group label,
+      .franchise-label,
+      .stat-label,
+      .stat-disclaimer,
+      .ac-badge,
+      .ac-readtime,
+      .ac-label,
+      .ft-tag,
+      .ft-mark {
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+      }
+
+      /* Block 3 Philosophy mobile handling */
+      #b3-pin-container {
+        position: relative !important;
         height: auto !important;
-        min-height: auto !important;
+        overflow: visible !important;
       }
-      .b4-panel {
-        padding: 4rem 1.5rem !important;
+      #b3-bg-img,
+      #b3-scrim {
+        display: none !important;
       }
-      .b4-panel-content {
+      #b3-content {
         position: relative !important;
         inset: auto !important;
-        height: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+        gap: 1rem !important;
+        opacity: 1 !important;
+      }
+      #b3-headline {
+        position: static !important;
+        opacity: 1 !important;
+        transform: none !important;
+        margin: 0 !important;
+      }
+      .b3-word {
         opacity: 1 !important;
         transform: none !important;
       }
-    
+      #b3-left-para,
+      #b3-right-para,
+      #b3-signoff {
+        position: static !important;
+        opacity: 1 !important;
+        transform: none !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+
+      /* Fix the "How We Host" panels: text below images on solid dark background */
+      #b4-header {
+        padding-top: 0 !important;
+        padding-bottom: 24px !important;
+        text-align: left !important;
+      }
+      #b4-panels {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        height: auto !important;
+        gap: 20px !important;
+        padding: 0 !important;
+      }
+      .b4-panel {
+        display: flex !important;
+        flex-direction: column !important;
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        background: #12090B !important;
+        border: 1px solid rgba(242, 228, 225, 0.12) !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        filter: none !important;
+        margin-bottom: 0 !important;
+        cursor: default !important;
+      }
+      .b4-panel-img-wrap {
+        position: relative !important;
+        inset: auto !important;
+        width: 100% !important;
+        height: 200px !important;
+        overflow: hidden !important;
+      }
+      .b4-panel-img {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        left: 0 !important;
+        top: 0 !important;
+        object-fit: cover !important;
+        transform: none !important;
+      }
+      .b4-panel-scrim {
+        display: none !important;
+      }
+      .b4-panel-content {
+        position: static !important;
+        inset: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+        gap: 10px !important;
+        background: #12090B !important;
+        color: var(--foreground-accent) !important;
+        opacity: 1 !important;
+        transform: none !important;
+        z-index: 2 !important;
+      }
+      .b4-panel-content .wordmark {
+        font-size: 18px !important;
+        line-height: 1.35 !important;
+        color: #fff !important;
+        text-align: left !important;
+      }
+      .b4-panel-content div:nth-child(2) {
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+        color: var(--foreground-accent-soft) !important;
+        text-align: left !important;
+        max-width: 100% !important;
+      }
+      .b4-panel-content div:nth-child(3) {
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+        font-style: italic !important;
+        color: var(--foreground-accent-muted) !important;
+        text-align: left !important;
+      }
+
+      /* Footer layout on mobile */
+      .ft-asset::after {
+        content: '';
+        position: absolute !important;
+        inset: 0 !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        z-index: 1 !important;
+      }
+      .ft-asset,
+      .ft-asset > video {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        transform: none !important;
+      }
+      .ft-asset > video {
+        opacity: 0.25 !important;
+      }
+      .ft-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+      }
+      .ft-card {
+        width: 100% !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+        min-height: auto !important;
+      }
+      
+      /* Align text and set sizes */
+      .ft-stat-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 24px !important;
+      }
+      .ft-stat-item {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+      }
+      .ft-stat-item svg {
+        margin-left: 0 !important;
+        margin-right: auto !important;
+        margin-bottom: 8px !important;
+      }
+      .ft-stat-item .stat-number {
+        font-size: 28px !important;
+        margin-bottom: 4px !important;
+      }
+      .ft-stat-item .caption {
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+      }
+      
+      .ft-contact-row {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+      }
+      .ft-contact-row b {
+        display: none !important;
+      }
+      .ft-contact-row span {
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+      }
+      
+      .ft-chips {
+        justify-content: flex-start !important;
+      }
+      
+      .ft-news-body,
+      .ft-nav-row em {
+        font-size: 15px !important;
+      }
+      
+      .ft-tag span,
+      .ft-mark,
+      .ft-nav-row span {
+        font-size: 12px !important;
+      }
+
       /* Right Rail Shrink & Move */
       #right-rail {
         top: 4.5rem !important;
         width: 2rem !important;
+        display: flex !important;
+        flex-direction: column !important;
       }
-      
       .rail-btn {
         min-height: max-content !important;
         margin-bottom: 2px !important;
@@ -1226,14 +1586,119 @@
         padding: 0.75rem 0 !important;
         font-size: 0.55rem !important;
       }
-      #right-rail {
-        display: flex !important;
-        flex-direction: column !important;
-      }
-    
     }
     
-</style>
+
+  /* Interactive Buttons */
+  .interactive-btn {
+    position: relative !important;
+    overflow: hidden !important;
+    border: 1px solid var(--foreground-accent-muted, rgba(242, 228, 225, 0.4)) !important;
+    border-radius: 9999px !important;
+    background: transparent !important;
+    padding: 0.75rem 2rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: inherit;
+  }
+  .interactive-btn .btn-dot {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #A31621;
+    transform-origin: center;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+  }
+  .interactive-btn .btn-label-default,
+  .interactive-btn .btn-label-hover {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 12px;
+    display: flex;
+    align-items: center;
+  }
+  .interactive-btn .btn-label-default {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .interactive-btn .btn-label-hover {
+    position: absolute;
+    opacity: 0;
+    transform: translateX(6px);
+    color: #fff;
+    white-space: nowrap;
+  }
+  @media (hover: hover) {
+    .interactive-btn:hover .btn-dot {
+      transform: translateY(-50%) scale(56);
+    }
+    .interactive-btn:hover .btn-label-default {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+    .interactive-btn:hover .btn-label-hover {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .interactive-btn .btn-dot,
+    .interactive-btn .btn-label-default,
+    .interactive-btn .btn-label-hover {
+      transition: none !important;
+    }
+  }
+
+  
+  /* Skeleton Loading State */
+  .skeleton {
+    background: linear-gradient(90deg, rgba(242, 228, 225, 0.05) 25%, rgba(242, 228, 225, 0.12) 50%, rgba(242, 228, 225, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite linear;
+  }
+  @keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton {
+      animation: none;
+      background: rgba(242, 228, 225, 0.08);
+    }
+  }
+  .ac-skeleton-card {
+    pointer-events: none;
+  }
+
+  
+  /* Newsletter Modal */
+  .nl-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transition: opacity 0.4s ease; }
+  .nl-modal.is-open { pointer-events: auto; opacity: 1; }
+  .nl-overlay { position: absolute; inset: 0; background: rgba(10, 5, 5, 0.8); backdrop-filter: blur(8px); }
+  .nl-content { position: relative; background: var(--raw-color-velvet-900); border: 1px solid var(--foreground-accent-muted); border-radius: 16px; padding: 3rem 2.5rem; max-width: 440px; width: 90%; transform: translateY(20px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 24px 48px rgba(0,0,0,0.5); text-align: center; }
+  .nl-modal.is-open .nl-content { transform: translateY(0); }
+  .nl-close { position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: var(--foreground-accent-muted); cursor: pointer; transition: color 0.2s ease; padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
+  .nl-close:hover { color: var(--foreground-accent); }
+  .nl-title { font-family: var(--typeface-display); font-size: 2.5rem; color: var(--foreground-accent); margin-bottom: 0.5rem; line-height: 1.1; }
+  .nl-desc { font-family: var(--typeface-ui); font-size: 0.95rem; color: var(--foreground-accent-muted); margin-bottom: 2rem; line-height: 1.5; }
+  .nl-form { display: flex; flex-direction: column; gap: 1rem; }
+  .nl-input { width: 100%; text-align: center; }
+  .nl-success { margin-top: 1rem; font-family: var(--typeface-ui); color: var(--foreground-accent); font-size: 0.95rem; display: none; }
+
+  </style>
 </head>
 <body>
     <a href="index.html" id="site-logo" aria-label="Go to homepage">
@@ -1270,12 +1735,12 @@
 
     <div id="titles" class="hero-group" data-group="titles">
       <div id="hero-headline" class="display text-trim">
-        <div><span class="italic">S</span>tay <span class="italic">S</span>omewhere</div>
-        <div><span class="italic">W</span>orth <span class="italic">R</span>emembering</div>
+        <div>Stay Somewhere</div>
+        <div>Worth <span class="rotating-text-wrapper">Remembering</span></div>
       </div>
       <div id="hero-subtitle">A Curated Collection of Extraordinary Homes</div>
       <div id="hero-actions">
-        <a href="#book" class="btn-pill btn-fill">Book a Stay</a>
+        <a href="#book" class="btn-pill btn-fill interactive-btn"><span class="btn-dot"></span><span class="btn-label-default">Book a Stay</span><span class="btn-label-hover">Book a Stay →</span></a>
         <a href="franchise.html" class="btn-pill btn-outline">Partner With Us</a>
       </div>
     </div>
@@ -1284,7 +1749,7 @@
       </div>
 </section>
 
-<section id="book">
+<section id="book" class="section-container">
   <video autoplay muted loop playsinline  id="book-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/pool.mp4"  muted loop playsinline></video>
   <div id="book-overlay"></div>
   <div id="book-container">
@@ -1333,9 +1798,8 @@
         </div>
       </div>
       <div id="booking-error" style="display: none; color: var(--foreground-accent); margin-top: -0.5rem; font-family: var(--typeface-ui); font-size: 0.9rem; width: 100%;">Please select both check-in and check-out dates.</div>
-      <button type="button" id="book-submit-btn" class="book-submit-btn whatsapp-btn">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Check Availability
+      <button type="button" id="book-submit-btn" class="book-submit-btn whatsapp-btn interactive-btn" style="width: 100%; height: 52px; border: none;">
+          <span class="btn-dot"></span><span class="btn-label-default"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Check Availability</span><span class="btn-label-hover"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Check Availability →</span>
         </button>
     </form>
     <div class="book-benefits">
@@ -1360,7 +1824,7 @@
   </div>
 </section>
 
-<section id="block3" style="height: 100vh;">
+<section id="block3" class="section-container" style="height: 100vh;">
   <div id="b3-pin-container">
     <img  id="b3-bg-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 3/pexels-arthousestudio-4344885.jpg" />
     <div id="b3-scrim"></div>
@@ -1376,7 +1840,7 @@
   </div>
 </section>
 
-<section id="block4">
+<section id="block4" class="section-container">
   <div id="b4-header">
     <div class="display text-trim"><span class="italic">H</span>ow <span class="italic">W</span>e <span class="italic">H</span>ost</div>
     <div class="caption" style="margin-top: 1rem;">Every home, the same standard.</div>
@@ -1412,7 +1876,7 @@
   </div>
 </section>
 
-<section id="franchise">
+<section id="franchise" class="section-container">
   <video autoplay muted loop playsinline  id="franchise-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/host.mp4"  muted loop playsinline></video>
   <div id="franchise-overlay"></div>
   <div class="franchise-container">
@@ -1444,19 +1908,103 @@
     </div>
 
     <div class="franchise-action">
-      <a href="franchise.html" class="btn-pill btn-fill">View The Blueprint</a>
+      <a href="franchise.html" class="btn-pill btn-fill interactive-btn"><span class="btn-dot"></span><span class="btn-label-default">View The Blueprint</span><span class="btn-label-hover">View The Blueprint →</span></a>
     </div>
   </div>
 </section>
 
-<section id="journal" class="ac-section">
+<section id="journal" class="ac-section section-container">
   <h2 class="ac-section-title">Explore</h2>
   <div class="ac-grid" id="ac-grid">
-    <!-- cards injected here -->
+
+    <!-- Skeleton cards -->
+    <article class="ac-card ac-skeleton-card">
+      <header class="ac-card-header">
+        <div class="ac-cover skeleton"></div>
+      </header>
+      <div class="ac-card-content">
+        <div class="ac-meta">
+          <span class="skeleton" style="width: 60px; height: 24px; border-radius: 999px;"></span>
+          <span class="ac-dot" style="opacity: 0;">•</span>
+          <span class="skeleton" style="width: 80px; height: 16px; border-radius: 4px;"></span>
+        </div>
+        <div class="skeleton" style="width: 90%; height: 28px; margin-bottom: 12px; border-radius: 4px;"></div>
+        <div class="skeleton" style="width: 100%; height: 16px; margin-bottom: 8px; border-radius: 4px;"></div>
+        <div class="skeleton" style="width: 100%; height: 16px; margin-bottom: 8px; border-radius: 4px;"></div>
+        <div class="skeleton" style="width: 70%; height: 16px; border-radius: 4px;"></div>
+      </div>
+      <footer class="ac-card-footer">
+        <div class="ac-by">
+          <div class="skeleton" style="width: 40px; height: 14px; margin-bottom: 6px; border-radius: 4px;"></div>
+          <div class="skeleton" style="width: 100px; height: 16px; border-radius: 4px;"></div>
+        </div>
+        <div class="ac-published">
+          <div class="skeleton" style="width: 60px; height: 14px; margin-bottom: 6px; margin-left: auto; border-radius: 4px;"></div>
+          <div class="skeleton" style="width: 80px; height: 16px; margin-left: auto; border-radius: 4px;"></div>
+        </div>
+      </footer>
+    </article>
+
+    <!-- Skeleton cards -->
+    <article class="ac-card ac-skeleton-card">
+      <header class="ac-card-header">
+        <div class="ac-cover skeleton"></div>
+      </header>
+      <div class="ac-card-content">
+        <div class="ac-meta">
+          <span class="skeleton" style="width: 60px; height: 24px; border-radius: 999px;"></span>
+          <span class="ac-dot" style="opacity: 0;">•</span>
+          <span class="skeleton" style="width: 80px; height: 16px; border-radius: 4px;"></span>
+        </div>
+        <div class="skeleton" style="width: 90%; height: 28px; margin-bottom: 12px; border-radius: 4px;"></div>
+        <div class="skeleton" style="width: 100%; height: 16px; margin-bottom: 8px; border-radius: 4px;"></div>
+        <div class="skeleton" style="width: 100%; height: 16px; margin-bottom: 8px; border-radius: 4px;"></div>
+        <div class="skeleton" style="width: 70%; height: 16px; border-radius: 4px;"></div>
+      </div>
+      <footer class="ac-card-footer">
+        <div class="ac-by">
+          <div class="skeleton" style="width: 40px; height: 14px; margin-bottom: 6px; border-radius: 4px;"></div>
+          <div class="skeleton" style="width: 100px; height: 16px; border-radius: 4px;"></div>
+        </div>
+        <div class="ac-published">
+          <div class="skeleton" style="width: 60px; height: 14px; margin-bottom: 6px; margin-left: auto; border-radius: 4px;"></div>
+          <div class="skeleton" style="width: 80px; height: 16px; margin-left: auto; border-radius: 4px;"></div>
+        </div>
+      </footer>
+    </article>
+
+    <!-- Skeleton cards -->
+    <article class="ac-card ac-skeleton-card">
+      <header class="ac-card-header">
+        <div class="ac-cover skeleton"></div>
+      </header>
+      <div class="ac-card-content">
+        <div class="ac-meta">
+          <span class="skeleton" style="width: 60px; height: 24px; border-radius: 999px;"></span>
+          <span class="ac-dot" style="opacity: 0;">•</span>
+          <span class="skeleton" style="width: 80px; height: 16px; border-radius: 4px;"></span>
+        </div>
+        <div class="skeleton" style="width: 90%; height: 28px; margin-bottom: 12px; border-radius: 4px;"></div>
+        <div class="skeleton" style="width: 100%; height: 16px; margin-bottom: 8px; border-radius: 4px;"></div>
+        <div class="skeleton" style="width: 100%; height: 16px; margin-bottom: 8px; border-radius: 4px;"></div>
+        <div class="skeleton" style="width: 70%; height: 16px; border-radius: 4px;"></div>
+      </div>
+      <footer class="ac-card-footer">
+        <div class="ac-by">
+          <div class="skeleton" style="width: 40px; height: 14px; margin-bottom: 6px; border-radius: 4px;"></div>
+          <div class="skeleton" style="width: 100px; height: 16px; border-radius: 4px;"></div>
+        </div>
+        <div class="ac-published">
+          <div class="skeleton" style="width: 60px; height: 14px; margin-bottom: 6px; margin-left: auto; border-radius: 4px;"></div>
+          <div class="skeleton" style="width: 80px; height: 16px; margin-left: auto; border-radius: 4px;"></div>
+        </div>
+      </footer>
+    </article>
+
   </div>
 </section>
 
-<section id="contact">
+<section id="contact" class="section-container">
   <div class="contact-container">
     <div class="contact-header display text-trim">
       <span class="italic">G</span>et in <span class="italic">T</span>ouch
@@ -1507,7 +2055,7 @@
 </section>
 
 
-<footer id="footer" class="ft">
+<footer id="footer" class="ft section-container">
   <!-- The shared video, one copy per dark cell, kept in step by the offsets -->
 
   <div class="ft-grid">
@@ -2154,10 +2702,194 @@ function renderExplore() {
 }
 
 // Ensure this runs when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
+let exploreRendered = false;
+function safeRenderExplore() {
+  if(exploreRendered) return;
+  exploreRendered = true;
   renderExplore();
+}
+window.addEventListener("load", () => { setTimeout(safeRenderExplore, 400); });
+setTimeout(safeRenderExplore, 2000);
+
+
+</script>
+
+<!-- Newsletter Modal -->
+<div id="newsletter-modal" class="nl-modal" aria-hidden="true">
+  <div class="nl-overlay" id="nl-close-overlay"></div>
+  <div class="nl-content">
+    <button class="nl-close" id="nl-close-btn" aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+    </button>
+    <h2 class="nl-title">The Inner Circle</h2>
+    <p class="nl-desc">Subscribe to receive exclusive access to unlisted properties and investment insights.</p>
+    <form id="nl-form" class="nl-form">
+      <input type="email" placeholder="Your email address" required class="book-input nl-input" />
+      <button type="submit" class="btn-pill btn-fill interactive-btn nl-submit" style="width: 100%;">
+        <span class="btn-dot"></span>
+        <span class="btn-label-default">Subscribe</span>
+        <span class="btn-label-hover">Subscribe →</span>
+      </button>
+    </form>
+    <p id="nl-success" class="nl-success">Welcome to the network.</p>
+  </div>
+</div>
+
+<script>
+
+// Newsletter Modal Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('newsletter-modal');
+  const closeBtn = document.getElementById('nl-close-btn');
+  const overlay = document.getElementById('nl-close-overlay');
+  const form = document.getElementById('nl-form');
+  const success = document.getElementById('nl-success');
+  
+  if (!modal) return;
+  
+  let hasTriggered = sessionStorage.getItem('rf_newsletter_seen');
+  
+  const checkScroll = () => {
+    if (hasTriggered) return;
+    const scrollPos = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = scrollPos / docHeight;
+    
+    if (scrollPercent >= 0.75) {
+      openModal();
+    }
+  };
+  
+  const openModal = () => {
+    modal.classList.add('is-open');
+    modal.removeAttribute('aria-hidden');
+    hasTriggered = true;
+    sessionStorage.setItem('rf_newsletter_seen', 'true');
+    window.removeEventListener('scroll', checkScroll);
+  };
+  
+  const closeModal = () => {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+  
+  window.addEventListener('scroll', checkScroll, { passive: true });
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (overlay) overlay.addEventListener('click', closeModal);
+  
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      form.style.display = 'none';
+      if (success) success.style.display = 'block';
+      setTimeout(closeModal, 2500);
+    });
+  }
 });
 
+
+// Rotating Text Reveal
+document.addEventListener('DOMContentLoaded', () => {
+  const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (isReducedMotion) return;
+
+  const wrapper = document.querySelector('.rotating-text-wrapper');
+  if (!wrapper) return;
+
+  const words = ["Remembering", "Returning To", "Talking About"];
+  let wordIndex = 0;
+
+  // Clear out static text and setup
+  wrapper.innerHTML = '';
+  wrapper.style.display = 'inline-block'; wrapper.style.whiteSpace = 'nowrap';
+  
+  // Calculate max width dynamically based on font context
+  const measurer = document.createElement('span');
+  measurer.style.visibility = 'hidden';
+  measurer.style.position = 'absolute';
+  measurer.style.whiteSpace = 'nowrap';
+  document.body.appendChild(measurer);
+  
+  let maxWidth = 0;
+  measurer.className = wrapper.parentElement.className;
+  measurer.style.fontFamily = getComputedStyle(wrapper).fontFamily;
+  measurer.style.fontSize = getComputedStyle(wrapper).fontSize;
+  measurer.style.fontWeight = getComputedStyle(wrapper).fontWeight;
+  measurer.style.letterSpacing = getComputedStyle(wrapper).letterSpacing;
+  
+  words.forEach(w => {
+    measurer.textContent = w;
+    const wWidth = measurer.getBoundingClientRect().width;
+    if (wWidth > maxWidth) maxWidth = wWidth;
+  });
+  document.body.removeChild(measurer);
+  wrapper.style.minWidth = Math.ceil(maxWidth + 5) + 'px';
+
+  function splitWord(word) {
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < word.length; i++) {
+      const char = word[i];
+      const span = document.createElement('span');
+      span.textContent = char === ' ' ? '\u00A0' : char; // Non-breaking space for layout
+      span.style.display = 'inline-block';
+      span.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+      frag.appendChild(span);
+    }
+    return frag;
+  }
+
+  const initialFrag = splitWord(words[0]);
+  wrapper.appendChild(initialFrag);
+
+  function cycleWords() {
+    const currentChars = Array.from(wrapper.children);
+    
+    // 1. Exit transition
+    currentChars.forEach((char, i) => {
+      setTimeout(() => {
+        char.style.opacity = '0';
+        char.style.transform = 'translateY(-8px)';
+      }, i * 25);
+    });
+
+    const exitDuration = (currentChars.length * 25) + 400;
+
+    // 2. Wait for exit, swap and enter
+    setTimeout(() => {
+      wordIndex = (wordIndex + 1) % words.length;
+      const nextWord = words[wordIndex];
+      wrapper.innerHTML = '';
+      
+      const newFrag = splitWord(nextWord);
+      const newChars = Array.from(newFrag.children);
+      
+      newChars.forEach(char => {
+        char.style.opacity = '0';
+        char.style.transform = 'translateY(8px)';
+      });
+      
+      wrapper.appendChild(newFrag);
+
+      void wrapper.offsetHeight;
+
+      newChars.forEach((char, i) => {
+        setTimeout(() => {
+          char.style.opacity = '1';
+          char.style.transform = 'translateY(0)';
+        }, i * 25);
+      });
+
+      const enterDuration = (newChars.length * 25) + 400;
+
+      // 3. Hold for 1.2s before next cycle
+      setTimeout(cycleWords, enterDuration + 1200);
+
+    }, exitDuration);
+  }
+
+  // Start the first hold phase
+  setTimeout(cycleWords, 1200);
+});
 
 </script>
 </body>
