@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Red Flag Outpost</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://api.fontshare.com/v2/css?f%5B%5D=general-sans@400,500,600,700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+
+  <style>
+    /* ══ Reset ═══════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; border: 0 solid; }
+    h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+    p, h1, h2, h3, h4, h5, h6, figure, blockquote, dl, dd, pre, hr { margin: 0; }
+    ul, ol, menu { margin: 0; padding: 0; list-style: none; }
+    b, strong { font-weight: bolder; }
+    small { font-size: 80%; }
+    img, svg, video, canvas { display: block; max-width: 100%; }
+    button, input, select, textarea { margin: 0; padding: 0; font: inherit; color: inherit; background: transparent; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ══ Tokens ══════════════════════════════════════════════════════════ */
+    :root {
+      --font-general: "General Sans", system-ui, sans-serif;
+      --lk-asset: #080808;
+      --bx-gutter: 30px;
+      --bx-col: 607px;
+      --bx-rule: rgba(255, 255, 255, 0.24);
+      --bx-card: rgba(0, 0, 0, 0.55);
+      --bx-card-blur: 14px;
+      --bx-panel: #000000;
+      --bx-ink: #f2f2f2;
+      --bx-muted: rgba(242, 242, 242, 0.42);
+      --bx-btn: #f2f2f2;
+      --bx-btn-ink: #0c0c0c;
+      --bx-signal: #A31621;
+    }
+
+    html {
+      font-size: 16px;
+      background: var(--lk-asset);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      overflow-x: hidden;
+      background: var(--lk-asset);
+      font-family: var(--font-general);
+      color: var(--bx-ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .lk-stage {
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      overflow: hidden;
+      background: var(--lk-asset);
+    }
+
+    .lk-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .lk-bg video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    html.lk-js [data-rise] { opacity: 0; }
+
+    /* ══ Field notes — the composition ═══════════════════════════════════ */
+    .lk-brutal {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      padding: var(--bx-gutter);
+      color: #fff;
+    }
+
+    .lk-brutal .bx-gap { flex-grow: 340; flex-shrink: 1; flex-basis: 0; min-height: 0; }
+    .lk-brutal .bx-gap-b { flex-grow: 256; }
+
+    .lk-brutal .bx-nav { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; flex: none; }
+    .lk-brutal .bx-menu { display: flex; align-items: center; gap: 48px; height: 40px; font-size: 24px; line-height: 1; }
+    .lk-brutal .bx-brand { display: inline-flex; align-items: center; flex: none; }
+    .lk-brutal .bx-brand img { height: 40px; width: auto; }
+    .lk-brutal .bx-link { white-space: nowrap; }
+
+    .lk-brutal .bx-consult {
+      display: flex; align-items: center; justify-content: space-between; gap: 24px; flex: none;
+      width: var(--bx-col); height: 72px; padding: 24px 32px 24px 24px;
+      background: var(--bx-panel); color: var(--bx-ink); font-size: 20px; line-height: 1.2;
+    }
+    .lk-brutal .bx-consult i { width: 8px; height: 8px; flex: none; background: var(--bx-signal); }
+
+    .lk-brutal .bx-line { flex: none; height: 1px; margin: 0 calc(var(--bx-gutter) * -1); background: var(--bx-rule); }
+    .lk-brutal .bx-band { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; flex: none; margin-top: 31px; }
+    .lk-brutal .bx-outpost-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--bx-signal);
+      font-weight: 600;
+    }
+    .lk-brutal .bx-ship { font-size: 28px; line-height: 1; letter-spacing: 0.04em; white-space: nowrap; }
+    .lk-brutal .bx-mission { flex: none; width: var(--bx-col); font-size: 28px; line-height: 1.2; }
+
+    .lk-brutal .bx-bottom { display: flex; align-items: stretch; justify-content: space-between; gap: 40px; flex: none; height: 252px; }
+    .lk-brutal .bx-bottomleft { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+    .lk-brutal .bx-index { display: flex; gap: 48px; font-size: 28px; line-height: 1.2; white-space: nowrap; }
+    .lk-brutal .bx-h1 { display: flex; align-items: flex-end; gap: 24px; font-size: 128px; font-weight: 400; line-height: 1; white-space: nowrap; }
+    .lk-brutal .bx-h1 span {
+      background-image: linear-gradient(to left, rgba(255, 255, 255, 0.3), #fff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .lk-brutal .bx-card {
+      display: flex; gap: 24px; flex: none; width: var(--bx-col); padding: 10px;
+      background: var(--bx-card); -webkit-backdrop-filter: blur(var(--bx-card-blur));
+      backdrop-filter: blur(var(--bx-card-blur)); color: var(--bx-ink);
+    }
+    .lk-brutal .bx-portrait { width: 193px; flex: none; background: linear-gradient(to bottom, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0)); }
+    .lk-brutal .bx-cardbody { display: flex; flex-direction: column; align-items: stretch; flex: 1; min-width: 0; padding: 24px 14px 14px 0; }
+    .lk-brutal .bx-cardbody em { font-style: normal; font-size: 28px; line-height: 1.2; text-transform: uppercase; white-space: nowrap; }
+    .lk-brutal .bx-role { margin-top: 16px; color: var(--bx-muted); font-size: 24px; line-height: 1.2; white-space: nowrap; }
+    .lk-brutal .bx-book { display: flex; align-items: center; justify-content: center; margin-top: auto; height: 62px; background: var(--bx-btn); color: var(--bx-btn-ink); font-size: 24px; line-height: 1; white-space: nowrap; }
+
+    .lk-brutal .bx-link, .lk-brutal .bx-brand, .lk-brutal .bx-consult, .lk-brutal .bx-index span, .lk-brutal .bx-book { cursor: pointer; }
+    .lk-brutal .bx-link:hover, .lk-brutal .bx-index span:hover { text-decoration: underline; text-underline-offset: 0.22em; }
+    .lk-brutal .bx-consult:hover { background: #1a1a1a; }
+    .lk-brutal .bx-consult:active { background: #262626; }
+    .lk-brutal .bx-book:hover { background: #ffffff; }
+    .lk-brutal .bx-book:active { background: #c9c9c9; }
+
+    /* ══ RESPONSIVE ══════════════════════════════════════════════════════ */
+    @media (max-width: 1720px) { .lk-brutal .bx-h1 { font-size: 112px; } }
+    @media (max-width: 1600px) { .lk-brutal .bx-h1 { font-size: 96px; } }
+    @media (max-width: 1470px) { .lk-brutal .bx-h1 { font-size: 80px; } }
+
+    @media (max-width: 1440px) {
+      :root { --bx-col: 480px; }
+      .lk-brutal .bx-menu { gap: 28px; font-size: 22px; }
+      .lk-brutal .bx-brand img { height: 34px; }
+      .lk-brutal .bx-consult { font-size: 18px; }
+      .lk-brutal .bx-ship, .lk-brutal .bx-mission { font-size: 24px; }
+      .lk-brutal .bx-index { flex-wrap: wrap; gap: 6px 22px; font-size: 21px; }
+      .lk-brutal .bx-h1 { font-size: 60px; }
+      .lk-brutal .bx-portrait { width: 150px; }
+      .lk-brutal .bx-cardbody em { font-size: 24px; }
+      .lk-brutal .bx-role { font-size: 20px; }
+      .lk-brutal .bx-book { font-size: 20px; }
+      .lk-brutal .bx-mission br { display: none; }
+    }
+
+    @media (max-width: 1100px) {
+      :root { --bx-col: 380px; }
+      .lk-brutal .bx-menu { gap: 24px; font-size: 20px; }
+      .lk-brutal .bx-brand img { height: 30px; }
+      .lk-brutal .bx-consult { font-size: 16px; padding: 20px 24px 20px 20px; }
+      .lk-brutal .bx-ship, .lk-brutal .bx-mission { font-size: 20px; }
+      .lk-brutal .bx-index { gap: 6px 20px; font-size: 19px; }
+      .lk-brutal .bx-h1 { font-size: 52px; }
+      .lk-brutal .bx-portrait { width: 118px; }
+      .lk-brutal .bx-cardbody { padding: 18px 12px 12px 0; }
+      .lk-brutal .bx-cardbody em { font-size: 21px; }
+      .lk-brutal .bx-role { margin-top: 12px; font-size: 18px; }
+      .lk-brutal .bx-book { height: 54px; font-size: 18px; }
+    }
+
+    @media (max-width: 1000px) {
+      :root { --bx-gutter: 20px; --bx-col: auto; }
+      .lk-brutal .bx-nav { flex-direction: column; align-items: stretch; gap: 14px; }
+      .lk-brutal .bx-menu { gap: 0; font-size: 18px; }
+      .lk-brutal .bx-link { display: none; }
+      .lk-brutal .bx-brand img { height: 28px; }
+      .lk-brutal .bx-consult { width: 100%; height: 52px; padding: 0 18px; font-size: 14px; }
+      .lk-brutal .bx-band { flex-direction: column; align-items: stretch; gap: 12px; margin-top: 18px; }
+      .lk-brutal .bx-ship, .lk-brutal .bx-mission, .lk-brutal .bx-index { font-size: 15px; }
+      .lk-brutal .bx-mission { width: 100%; }
+      .lk-brutal .bx-ship { white-space: normal; }
+      .lk-brutal .bx-index { flex-wrap: wrap; gap: 8px 16px; }
+      .lk-brutal .bx-bottom { flex-direction: column; align-items: stretch; gap: 32px; height: auto; }
+      .lk-brutal .bx-bottomleft { gap: 28px; }
+      .lk-brutal .bx-h1 { flex-wrap: wrap; align-items: flex-start; gap: 0 16px; font-size: 60px; white-space: normal; }
+      .lk-brutal .bx-card { width: 100%; }
+      .lk-brutal .bx-portrait { width: 96px; min-height: 132px; }
+      .lk-brutal .bx-cardbody { padding: 14px 8px 8px 0; }
+      .lk-brutal .bx-cardbody em { font-size: 20px; white-space: normal; }
+      .lk-brutal .bx-role { margin-top: 8px; font-size: 15px; white-space: normal; }
+      .lk-brutal .bx-book { height: 48px; font-size: 16px; }
+    }
+
+    @media (max-width: 520px) {
+      .lk-brutal .bx-h1 { font-size: 44px; }
+      .lk-brutal .bx-bottom { gap: 26px; }
+      .lk-brutal .bx-bottomleft { gap: 22px; }
+      .lk-brutal .bx-card { gap: 14px; }
+      .lk-brutal .bx-portrait { width: 76px; min-height: 118px; }
+      .lk-brutal .bx-cardbody em { font-size: 18px; }
+      .lk-brutal .bx-role { font-size: 14px; }
+      .lk-brutal .bx-book { height: 44px; font-size: 15px; }
+      .lk-brutal .bx-index { font-size: 14px; }
+      .lk-brutal .bx-consult { font-size: 13px; }
+    }
+
+    @media (min-width: 620px) and (max-width: 1000px) and (max-height: 560px) {
+      .lk-brutal .bx-nav { flex-direction: row; align-items: center; gap: 20px; }
+      .lk-brutal .bx-consult { width: 300px; height: 44px; }
+      .lk-brutal .bx-band { flex-direction: row; align-items: flex-start; gap: 20px; margin-top: 14px; }
+      .lk-brutal .bx-ship { white-space: nowrap; }
+      .lk-brutal .bx-mission { width: 300px; }
+      .lk-brutal .bx-bottom { flex-direction: row; align-items: stretch; gap: 20px; }
+      .lk-brutal .bx-bottomleft { gap: 8px; }
+      .lk-brutal .bx-h1 { font-size: 30px; }
+      .lk-brutal .bx-index { font-size: 14px; }
+      .lk-brutal .bx-card { width: 300px; }
+      .lk-brutal .bx-portrait { width: 70px; min-height: 0; }
+      .lk-brutal .bx-cardbody { padding: 12px 8px 8px 0; }
+      .lk-brutal .bx-cardbody em { font-size: 18px; }
+      .lk-brutal .bx-role { margin-top: 6px; font-size: 14px; }
+      .lk-brutal .bx-book { height: 40px; font-size: 14px; }
+    }
+
+    @media (max-width: 619px) and (max-height: 560px) {
+      :root { --bx-gutter: 12px; }
+      .lk-brutal .bx-nav { gap: 8px; }
+      .lk-brutal .bx-consult { height: 40px; font-size: 12px; }
+      .lk-brutal .bx-band { gap: 6px; margin-top: 6px; }
+      .lk-brutal .bx-bottom { gap: 10px; }
+      .lk-brutal .bx-bottomleft { gap: 8px; }
+      .lk-brutal .bx-h1 { font-size: 26px; }
+      .lk-brutal .bx-card { gap: 10px; padding: 6px; }
+      .lk-brutal .bx-portrait { width: 60px; min-height: 0; }
+      .lk-brutal .bx-cardbody { padding: 8px 6px 6px 0; }
+      .lk-brutal .bx-cardbody em { font-size: 16px; }
+      .lk-brutal .bx-role { margin-top: 4px; font-size: 13px; }
+      .lk-brutal .bx-book { height: 32px; font-size: 13px; }
+    }
+
+    @media (max-height: 820px) and (min-width: 1001px) {
+      .lk-brutal .bx-bottom { height: 220px; }
+    }
+    @media (max-height: 820px) and (min-width: 1601px) {
+      .lk-brutal .bx-h1 { font-size: 96px; }
+    }
+    @media (max-height: 660px) and (min-width: 1001px) {
+      .lk-brutal .bx-bottom { height: 205px; }
+      .lk-brutal .bx-band { margin-top: 20px; }
+    }
+    @media (max-height: 660px) and (min-width: 1441px) {
+      .lk-brutal .bx-h1 { font-size: 72px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html.lk-js [data-rise] { opacity: 1; }
+    }
+
+    /* ══ PROGRAMME STYLES ════════════════════════════════════════════════ */
+    .prog-wrap {
+      background: var(--lk-asset);
+      color: var(--bx-ink);
+      position: relative;
+      z-index: 10;
+    }
+    .prog-section {
+      max-width: 1860px;
+      margin: 0 auto;
+      padding: 100px var(--bx-gutter);
+      border-top: 1px solid var(--bx-rule);
+    }
+    .prog-section:first-child {
+      border-top: none;
+    }
+    
+    .prog-display {
+      font-family: 'Michroma', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .prog-h2 {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.1;
+      margin-bottom: 2rem;
+      font-weight: 500;
+    }
+    .prog-p {
+      font-size: clamp(1.2rem, 2vw, 1.75rem);
+      line-height: 1.4;
+      color: var(--bx-muted);
+      max-width: 900px;
+    }
+    .prog-p.italic {
+      font-style: italic;
+    }
+
+    /* STAT BAR */
+    .stat-section { padding-top: 60px; padding-bottom: 60px; text-align: center; }
+    .stat-row {
+      display: flex; align-items: center; justify-content: center; gap: 4vw;
+      font-size: clamp(2rem, 5vw, 6rem);
+      font-weight: 600;
+      line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+    .stat-arrow { color: var(--bx-muted); font-family: 'Michroma', sans-serif; font-weight: 400; }
+    .stat-sub { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 500; margin-bottom: 1rem; }
+    .stat-caption { font-size: 1rem; color: var(--bx-muted); }
+
+    /* TICKER */
+    .ticker-section {
+      border-top: 1px solid var(--bx-rule);
+      border-bottom: 1px solid var(--bx-rule);
+      overflow: hidden;
+      padding: 20px 0;
+      white-space: nowrap;
+      color: var(--bx-muted);
+      font-size: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: flex;
+    }
+    .ticker-track {
+      display: flex;
+      animation: ticker-scroll 25s linear infinite;
+    }
+    .ticker-section:hover .ticker-track {
+      animation-play-state: paused;
+    }
+    .ticker-text {
+      padding-right: 1rem;
+    }
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ticker-track { animation: none; }
+    }
+
+    /* THE EXECUTION MAP */
+    .exec-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      margin-top: 60px;
+    }
+    .exec-block h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      font-family: 'Michroma', sans-serif;
+      color: var(--bx-ink);
+    }
+    .exec-block p {
+      font-size: 1.125rem;
+      line-height: 1.5;
+      color: var(--bx-muted);
+      margin-bottom: 1.5rem;
+    }
+    .exec-block .arrow-list {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      color: var(--bx-ink);
+    }
+    .exec-block .arrow-list li { margin-bottom: 0.5rem; }
+
+    @media (max-width: 768px) {
+      .exec-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    /* THE MATH */
+    .math-table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+    .math-table {
+      width: 100%;
+      min-width: 800px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .math-table th, .math-table td {
+      padding: 1.25rem 1rem;
+      border-bottom: 1px solid var(--bx-rule);
+      font-size: 1.125rem;
+    }
+    .math-table th { font-weight: 500; color: var(--bx-muted); }
+    .math-table tr.total td { font-weight: 600; color: #fff; }
+    .math-highlight { background: rgba(255,255,255,0.05); }
+    .math-highlight-strong { background: rgba(255,255,255,0.1); font-weight: 600; color: #fff; }
+    
+    .caveats { margin-top: 40px; }
+    .caveats li {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    .caveats li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--bx-muted);
+    }
+
+        .blur-row td > span { filter: blur(5px); opacity: 0.8; user-select: none; }
+    .blur-row td { position: relative; }
+    .blur-row-btn {
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      white-space: nowrap;
+      margin: 0;
+      padding: 0.5rem 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    /* WHY NOT A TRADITIONAL BNB */
+    .vs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 40px;
+    }
+    .vs-table th, .vs-table td {
+      padding: 1.5rem 1rem;
+      border-bottom: 1px solid var(--bx-rule);
+      font-size: 1.125rem;
+      text-align: left;
+    }
+    .vs-table th { font-family: 'Michroma', sans-serif; font-size: 1rem; text-transform: uppercase; color: var(--bx-muted); }
+    .vs-table td:nth-child(2) { color: var(--bx-muted); }
+    .vs-table td:nth-child(3) { color: #fff; font-weight: 600; }
+    
+    /* APPLICATION FORM */
+    .form-wrap {
+      max-width: 700px;
+      margin: 40px 0;
+      background: var(--bx-card);
+      -webkit-backdrop-filter: blur(var(--bx-card-blur));
+      backdrop-filter: blur(var(--bx-card-blur));
+      padding: 40px;
+      border: 1px solid var(--bx-rule);
+    }
+    .form-group {
+      margin-bottom: 24px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+      color: var(--bx-muted);
+    }
+    .form-control {
+      width: 100%;
+      height: 48px;
+      background: transparent;
+      border: 1px solid var(--bx-rule);
+      color: #fff;
+      padding: 0 16px;
+      font-size: 1.125rem;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: #fff;
+    }
+    .form-control option { background: #080808; color: #fff; }
+
+    /* FINAL CTA */
+    .cta-section {
+      text-align: center;
+      padding: 120px var(--bx-gutter);
+    }
+    .cta-h1 {
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-family: 'Michroma', sans-serif;
+      margin-bottom: 1rem;
+    }
+    .cta-p {
+      font-size: 1.5rem;
+      color: var(--bx-muted);
+      margin-bottom: 40px;
+    }
+    .footer-meta {
+      margin-top: 80px;
+      font-size: 1rem;
+      color: var(--bx-muted);
+      line-height: 1.6;
+    }
+  
+    /* Prevent mobile overflow */
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    /* Container for horizontal table scroll with subtle right-edge fade */
+    .math-table-outer,
+    .vs-table-outer {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      margin: 24px 0;
+      box-sizing: border-box;
+    }
+    .math-table-scroll,
+    .vs-table-scroll {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 768px) {
+      /* Shared Gutters: exactly 20px left and right padding */
+      .section-container {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .prog-section {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .prog-section * {
+        box-sizing: border-box;
+      }
+      .exec-grid,
+      .math-table-outer,
+      .vs-table-outer,
+      .form-wrap {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Consistent Alignment: Left-aligned on mobile */
+      .prog-section h2,
+      .prog-section h3,
+      .prog-section p,
+      .prog-section ul,
+      .prog-section li,
+      .prog-section .prog-h2,
+      .prog-section .prog-p,
+      .prog-section .exec-block,
+      .prog-section .exec-block h3,
+      .prog-section .exec-block p,
+      .prog-section .arrow-list,
+      .prog-section .arrow-list li,
+      .prog-section .caveats,
+      .prog-section .caveats li,
+      .prog-section form,
+      .prog-section .form-group,
+      .prog-section .form-group label {
+        text-align: left !important;
+      }
+
+      .stat-section {
+        text-align: left !important;
+        padding-top: 40px !important;
+        padding-bottom: 40px !important;
+      }
+      .stat-row {
+        justify-content: flex-start !important;
+        gap: 16px !important;
+        margin-bottom: 12px !important;
+      }
+      .stat-number {
+        font-size: 24px !important;
+        line-height: 1.1 !important;
+      }
+      .stat-arrow {
+        font-size: 18px !important;
+      }
+      .stat-sub {
+        font-size: 18px !important;
+        text-align: left !important;
+        margin-bottom: 8px !important;
+      }
+      .stat-caption {
+        font-size: 12px !important;
+        text-align: left !important;
+        color: var(--bx-muted) !important;
+      }
+
+      /* Exception: Final CTA stays centred */
+      .cta-section,
+      .cta-section .cta-h1,
+      .cta-section .cta-p,
+      .cta-section a.interactive-btn {
+        text-align: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+      .cta-section {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        padding-top: 60px !important;
+        padding-bottom: 60px !important;
+      }
+
+      /* Type Sizing: Fixed mobile values (not clamp) */
+      /* Section headings to 22px */
+      .prog-h2,
+      .prog-display,
+      .exec-block h3,
+      h2.prog-h2 {
+        font-size: 22px !important;
+        line-height: 1.25 !important;
+        letter-spacing: 0.04em !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        margin-bottom: 1.25rem !important;
+      }
+
+      /* Sub-headings to 18px */
+      .prog-section h3:not(.exec-block h3),
+      .prog-subhead {
+        font-size: 18px !important;
+        line-height: 1.35 !important;
+        margin-bottom: 0.75rem !important;
+      }
+
+      /* Body text to 15px */
+      .prog-p,
+      .prog-section p,
+      .exec-block p,
+      .arrow-list li,
+      .caveats li,
+      .math-table th,
+      .math-table td,
+      .vs-table th,
+      .vs-table td,
+      .form-control,
+      .prog-section div[style*="font-size: 1.125rem"] {
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+      }
+
+      /* Small labels to 12px */
+      .form-group label,
+      .prog-p i,
+      .prog-p.italic[style*="font-size: 1rem"],
+      .small-label {
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+      }
+
+      /* Maths table scroll container with right edge fade */
+      .math-table-outer::after,
+      .vs-table-outer::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 32px !important;
+        pointer-events: none !important;
+        background: linear-gradient(to right, transparent, rgba(14, 7, 8, 0.95)) !important;
+        z-index: 2 !important;
+      }
+      .math-table {
+        min-width: 580px !important;
+        width: 100% !important;
+      }
+      .math-table th, .math-table td {
+        padding: 10px 8px !important;
+        font-size: 15px !important;
+      }
+      .vs-table {
+        min-width: 520px !important;
+        width: 100% !important;
+      }
+      .vs-table th, .vs-table td {
+        padding: 10px 8px !important;
+        font-size: 15px !important;
+      }
+
+      /* Form inputs */
+      .form-control {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+    }
+    
+
+  /* Meteor Effect */
+  :root {
+    --foreground-accent-muted: rgba(242, 228, 225, 0.4);
+  }
+  .meteor-shower {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .meteor-target {
+    position: relative;
+  }
+  .meteor-target > :not(.meteor-shower) {
+    position: relative;
+    z-index: 1;
+  }
+  .meteor {
+    position: absolute;
+    width: 1px;
+    height: 2px;
+    border-radius: 9999px;
+    background: var(--foreground-accent-muted);
+    box-shadow: 0 0 0 1px rgba(242,228,225,0.1);
+    opacity: 0;
+  }
+  .meteor::before {
+    content: "";
+    position: absolute;
+    width: 50px;
+    height: 1px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(90deg, var(--foreground-accent-muted), transparent);
+  }
+  @keyframes meteor {
+    from { transform: rotate(215deg) translateX(0); opacity: 1; }
+    to { transform: rotate(215deg) translateX(-500px); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .meteor-shower { display: none !important; }
+  }
+  
+  /* Interactive Buttons */
+  .interactive-btn {
+    position: relative !important;
+    overflow: hidden !important;
+    border: 1px solid var(--foreground-accent-muted, rgba(242, 228, 225, 0.4)) !important;
+    border-radius: 9999px !important;
+    background: transparent !important;
+    padding: 0.75rem 2rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: inherit;
+  }
+  .interactive-btn .btn-dot {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #A31621;
+    transform-origin: center;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+  }
+  .interactive-btn .btn-label-default,
+  .interactive-btn .btn-label-hover {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 12px;
+    display: flex;
+    align-items: center;
+  }
+  .interactive-btn .btn-label-default {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .interactive-btn .btn-label-hover {
+    position: absolute;
+    opacity: 0;
+    transform: translateX(6px);
+    color: #fff;
+    white-space: nowrap;
+  }
+  @media (hover: hover) {
+    .interactive-btn:hover .btn-dot {
+      transform: translateY(-50%) scale(56);
+    }
+    .interactive-btn:hover .btn-label-default {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+    .interactive-btn:hover .btn-label-hover {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .interactive-btn .btn-dot,
+    .interactive-btn .btn-label-default,
+    .interactive-btn .btn-label-hover {
+      transition: none !important;
+    }
+  }
+
+  
+  /* Newsletter Modal */
+  .nl-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transition: opacity 0.4s ease; }
+  .nl-modal.is-open { pointer-events: auto; opacity: 1; }
+  .nl-overlay { position: absolute; inset: 0; background: rgba(10, 5, 5, 0.8); backdrop-filter: blur(8px); }
+  .nl-content { position: relative; background: #1A0A0C; border: 1px solid var(--foreground-accent-muted, rgba(242,228,225,0.4)); border-radius: 16px; padding: 3rem 2.5rem; max-width: 440px; width: 90%; transform: translateY(20px); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 24px 48px rgba(0,0,0,0.5); text-align: center; }
+  .nl-modal.is-open .nl-content { transform: translateY(0); }
+  .nl-close { position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: var(--foreground-accent-muted, rgba(242,228,225,0.4)); cursor: pointer; transition: color 0.2s ease; padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
+  .nl-close:hover { color: #f2f2f2; }
+  .nl-title { font-size: 2.5rem; color: #f2f2f2; margin-bottom: 0.5rem; line-height: 1.1; font-weight: 600; }
+  .nl-desc { font-size: 0.95rem; color: var(--foreground-accent-muted, rgba(242,228,225,0.4)); margin-bottom: 2rem; line-height: 1.5; }
+  .nl-form { display: flex; flex-direction: column; gap: 1rem; }
+  .nl-input { width: 100%; text-align: center; background: transparent; border: 1px solid var(--foreground-accent-muted, rgba(242,228,225,0.4)); color: #f2f2f2; padding: 1rem; border-radius: 6px; outline: none; transition: border-color 0.2s ease; box-sizing: border-box; }
+  .nl-input::placeholder { color: var(--foreground-accent-muted, rgba(242,228,225,0.4)); }
+  .nl-success { margin-top: 1rem; color: #f2f2f2; font-size: 0.95rem; display: none; }
+
+  </style>
+</head>
+<body>
+  
+<div class="lk-stage">
+  <!-- The asset sits here, behind the composition. Full-bleed, and first in
+       the DOM so it stays behind everything else. -->
+  <div class="lk-bg" id="lkBg">
+    <video
+      src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise.mp4"
+      muted loop playsinline ></video>
+  </div>
+
+  <div class="lk lk-brutal">
+    <!-- Frame 24 and Frame 26 -->
+    <header class="bx-nav" data-rise="0">
+      <div class="bx-menu">
+        <a class="bx-brand" href="index.html">
+          <img  src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Homes Network" />
+        </a>
+        <a class="bx-link" href="index.html">Home</a>
+        <a class="bx-link" href="index.html#book">Book a Stay</a>
+        <a class="bx-link" href="index.html#journal">Explore</a>
+        <a class="bx-link" href="#apply">Contact</a>
+      </div>
+      <a class="bx-consult" href="#apply">
+        Founding Partner allocation — 40% off franchise fee
+        <i aria-hidden="true"></i>
+      </a>
+    </header>
+
+    <div class="bx-gap"></div>
+
+    <!-- Group 4 — Line 3 and the two texts that hang off it -->
+    <div class="bx-line"></div>
+    <div class="bx-band">
+      <div class="bx-ship-group" data-rise="1">
+        <div class="bx-outpost-label">RED FLAG OUTPOST</div>
+        <p class="bx-ship" style="margin-top: 8px;">THE INVESTMENT PLAYBOOK</p>
+      </div>
+      <p class="bx-mission" data-rise="2">
+        You bring the capital and the location. We bring the blueprint,<br />
+        the brand, the creators, and the AI system that runs it.
+      </p>
+    </div>
+
+    <div class="bx-gap bx-gap-b"></div>
+
+    <div class="bx-bottom">
+      <div class="bx-bottomleft">
+        <!-- Frame 25 -->
+        <div class="bx-index" data-rise="3">
+          <span>/ Studio</span>
+          <span>/ Villa</span>
+          <span>/ Estate</span>
+        </div>
+        <h1 class="bx-h1" data-rise="4"><span>No&nbsp;property?</span><span>No&nbsp;problem.</span></h1>
+      </div>
+
+      <!-- Rectangle 18 and everything inside it -->
+      <aside class="bx-card" data-rise="5">
+        <i class="bx-portrait" aria-hidden="true"></i>
+        <div class="bx-cardbody">
+          <em>Talk with Aria</em>
+          <span class="bx-role">AI-Powered Partnership Representative, Red Flag Homes Network</span>
+          <a class="bx-book interactive-btn" href="#apply"><span class="btn-dot"></span><span class="btn-label-default">Apply for Allocation</span><span class="btn-label-hover">Apply for Allocation →</span></a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<main class="prog-wrap">
+  
+  <!-- SECTION — THE STAT BAR -->
+  <section class="prog-section stat-section section-container">
+    <div class="stat-row">
+      <span class="stat-number" data-val="75000">₹75,000</span>
+      <span class="stat-arrow">→</span>
+      <span class="stat-number" data-val="148500" data-format="mo">₹1,48,500 /mo</span>
+    </div>
+    <div class="stat-sub">≈ 2x yield spread</div>
+    <div class="stat-caption"><i>Illustrative, 3-key Villa at 55% occupancy. Full workings below.</i></div>
+  </section>
+
+  <!-- SECTION — TICKER STRIP -->
+  <section class="ticker-section" aria-hidden="true">
+    <div class="ticker-track">
+      <span class="ticker-text">ASSET LIGHT · ZERO STAFF · CREATOR-LED MARKETING · AI-RUN OPERATIONS · LIFETIME SUPPORT · </span>
+      <span class="ticker-text">ASSET LIGHT · ZERO STAFF · CREATOR-LED MARKETING · AI-RUN OPERATIONS · LIFETIME SUPPORT · </span>
+    </div>
+  </section>
+
+  <!-- SECTION — THE PITCH IN ONE LINE -->
+  <section class="meteor-target prog-section section-container">
+    <h2 class="prog-h2">Most franchises hand you a business and leave you to run it. We hand you an asset and run it for you.</h2>
+    <p class="prog-p">No staff to hire. No hospitality experience needed. No ops to learn.</p>
+  </section>
+
+  <!-- SECTION — THE EXECUTION MAP -->
+  <section class="meteor-target prog-section section-container">
+    <p class="prog-p italic" style="margin-bottom: 2rem;">This is not a guessing game. It's a system. Here is exactly how your capital becomes a high-yield asset.</p>
+    
+    <div class="exec-grid">
+      <div class="exec-block">
+        <h3>01 · THE HUNT</h3>
+        <p>We don't let you sign a bad lease. Using demand data from our managed portfolio, we assess your property — or help you find one in a high-demand, low-supply pocket.</p>
+        <ul class="arrow-list">
+          <li>→ Demand & occupancy-potential assessment</li>
+          <li>→ Lease negotiation support</li>
+          <li>→ Legal and risk review <i>before</i> you commit</li>
+        </ul>
+      </div>
+      
+      <div class="exec-block">
+        <h3>02 · THE FLIP</h3>
+        <p>Keys secured, our build team moves in. Ordinary spaces become premium, photograph-ready properties in <b>under 45 days.</b></p>
+        <ul class="arrow-list">
+          <li>→ Signature interior transformation — Pinterest-forward, Greek-architecture accents</li>
+          <li>→ Furnishing, styling and decor procurement</li>
+          <li>→ Smart locks, keyless entry, high-speed WiFi</li>
+        </ul>
+      </div>
+      
+      <div class="exec-block">
+        <h3>03 · THE DROP</h3>
+        <p>We don't quietly list you and hope. Every property launches through content creators — building demand <i>and</i> a permanent content library from week one.</p>
+        <ul class="arrow-list">
+          <li>→ Creator stay campaign</li>
+          <li>→ Professional editorial shoot</li>
+          <li>→ Listing across Airbnb, Booking.com and direct</li>
+          <li>→ Direct booking setup — revenue that pays no platform commission</li>
+        </ul>
+      </div>
+      
+      <div class="exec-block">
+        <h3>04 · THE YIELD</h3>
+        <p>You step back. The system runs.</p>
+        <ul class="arrow-list">
+          <li>→ AI dynamic pricing, adjusting daily</li>
+          <li>→ 24/7 automated guest messaging</li>
+          <li>→ Review and reputation management</li>
+          <li>→ Payouts twice monthly, 1st and 16th</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION — SETUP FLEX -->
+  <section class="meteor-target prog-section section-container">
+    <h2 class="prog-h2 prog-display">SETUP FLEX</h2>
+    <h3 style="font-size: 2rem; margin-bottom: 1rem; font-weight: 500;">You don't need it all on day one.</h3>
+    <p class="prog-p" style="margin-bottom: 1.5rem;">Pay 50% of setup upfront. The balance comes out of your booking payouts across the first nine months.</p>
+    <p class="prog-p" style="color: #fff; font-weight: 600; margin-bottom: 1rem;">Villa day-one cash: ₹1,99,999 → ₹1,24,999</p>
+    <p class="prog-p" style="font-size: 1rem;"><i>10% convenience charge. Subject to availability and approval.</i></p>
+  </section>
+
+  <!-- SECTION — THE MATH -->
+  <section class="meteor-target prog-section section-container">
+    <h2 class="prog-h2 prog-display">THE MATH</h2>
+    <p class="prog-p italic" style="margin-bottom: 2rem;">A realistic projection. 3-key Villa, whole-property lets.</p>
+    <p class="prog-p" style="color: #fff; margin-bottom: 0.5rem;"><strong>Capital deployed:</strong> deposit ₹4,50,000 + franchise ₹49,999 + setup ₹1,50,000 = <strong>₹6,49,999</strong></p>
+    <p class="prog-p" style="font-size: 1rem;"><strong>Assumptions:</strong> ADR ₹9,000 · rent ₹75,000/mo · operating costs ₹30,000/mo</p>
+    
+    <div class="math-table-outer">
+      <div class="math-table-scroll">
+        <table class="math-table">
+          <thead>
+            <tr>
+              <th>Occupancy</th>
+              <th>45%</th>
+              <th class="math-highlight-strong">55%</th>
+              <th>65%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Monthly gross revenue</td>
+              <td>₹1,21,500</td>
+              <td class="math-highlight-strong">₹1,48,500</td>
+              <td>₹1,75,500</td>
+            </tr>
+            <tr class="blur-row">
+              <td><span>Less Red Flag 13.5%</span></td>
+              <td>
+                <span>₹16,403</span>
+                <a href="#apply" class="prog-btn blur-row-btn">Reveal</a>
+              </td>
+              <td class="math-highlight"><span>₹20,048</span></td>
+              <td><span>₹23,693</span></td>
+            </tr>
+            <tr>
+              <td>Less rent</td>
+              <td>₹75,000</td>
+              <td class="math-highlight">₹75,000</td>
+              <td>₹75,000</td>
+            </tr>
+            <tr>
+              <td>Less operating</td>
+              <td>₹30,000</td>
+              <td class="math-highlight">₹30,000</td>
+              <td>₹30,000</td>
+            </tr>
+            <tr class="total">
+              <td>Net monthly to you</td>
+              <td>₹97</td>
+              <td class="math-highlight-strong">₹23,452</td>
+              <td>₹46,807</td>
+            </tr>
+            <tr class="total">
+              <td>Return on capital</td>
+              <td>Breakeven</td>
+              <td class="math-highlight-strong">43%</td>
+              <td>86%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="font-size: 1.125rem; font-weight: 600; color: #fff; margin-bottom: 1rem;">Read this properly — we'd rather you understood it now than later:</div>
+    <ul class="caveats">
+      <li>Breakeven is around 45% occupancy. Below that you're cash-negative against rent.</li>
+      <li>A ten-point occupancy swing roughly doubles or halves your profit. That sensitivity is exactly why professional management matters — and why our commission is tied to your revenue.</li>
+      <li>Illustrative figures. You get a property-specific projection during assessment, before you commit.</li>
+      <li>No minimum guarantees. Performance-linked. <strong>We only earn when you earn.</strong></li>
+    </ul>
+  </section>
+
+  <!-- SECTION — WHY NOT A TRADITIONAL BNB -->
+  <section class="meteor-target prog-section section-container">
+    <h2 class="prog-h2 prog-display">WHY NOT A TRADITIONAL BNB</h2>
+    
+    <div class="vs-table-outer">
+      <div class="vs-table-scroll">
+        <table class="vs-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Example</th>
+              <th>RED FLAG OUTPOST</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Entry cost</td>
+              <td>₹2L – ₹50L</td>
+              <td>From ₹1,28,999</td>
+            </tr>
+            <tr>
+              <td>Staff to hire</td>
+              <td>10–15 people</td>
+              <td>Zero</td>
+            </tr>
+            <tr>
+              <td>Ops experience</td>
+              <td>Essential</td>
+              <td>None</td>
+            </tr>
+            <tr>
+              <td>Onboarding fee</td>
+              <td>Standard</td>
+              <td>Zero</td>
+            </tr>
+            <tr>
+              <td>Ongoing commission</td>
+              <td>17–20% typical</td>
+              <td>13.5–15%</td>
+            </tr>
+            <tr>
+              <td>Design</td>
+              <td>Template</td>
+              <td>Bespoke, brand-led</td>
+            </tr>
+            <tr>
+              <td>Marketing</td>
+              <td>Your problem</td>
+              <td>Creator-led, ours</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPLICATION FORM -->
+  <section class="prog-section section-container" id="apply">
+    <h2 class="prog-h2 prog-display">Deploy Your Capital</h2>
+    <p class="prog-p">Ready to build a hospitality portfolio? Request an allocation spot with our expansion team.</p>
+    
+    <div class="form-wrap">
+      <form id="apply-form">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="app-name" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="app-email" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label>Contact Number</label>
+          <input type="tel" id="app-tel" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label>Target City</label>
+          <input type="text" id="app-city" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label>Deployable Capital <span style="color:var(--bx-signal);">*</span></label>
+          <select id="app-capital" class="form-control" required>
+            <option value="" disabled selected>Select an option...</option>
+            <option value="₹1.5 Lakh – ₹3 Lakh (Studio track)">₹1.5 Lakh – ₹3 Lakh (→ Studio)</option>
+            <option value="₹3 Lakh – ₹8 Lakh (Villa track)">₹3 Lakh – ₹8 Lakh (→ Villa)</option>
+            <option value="₹8 Lakh+ (Estate / Multi-property track)">₹8 Lakh+ (→ Villa multi-property / Estate track)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Do you already have a property in mind?</label>
+          <select id="app-property" class="form-control" required>
+            <option value="" disabled selected>Select an option...</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Looking">Looking</option>
+          </select>
+        </div>
+        <button type="submit" class="prog-btn interactive-btn" style="width: 100%; margin-top: 20px;"><span class="btn-dot"></span><span class="btn-label-default">Apply for Allocation</span><span class="btn-label-hover">Apply for Allocation →</span></button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="meteor-target cta-section section-container">
+    <h1 class="cta-h1">Be part of the revolution.</h1>
+    <p class="cta-p">Founding Partner allocation is limited.</p>
+    <a href="#apply" class="prog-btn interactive-btn"><span class="btn-dot"></span><span class="btn-label-default">Apply for Allocation</span><span class="btn-label-hover">Apply for Allocation →</span></a>
+    
+    <div class="footer-meta">
+      <a href="mailto:partners@redflagworld.co.uk" style="text-decoration: underline; text-underline-offset: 4px;">partners@redflagworld.co.uk</a><br />
+      <span style="display:inline-block; margin-top: 10px;">Red Flag Homes Network · a Red Flag World Holdings Ltd company</span>
+    </div>
+  </section>
+
+
+<!-- Newsletter Modal -->
+<div id="newsletter-modal" class="nl-modal" aria-hidden="true">
+  <div class="nl-overlay" id="nl-close-overlay"></div>
+  <div class="nl-content">
+    <button class="nl-close" id="nl-close-btn" aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+    </button>
+    <h2 class="nl-title">The Inner Circle</h2>
+    <p class="nl-desc">Subscribe to receive exclusive access to unlisted properties and investment insights.</p>
+    <form id="nl-form" class="nl-form">
+      <input type="email" placeholder="Your email address" required class="nl-input" />
+      <button type="submit" class="prog-btn interactive-btn nl-submit" style="width: 100%; border: none;">
+        <span class="btn-dot"></span>
+        <span class="btn-label-default">Subscribe</span>
+        <span class="btn-label-hover">Subscribe →</span>
+      </button>
+    </form>
+    <p id="nl-success" class="nl-success">Welcome to the network.</p>
+  </div>
+</div>
+
+</main>
+
+<script>
+  /* ══ The entry cascade ═══════════════════════════════════════════════ */
+  (() => {
+    const STEP_MS = 45;
+    const FROM_Y = 14;
+    const TENSION = 220;
+    const FRICTION = 26;
+    const MASS = 1;
+    const PRECISION = 0.01;
+    const SUBSTEP = 1 / 240;
+
+    const root = document.documentElement;
+    root.classList.add("lk-js");
+
+    const nodes = Array.from(document.querySelectorAll("[data-rise]"));
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let generation = 0;
+
+    const rest = (el) => {
+      el.style.transform = "";
+      el.style.opacity = "1";
+      el.style.willChange = "";
+    };
+
+    const rise = (el, delayMs, gen) => {
+      el.style.opacity = "0";
+      el.style.transform = "translate3d(0," + FROM_Y + "px,0)";
+      el.style.willChange = "transform, opacity";
+
+      if (reduced) {
+        window.setTimeout(() => { if (gen === generation) rest(el); }, delayMs);
+        return;
+      }
+
+      let x = FROM_Y;
+      let v = 0;
+      let last = null;
+
+      const frame = (now) => {
+        if (gen !== generation) return;
+        if (last === null) last = now;
+
+        const dt = Math.min((now - last) / 1000, 0.064);
+        last = now;
+
+        const steps = Math.max(1, Math.ceil(dt / SUBSTEP));
+        const h = dt / steps;
+        for (let i = 0; i < steps; i++) {
+          const a = (-TENSION * x - FRICTION * v) / MASS;
+          v += a * h;
+          x += v * h;
+        }
+
+        const p = 1 - x / FROM_Y;
+        el.style.transform = "translate3d(0," + x.toFixed(3) + "px,0)";
+        el.style.opacity = String(Math.max(0, Math.min(1, p)));
+
+        if (Math.abs(x) < PRECISION && Math.abs(v) < PRECISION) return rest(el);
+        requestAnimationFrame(frame);
+      };
+
+      window.setTimeout(() => {
+        if (gen === generation) requestAnimationFrame(frame);
+      }, delayMs);
+    };
+
+    const play = () => {
+      const gen = ++generation;
+      nodes.forEach((el) => {
+        const order = Number(el.dataset.rise) || 0;
+        rise(el, order * STEP_MS, gen);
+      });
+    };
+
+    play();
+
+    addEventListener("keydown", (e) => {
+      if (e.key === "r" || e.key === "R") play();
+    });
+  })();
+
+  /* ══ Form submit to WhatsApp ══════════════════════════════════════════ */
+  document.getElementById('apply-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('app-name').value;
+    const email = document.getElementById('app-email').value;
+    const tel = document.getElementById('app-tel').value;
+    const city = document.getElementById('app-city').value;
+    const capital = document.getElementById('app-capital').value;
+    const prop = document.getElementById('app-property').value;
+
+    const msg = 
+`NEW FRANCHISE APPLICATION:
+Name: ${name}
+Email: ${email}
+Contact: ${tel}
+Target City: ${city}
+Deployable Capital: ${capital}
+Property in mind: ${prop}`;
+
+    const whatsappUrl = `https://wa.me/918881306632?text=${encodeURIComponent(msg)}`;
+    window.open(whatsappUrl, '_blank');
+  });
+
+  /* ══ Stat Counter ════════════════════════════════════════════════════ */
+  const statNumbers = document.querySelectorAll('.stat-number');
+  let hasCounted = false;
+
+  const countUp = (el, target, format) => {
+    let start = 0;
+    const duration = 1400; // 1.4s
+    const startTime = performance.now();
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const formatCurrency = (val) => {
+      return '₹' + Math.round(val).toLocaleString('en-IN') + (format === 'mo' ? ' /mo' : '');
+    };
+
+    if (reduced) {
+      el.textContent = formatCurrency(target);
+      return;
+    }
+
+    const easeOutQuart = (t) => 1 - (--t) * t * t * t;
+
+    const update = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const current = start + (target - start) * easeOutQuart(progress);
+      
+      el.textContent = formatCurrency(current);
+      
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        el.textContent = formatCurrency(target);
+      }
+    };
+    
+    requestAnimationFrame(update);
+  };
+
+  const statObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !hasCounted) {
+        hasCounted = true;
+        statNumbers.forEach(el => {
+          const target = parseInt(el.getAttribute('data-val'), 10);
+          const format = el.getAttribute('data-format');
+          countUp(el, target, format);
+        });
+      }
+    });
+  }, { threshold: 0.5 });
+
+  const statSection = document.querySelector('.stat-section');
+  if (statSection) statObserver.observe(statSection);
+
+
+  // Performance: Video Lazy Loading & Play/Pause
+  document.addEventListener('DOMContentLoaded', () => {
+    const isMobile = window.innerWidth < 768;
+    
+  });
+
+</script>
+
+<script>
+  // Meteor initialization
+  document.addEventListener("DOMContentLoaded", () => {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) return;
+    const targets = document.querySelectorAll('.meteor-target');
+    targets.forEach(section => {
+      const container = document.createElement('div');
+      container.className = 'meteor-shower';
+      for (let i = 0; i < 30; i++) {
+        const m = document.createElement('span');
+        m.className = 'meteor';
+        const left = Math.random() * 100;
+        const top = (Math.random() * 20) - 10;
+        const delay = Math.random() * 5;
+        const duration = 4 + (Math.random() * 6);
+        m.style.left = left + '%';
+        m.style.top = top + '%';
+        m.style.animation = `meteor ${duration}s linear ${delay}s infinite`;
+        container.appendChild(m);
+      }
+      section.appendChild(container);
+    });
+  });
+
+// Newsletter Modal Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('newsletter-modal');
+  const closeBtn = document.getElementById('nl-close-btn');
+  const overlay = document.getElementById('nl-close-overlay');
+  const form = document.getElementById('nl-form');
+  const success = document.getElementById('nl-success');
+  
+  if (!modal) return;
+  
+  let hasTriggered = sessionStorage.getItem('rf_newsletter_seen');
+  
+  const checkScroll = () => {
+    if (hasTriggered) return;
+    const scrollPos = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = scrollPos / docHeight;
+    
+    if (scrollPercent >= 0.75) {
+      openModal();
+    }
+  };
+  
+  const openModal = () => {
+    modal.classList.add('is-open');
+    modal.removeAttribute('aria-hidden');
+    hasTriggered = true;
+    sessionStorage.setItem('rf_newsletter_seen', 'true');
+    window.removeEventListener('scroll', checkScroll);
+  };
+  
+  const closeModal = () => {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+  
+  window.addEventListener('scroll', checkScroll, { passive: true });
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (overlay) overlay.addEventListener('click', closeModal);
+  
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      form.style.display = 'none';
+      success.style.display = 'block';
+      setTimeout(closeModal, 2500);
+    });
+  }
+});
+
+</script>
+<script src="transitions.js"></script>
+</body>
+</html>

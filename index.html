@@ -176,9 +176,9 @@
     #mobile-menu {
       position: fixed; inset: 0; background: var(--background); color: var(--foreground);
       z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+      opacity: 0; pointer-events: none; transform: translateX(100%); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    #mobile-menu.active { opacity: 1; pointer-events: auto; }
+    #mobile-menu.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
     #mobile-menu-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: inherit; cursor: pointer; padding: 0.5rem; }
     #mobile-menu a { font-size: 2rem; text-decoration: none; color: inherit; margin: 1rem 0; font-family: var(--font-display); text-transform: uppercase; transition: opacity 0.2s ease; }
     #mobile-menu a:hover { opacity: 0.6; }
@@ -298,44 +298,7 @@
     #franchise-overlay { position: absolute; inset: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 0; pointer-events: none; }
     #franchise { background: var(--background); color: var(--foreground); padding: 8rem 1.5rem; text-align: center;  position: relative; overflow: hidden; }
     .franchise-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: center;  position: relative; z-index: 1; }
-    @keyframes sweep-gradient {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    .franchise-label { 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .franchise-label::before,
-    .franchise-label::after {
-      content: '';
-      display: block;
-      width: 60px;
-      height: 1px;
-      background: rgba(163,22,33,0.4);
-    }
-    .franchise-label span {
-      font-size: 32px;
-      font-family: "Michroma", var(--typeface-ui), sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.35em;
-      font-weight: 300;
-      background: linear-gradient(110deg, #A31621 0%, #ffffff 50%, #A31621 100%);
-      background-size: 200% 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      animation: sweep-gradient 3s linear infinite;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .franchise-label span {
-        animation: none;
-        background-position: 50% 0;
-      }
-    }
+    /* removed sweep-gradient */
     .franchise-header { margin-bottom: 1.5rem; }
     .franchise-subtitle { margin-bottom: 4rem; max-width: 600px; line-height: 1.5; }
     .franchise-stats { display: flex; align-items: center; justify-content: center; gap: 2rem; margin-bottom: 1rem; width: 100%; }
@@ -1406,13 +1369,8 @@
         line-height: 1.4 !important;
       }
       
-      .franchise-label span {
-        font-size: 20px !important;
-      }
-      .franchise-label::before,
-      .franchise-label::after {
-        width: 32px !important;
-      }
+      
+      
 
       /* Block 3 Philosophy mobile handling */
       #b3-pin-container {
@@ -1799,6 +1757,52 @@
   .nl-input { width: 100%; text-align: center; }
   .nl-success { margin-top: 1rem; font-family: var(--typeface-ui); color: var(--foreground-accent); font-size: 0.95rem; display: none; }
 
+  
+    @keyframes aurora-cycle {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .aurora {
+      background: linear-gradient(135deg, #A31621, #D93B4A, #E8E4DF, #5C1220, #A31621);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: aurora-cycle 8s ease-in-out infinite;
+      display: inline-block;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .aurora {
+        animation: none;
+        background-position: 50% 50%;
+      }
+    }
+    .aurora-headline {
+      font-family: "Michroma", var(--typeface-ui), sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      font-size: 28px;
+          line-height: 1.4;
+      padding: 0.1em 0;
+    }
+    .aurora-headline-wrapper {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+    }
+    .aurora-rule {
+      width: 80px;
+      height: 1px;
+      background: rgba(163,22,33,0.35);
+      margin-top: 32px;
+    }
+    @media (max-width: 768px) {
+      .aurora-headline { font-size: 18px; }
+      .aurora-headline-wrapper { width: 100%; box-sizing: border-box; }
+    }
+
   </style>
 </head>
 <body>
@@ -1854,7 +1858,10 @@
   <video autoplay muted loop playsinline  id="book-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/pool.mp4"  muted loop playsinline></video>
   <div id="book-overlay"></div>
   <div id="book-container">
-    <div class="book-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--raw-color-velvet-500); margin-bottom: 1rem; font-family: var(--typeface-ui); font-weight: 600;">RED FLAG HOMES</div>
+        <div class="aurora-headline-wrapper">
+      <div class="aurora aurora-headline">RED FLAG HOMES</div>
+      <div class="aurora-rule"></div>
+    </div>
     <div class="display text-trim" style="text-align: center; margin-bottom: 1rem; font-size: 3rem;">Book Direct & Save Up to 10%</div>
     <div class="caption" style="text-align: center; margin-bottom: 3rem; max-width: 600px;">Book directly with Red Flag Homes for the best prices, exclusive offers and personalised hospitality.</div>
     
@@ -1981,7 +1988,10 @@
   <video autoplay muted loop playsinline  id="franchise-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/host.mp4"  muted loop playsinline></video>
   <div id="franchise-overlay"></div>
   <div class="franchise-container">
-    <div class="franchise-label"><span>RED FLAG OUTPOST</span></div>
+        <div class="aurora-headline-wrapper">
+      <div class="aurora aurora-headline">RED FLAG OUTPOST</div>
+      <div class="aurora-rule"></div>
+    </div>
     <div class="franchise-header display text-trim">
       <span class="italic">N</span>o property? <span class="italic">N</span>o problem.
     </div>
@@ -2177,11 +2187,12 @@
     <!-- NEWSLETTER — opaque light cell -->
     <section class="ft-card ft-card--light ft-news">
       <div class="ft-tag"><span>NEWSLETTER</span></div>
-      <p class="ft-news-body">Stays, openings and the occasional good idea.</p>
-      <div class="ft-news-form">
-        <input type="email" id="newsletter-input" placeholder="Your e-mail" />
-        <button id="newsletter-btn">Subscribe</button>
-      </div>
+      <p class="ft-news-body" id="ft-news-body">Stays, openings and the occasional good idea.</p>
+      <form class="ft-news-form" id="footer-newsletter-form">
+        <input type="email" id="newsletter-input" placeholder="Your e-mail" required />
+        <button type="submit" id="newsletter-btn">Subscribe</button>
+      </form>
+      <p id="ft-news-success" style="display: none; color: var(--raw-color-velvet-500); font-size: 0.95rem; margin-top: 1rem; font-weight: 500;">Welcome to the network.</p>
     </section>
 
     
@@ -2884,9 +2895,27 @@ document.addEventListener('DOMContentLoaded', () => {
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      form.style.display = 'none';
+      const input = form.querySelector('input[type="email"]');
+      if (input) input.value = '';
       if (success) success.style.display = 'block';
       setTimeout(closeModal, 2500);
+    });
+  }
+  
+  // Footer Newsletter Logic
+  const footerForm = document.getElementById('footer-newsletter-form');
+  const footerSuccess = document.getElementById('ft-news-success');
+  if (footerForm) {
+    footerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = footerForm.querySelector('input[type="email"]');
+      if (input) input.value = '';
+      if (footerSuccess) {
+        footerSuccess.style.display = 'block';
+        setTimeout(() => {
+          footerSuccess.style.display = 'none';
+        }, 5000);
+      }
     });
   }
 });
