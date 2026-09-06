@@ -514,6 +514,42 @@
     * {
       max-width: 100vw;
     }
+
+    @media (max-width: 768px) {
+      /* Reset massive heights and padding */
+      #block3, #block4, #book, #franchise, #journal, .journal-container {
+        height: auto !important;
+        min-height: auto !important;
+        margin-top: 0 !important;
+      }
+      #b3-pin-container { position: relative !important; height: auto !important; }
+      #journal, #franchise, #contact, #book, #block4 { padding: 4rem 1.5rem !important; }
+      .journal-container { gap: 2rem !important; }
+      
+      
+      #wordmark-top {
+        display: none !important;
+      }
+    
+      /* Right Rail Shrink & Move */
+      #right-rail {
+        top: 4.5rem !important;
+        width: 2rem !important;
+      }
+      
+      .rail-btn {
+        min-height: 2.5rem !important;
+        padding: 0.75rem 0 !important;
+        font-size: 0.55rem !important;
+        border-top: 1px solid rgba(255,255,255,0.2) !important;
+      }
+      #right-rail {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+    
+    }
+    
 </style>
 </head>
 <body>
@@ -532,7 +568,7 @@
     <header class="bx-nav" data-rise="0">
       <div class="bx-menu">
         <a class="bx-brand" href="index.html">
-          <img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Homes Network" />
+          <img  src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Homes Network" />
         </a>
         <a class="bx-link" href="index.html">Home</a>
         <a class="bx-link" href="index.html#book">Book a Stay</a>
@@ -1017,31 +1053,7 @@ Property in mind: ${prop}`;
   // Performance: Video Lazy Loading & Play/Pause
   document.addEventListener('DOMContentLoaded', () => {
     const isMobile = window.innerWidth < 768;
-    const lazyVideos = document.querySelectorAll('.lazy-video');
     
-    const videoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          if (isMobile) {
-            // On mobile, just load metadata for the first frame if we want a static poster
-            // Or better, we can just load and pause immediately
-            video.setAttribute('preload', 'metadata');
-          } else {
-            video.setAttribute('preload', 'auto');
-            const playPromise = video.play();
-            if (playPromise !== undefined) {
-              playPromise.catch(e => console.warn("Auto-play prevented", e));
-            }
-          }
-        } else {
-          // Pause when off-screen to save CPU
-          video.pause();
-        }
-      });
-    }, { rootMargin: '200px' });
-    
-    lazyVideos.forEach(v => videoObserver.observe(v));
   });
 
 </script>

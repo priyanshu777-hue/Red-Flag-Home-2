@@ -13,31 +13,7 @@
   // Performance: Video Lazy Loading & Play/Pause
   document.addEventListener('DOMContentLoaded', () => {
     const isMobile = window.innerWidth < 768;
-    const lazyVideos = document.querySelectorAll('.lazy-video');
     
-    const videoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          if (isMobile) {
-            // On mobile, just load metadata for the first frame if we want a static poster
-            // Or better, we can just load and pause immediately
-            video.setAttribute('preload', 'metadata');
-          } else {
-            video.setAttribute('preload', 'auto');
-            const playPromise = video.play();
-            if (playPromise !== undefined) {
-              playPromise.catch(e => console.warn("Auto-play prevented", e));
-            }
-          }
-        } else {
-          // Pause when off-screen to save CPU
-          video.pause();
-        }
-      });
-    }, { rootMargin: '200px' });
-    
-    lazyVideos.forEach(v => videoObserver.observe(v));
   });
 
 </script>
@@ -74,8 +50,8 @@
       --raw-duration-normal: 250ms;
       --raw-radius-xs: 0.25rem;
 
-      --raw-text-display: clamp(2rem, 5vw + 1rem, 5.625rem);
-      --raw-text-wordmark: clamp(1.5rem, 2vw + 1rem, 1.5rem);
+      --raw-text-display: clamp(1.75rem, 5vw + 1rem, 5.625rem);
+      --raw-text-wordmark: clamp(1.375rem, 2vw + 1rem, 1.5rem);
       --raw-text-body: clamp(0.9375rem, 1vw + 0.5rem, 1rem);
       --raw-text-caption: clamp(0.75rem, 1vw + 0.3rem, 0.875rem);
 
@@ -567,6 +543,7 @@
  * columns exactly. */
 .ft-card--union {
   color: var(--on-dark);
+  background-color: #000;
   background-image: var(--grad);
   background-repeat: no-repeat;
   background-size: var(--win-w) var(--win-h);
@@ -596,7 +573,7 @@
   height: var(--win-h);
   max-width: none;
   object-fit: cover;
-  opacity: 0.55;
+  opacity: 0.3;
 }
 
 /* ── Placement ────────────────────────────────────────────────────────
@@ -1030,17 +1007,53 @@
     * {
       max-width: 100vw;
     }
+
+    @media (max-width: 768px) {
+      /* Reset massive heights and padding */
+      #block3, #block4, #book, #franchise, #journal, .journal-container {
+        height: auto !important;
+        min-height: auto !important;
+        margin-top: 0 !important;
+      }
+      #b3-pin-container { position: relative !important; height: auto !important; }
+      #journal, #franchise, #contact, #book, #block4 { padding: 4rem 1.5rem !important; }
+      .journal-container { gap: 2rem !important; }
+      
+      
+      #wordmark-top {
+        display: none !important;
+      }
+    
+      /* Right Rail Shrink & Move */
+      #right-rail {
+        top: 4.5rem !important;
+        width: 2rem !important;
+      }
+      
+      .rail-btn {
+        min-height: 2.5rem !important;
+        padding: 0.75rem 0 !important;
+        font-size: 0.55rem !important;
+        border-top: 1px solid rgba(255,255,255,0.2) !important;
+      }
+      #right-rail {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+    
+    }
+    
 </style>
 </head>
 <body>
     <a href="index.html" id="site-logo" aria-label="Go to homepage">
-      <img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Logo" />
+      <img  src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Logo" />
     </a>
 
 <div id="vignette"></div>
 
 <section id="hero">
-  <video preload="none" class="lazy-video" id="vid-base" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/hero.mp4" muted playsinline  loop></video>
+  <video autoplay muted loop playsinline  id="vid-base" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/hero.mp4" muted playsinline  loop></video>
   <div id="hero-grain"></div>
   <div id="hero-veil"></div>
 
@@ -1078,29 +1091,11 @@
     </div>
     
     
-    <div class="book-benefits">
-      <div class="benefit-item">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        Zero platform fees
       </div>
-      <div class="benefit-item">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        Best price guaranteed
-      </div>
-      <div class="benefit-item">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        Instant WhatsApp response
-      </div>
-      <div class="benefit-item">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        Personalised service
-      </div>
-    </div>
-  </div>
 </section>
 
 <section id="book">
-  <video preload="none" class="lazy-video" id="book-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/pool.mp4"  muted loop playsinline></video>
+  <video autoplay muted loop playsinline  id="book-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/pool.mp4"  muted loop playsinline></video>
   <div id="book-overlay"></div>
   <div id="book-container">
     <div class="book-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--raw-color-velvet-500); margin-bottom: 1rem; font-family: var(--typeface-ui); font-weight: 600;">RED FLAG HOMES</div>
@@ -1153,12 +1148,31 @@
           Check Availability
         </button>
     </form>
+    <div class="book-benefits">
+      <div class="benefit-item">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Zero platform fees
+      </div>
+      <div class="benefit-item">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Best price guaranteed
+      </div>
+      <div class="benefit-item">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Instant WhatsApp response
+      </div>
+      <div class="benefit-item">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--raw-color-signal-red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Personalised service
+      </div>
+    </div>
+
   </div>
 </section>
 
 <section id="block3" style="height: 100vh;">
   <div id="b3-pin-container">
-    <img loading="lazy" decoding="async" id="b3-bg-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 3/pexels-arthousestudio-4344885.jpg" />
+    <img  id="b3-bg-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 3/pexels-arthousestudio-4344885.jpg" />
     <div id="b3-scrim"></div>
     <div id="b3-content">
       <div id="b3-headline" class="display text-trim">
@@ -1179,7 +1193,7 @@
   </div>
   <div id="b4-panels">
     <div class="b4-panel active">
-      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/handpicked.jpeg" class="b4-panel-img" alt="Handpicked Homes" loading="lazy" /></div>
+      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/handpicked.jpeg" class="b4-panel-img" alt="Handpicked Homes"  /></div>
       <div class="b4-panel-scrim"></div>
       <div class="b4-panel-content">
         <div class="wordmark text-trim"><span class="italic">H</span>andpicked <span class="italic">H</span>omes</div>
@@ -1188,7 +1202,7 @@
       </div>
     </div>
     <div class="b4-panel">
-      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/cleaning.JPEG" class="b4-panel-img" alt="Fully Managed" loading="lazy" /></div>
+      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/cleaning.JPEG" class="b4-panel-img" alt="Fully Managed"  /></div>
       <div class="b4-panel-scrim"></div>
       <div class="b4-panel-content">
         <div class="wordmark text-trim"><span class="italic">F</span>ully <span class="italic">M</span>anaged</div>
@@ -1197,7 +1211,7 @@
       </div>
     </div>
     <div class="b4-panel">
-      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/guest.JPEG" class="b4-panel-img" alt="Guest-First Service" loading="lazy" /></div>
+      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/guest.JPEG" class="b4-panel-img" alt="Guest-First Service"  /></div>
       <div class="b4-panel-scrim"></div>
       <div class="b4-panel-content">
         <div class="wordmark text-trim"><span class="italic">G</span>uest-First <span class="italic">S</span>ervice</div>
@@ -1209,7 +1223,7 @@
 </section>
 
 <section id="franchise">
-  <video preload="none" class="lazy-video" id="franchise-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/host.mp4"  muted loop playsinline></video>
+  <video autoplay muted loop playsinline  id="franchise-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/host.mp4"  muted loop playsinline></video>
   <div id="franchise-overlay"></div>
   <div class="franchise-container">
     <div class="franchise-label">RED FLAG OUTPOST</div>
@@ -1253,7 +1267,7 @@
     <div class="journal-grid">
       <article class="journal-card">
         <div class="journal-img-wrap">
-          <img class="journal-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block2/Iceland.png" alt="Journal 1" loading="lazy" />
+          <img class="journal-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block2/Iceland.png" alt="Journal 1"  />
         </div>
         <div class="journal-date">October 12, 2026</div>
         <h2 class="journal-title">Designing the Perfect Alpine Retreat</h2>
@@ -1261,7 +1275,7 @@
       </article>
       <article class="journal-card">
         <div class="journal-img-wrap">
-          <img class="journal-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block2/Norway.png" alt="Journal 2" loading="lazy" />
+          <img class="journal-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block2/Norway.png" alt="Journal 2"  />
         </div>
         <div class="journal-date">September 28, 2026</div>
         <h2 class="journal-title">The Future of AI-Managed Hospitality</h2>
@@ -1269,7 +1283,7 @@
       </article>
       <article class="journal-card">
         <div class="journal-img-wrap">
-          <img class="journal-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block2/Japan.png" alt="Journal 3" loading="lazy" />
+          <img class="journal-img" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block2/Japan.png" alt="Journal 3"  />
         </div>
         <div class="journal-date">September 15, 2026</div>
         <h2 class="journal-title">A Culinary Journey Through Kyoto</h2>
@@ -1401,10 +1415,10 @@
       </span>
       <div class="ft-tag"><span>FOLLOW</span></div>
       <div class="ft-chips">
-        <a href="https://wa.me/1234567890" aria-label="WhatsApp"><img loading="lazy" decoding="async" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" /></a>
-        <a href="#" aria-label="Instagram"><img loading="lazy" decoding="async" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 5/SocialMedia1.svg" alt="Instagram" /></a>
-        <a href="#" aria-label="Facebook"><img loading="lazy" decoding="async" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 5/SocialMedia2.svg" alt="Facebook" /></a>
-        <a href="#" aria-label="YouTube"><img loading="lazy" decoding="async" src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 5/SocialMedia3.png" alt="YouTube" style="filter:invert(1)"/></a>
+        <a href="https://wa.me/1234567890" aria-label="WhatsApp"><img  src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" /></a>
+        <a href="#" aria-label="Instagram"><img  src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 5/SocialMedia1.svg" alt="Instagram" /></a>
+        <a href="#" aria-label="Facebook"><img  src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 5/SocialMedia2.svg" alt="Facebook" /></a>
+        <a href="#" aria-label="YouTube"><img  src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 5/SocialMedia3.png" alt="YouTube" style="filter:invert(1)"/></a>
       </div>
     </section>
 
