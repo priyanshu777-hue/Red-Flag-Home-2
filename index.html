@@ -194,7 +194,7 @@
       padding: 0 1.5rem; box-sizing: border-box;
     }
     #hero-headline { width: 100%; font-size: var(--raw-text-display); word-break: normal; overflow-wrap: break-word; }
-    #hero-subtitle { font-size: 0.9rem; color: var(--foreground-accent-muted); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    #hero-subtitle { font-size: 0.9rem; color: var(--foreground-accent-muted); letter-spacing: 0.05em; text-transform: uppercase;  max-width: 100%; }
     
     #hero-actions { display: flex; justify-content: center; gap: 1rem; pointer-events: auto; }
     .btn-pill { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.5rem; border-radius: 9999px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.8rem; font-weight: 500; transition: all 0.2s ease; }
@@ -1024,6 +1024,49 @@
         display: none !important;
       }
     
+      
+      #book-container .display.text-trim {
+        font-size: clamp(2rem, 8vw, 3rem) !important;
+      }
+    
+      
+      .journal-img-wrap {
+        aspect-ratio: 16/9 !important;
+      }
+    
+      
+      .prog-section {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+      }
+      .prog-display {
+        font-size: clamp(1.5rem, 8vw, 6rem) !important;
+        word-break: break-word !important;
+      }
+      .vs-table-wrapper {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+    
+      
+      #b4-panels, .b4-panel {
+        height: auto !important;
+        min-height: auto !important;
+      }
+      .b4-panel {
+        padding: 4rem 1.5rem !important;
+      }
+      .b4-panel-content {
+        position: relative !important;
+        inset: auto !important;
+        height: auto !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    
       /* Right Rail Shrink & Move */
       #right-rail {
         top: 4.5rem !important;
@@ -1031,10 +1074,11 @@
       }
       
       .rail-btn {
-        min-height: 2.5rem !important;
+        min-height: max-content !important;
+        margin-bottom: 2px !important;
+        border-bottom: 1px solid rgba(255,255,255,0.4) !important;
         padding: 0.75rem 0 !important;
         font-size: 0.55rem !important;
-        border-top: 1px solid rgba(255,255,255,0.2) !important;
       }
       #right-rail {
         display: flex !important;
@@ -1193,7 +1237,7 @@
   </div>
   <div id="b4-panels">
     <div class="b4-panel active">
-      <div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/handpicked.jpeg" class="b4-panel-img" alt="Handpicked Homes"  /></div>
+      
       <div class="b4-panel-scrim"></div>
       <div class="b4-panel-content">
         <div class="wordmark text-trim"><span class="italic">H</span>andpicked <span class="italic">H</span>omes</div>

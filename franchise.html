@@ -386,6 +386,7 @@
     /* THE MATH */
     .math-table-wrap {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       margin-top: 40px;
       margin-bottom: 40px;
     }
@@ -531,6 +532,49 @@
         display: none !important;
       }
     
+      
+      #book-container .display.text-trim {
+        font-size: clamp(2rem, 8vw, 3rem) !important;
+      }
+    
+      
+      .journal-img-wrap {
+        aspect-ratio: 16/9 !important;
+      }
+    
+      
+      .prog-section {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+      }
+      .prog-display {
+        font-size: clamp(1.5rem, 8vw, 6rem) !important;
+        word-break: break-word !important;
+      }
+      .vs-table-wrapper {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+    
+      
+      #b4-panels, .b4-panel {
+        height: auto !important;
+        min-height: auto !important;
+      }
+      .b4-panel {
+        padding: 4rem 1.5rem !important;
+      }
+      .b4-panel-content {
+        position: relative !important;
+        inset: auto !important;
+        height: auto !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    
       /* Right Rail Shrink & Move */
       #right-rail {
         top: 4.5rem !important;
@@ -538,10 +582,11 @@
       }
       
       .rail-btn {
-        min-height: 2.5rem !important;
+        min-height: max-content !important;
+        margin-bottom: 2px !important;
+        border-bottom: 1px solid rgba(255,255,255,0.4) !important;
         padding: 0.75rem 0 !important;
         font-size: 0.55rem !important;
-        border-top: 1px solid rgba(255,255,255,0.2) !important;
       }
       #right-rail {
         display: flex !important;
@@ -715,7 +760,7 @@
     <p class="prog-p" style="font-size: 1rem;"><strong>Assumptions:</strong> ADR ₹9,000 · rent ₹75,000/mo · operating costs ₹30,000/mo</p>
     
     <div class="math-table-wrap">
-      <table class="math-table">
+      <div class="vs-table-wrapper"><table class="math-table">
         <thead>
           <tr>
             <th>Occupancy</th>
@@ -765,7 +810,7 @@
             <td>86%</td>
           </tr>
         </tbody>
-      </table>
+      </table></div></div>
     </div>
 
     <div style="font-size: 1.125rem; font-weight: 600; color: #fff; margin-bottom: 1rem;">Read this properly — we'd rather you understood it now than later:</div>
@@ -782,7 +827,7 @@
     <h2 class="prog-h2 prog-display">WHY NOT A TRADITIONAL BNB</h2>
     
     <div style="overflow-x: auto;">
-      <table class="vs-table" style="min-width: 600px;">
+      <div class="vs-table-wrapper"><table class="vs-table" style="min-width: 600px;">
         <thead>
           <tr>
             <th></th>
