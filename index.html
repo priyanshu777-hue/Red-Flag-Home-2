@@ -1073,6 +1073,7 @@
       <div id="hero-subtitle">A Curated Collection of Extraordinary Homes</div>
       <div id="hero-actions">
         <a href="#book" class="btn-pill btn-fill">Book a Stay</a>
+        <a href="franchise.html" class="btn-pill btn-outline">Partner With Us</a>
       </div>
     </div>
     
@@ -1337,8 +1338,7 @@
     <!-- BRAND — union cell, origin (0, 0) -->
     <section class="ft-card ft-card--union ft-brand">
       <span class="ft-asset" aria-hidden="true">
-        <video preload="none" class="lazy-video" data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4"
-                muted loop playsinline ></video>
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="metadata"></video>
       </span>
       <div class="ft-mark">RED FLAG HOMES NETWORK</div>
       <nav class="ft-nav">
@@ -1364,8 +1364,7 @@
     <!-- STAT — union cell, origin (col + gap, r1 + gap) -->
     <section class="ft-card ft-card--union ft-stat" id="footer-stats">
       <span class="ft-asset" aria-hidden="true">
-        <video preload="none" class="lazy-video" data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4"
-                muted loop playsinline ></video>
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="metadata"></video>
       </span>
       <div class="ft-stat-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; width: 100%; height: 100%; align-content: center; padding: 1rem;">
         <div class="ft-stat-item" style="text-align: center;">
@@ -1398,8 +1397,7 @@
     <!-- FOLLOW — union cell, origin (2 col + 2 gap, 0) -->
     <section class="ft-card ft-card--union ft-follow">
       <span class="ft-asset" aria-hidden="true">
-        <video preload="none" class="lazy-video" data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4"
-                muted loop playsinline ></video>
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="metadata"></video>
       </span>
       <div class="ft-tag"><span>FOLLOW</span></div>
       <div class="ft-chips">
@@ -1443,8 +1441,8 @@
     lenis.raf(time);
     
     // Run custom animations inside the single loop
-    if (typeof tickHero === 'function') tickHero();
-    if (typeof tickB3 === 'function') tickB3();
+    if (typeof tickHero === 'function') tickHero(time);
+    if (typeof tickB3 === 'function') tickB3(time);
     
     requestAnimationFrame(raf);
   }
