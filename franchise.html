@@ -62,9 +62,9 @@
       flex-direction: column;
     }
     .op-content-col {
-      width: 62%;
-      max-width: 1400px;
-      padding: 0 4vw 120px 4vw;
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
     }
     @media (max-width: 1024px) {
       .op-content-col {
@@ -104,13 +104,18 @@
 
     /* Section defaults */
     .op-section {
-      margin-top: 120px;
+      width: 100%;
+      background: rgba(10, 12, 18, 0.94);
+      padding: 120px 4vw;
+      margin: 0;
+      border-radius: 0;
+      box-sizing: border-box;
       opacity: 0;
       transition: opacity 0.4s ease-out;
       will-change: transform, opacity;
     }
-    .op-section.is-revealed {
-      opacity: 1;
+    .op-section.is-revealed, .stagger-child.is-revealed {
+      opacity: 1 !important;
     }
     @media (max-width: 767px) {
       .op-section {
@@ -197,7 +202,7 @@
     }
     .op-hero-content.is-ready {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) !important;
       transition: opacity 0.8s ease-out, transform 0.8s ease-out;
     }
     
@@ -584,6 +589,336 @@
       .aurora-headline-wrapper { width: 100%; box-sizing: border-box; }
     }
 
+  
+    #scene-video {
+      position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;
+    }
+    #global-bg-poster {
+      position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;
+      background: url('https://images.unsplash.com/photo-1542224566-6e85f2e6772f?q=80&w=1920') center/cover no-repeat;
+      display: none;
+    }
+    @media (max-width: 767px) {
+      #scene-video, #scene-canvas { display: none !important; }
+      #global-bg-poster { display: block !important; }
+      .op-section { padding: 80px 24px; border-radius: 0; margin: 0; width: 100%; }
+    }
+  
+    /* GLOBAL TYPOGRAPHY ENFORCEMENT */
+    h1, h2, h3, h4, h5, h6, .op-h1, .op-h2, .op-h3, .s1-h1, .s2-h2, .s3-h2, .op-stat-val {
+      font-family: 'Instrument Serif', serif !important;
+      font-weight: 400 !important;
+      color: rgba(255, 255, 255, 0.95) !important;
+    }
+    body, p, li, td, th, span, div, a, input, select, button, label, .op-body, .op-small, .s1-eye, .s2-eye, .s3-eye, .op-btn, .op-input, .op-select, .op-label, .op-ticker-item {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    /* Body & Secondary Text */
+    .op-body, p, li, th, td, .op-input, .op-select, .op-phase-desc, .op-phase-bullets {
+      font-size: 17px !important;
+      line-height: 1.6 !important;
+      color: rgba(255, 255, 255, 0.72) !important;
+    }
+    
+    /* Hero Headings */
+    .s1-h1, .s2-h2, .s3-h2 {
+      font-size: 56px !important;
+      line-height: 1.1 !important;
+      text-transform: none !important;
+    }
+    
+    /* Section Headings */
+    .op-h2 {
+      font-size: 40px !important;
+      line-height: 1.2 !important;
+      text-transform: none !important;
+    }
+    
+    /* Sub-headings */
+    .op-h3 {
+      font-size: 24px !important;
+      line-height: 1.3 !important;
+      text-transform: none !important;
+    }
+    
+    /* Small Labels */
+    .op-small, .s1-eye, .s2-eye, .s3-eye, .op-label, .op-phase-num, label {
+      font-size: 13px !important;
+      letter-spacing: 0.12em !important;
+      text-transform: uppercase !important;
+      color: rgba(255, 255, 255, 0.72) !important;
+    }
+
+    /* Form Cleanup */
+    #apply-form {
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .op-field {
+      margin-bottom: 0 !important;
+    }
+    .op-input, .op-select {
+      height: 44px !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255,255,255,0.25) !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+      padding: 0 8px !important;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .op-input:focus, .op-select:focus {
+      outline: none !important;
+      border-bottom: 1px solid #fff !important;
+    }
+    
+    #apply-form button[type="submit"] {
+      height: 48px;
+      background: #fff;
+      color: #000;
+      border: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 8px !important;
+      width: auto;
+      align-self: flex-start;
+      padding: 0 32px;
+      font-size: 14px;
+    }
+    #apply-form button[type="submit"]:hover {
+      background: rgba(255,255,255,0.8);
+    }
+
+  
+/* ADDITIONAL CSS FOR REDESIGN */
+.op-section {
+  width: 100%;
+  background: rgba(10, 12, 18, 0.94);
+  padding: 160px 0;
+  margin: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(24px);
+  will-change: transform, opacity;
+}
+.op-section.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 700ms ease-out, transform 700ms ease-out;
+}
+@media (max-width: 767px) {
+  .op-section {
+    padding: 96px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .op-section, .stagger-child {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+.op-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 4vw;
+  box-sizing: border-box;
+}
+
+/* Eyebrows */
+.op-eyebrow {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12px !important;
+  letter-spacing: 0.18em !important;
+  color: #a31621 !important; /* brand red */
+  text-transform: uppercase !important;
+  margin-bottom: 24px;
+  display: block;
+}
+
+/* Typography Scales */
+.op-h2 {
+  font-family: 'Instrument Serif', serif !important;
+  font-size: 40px !important;
+  line-height: 1.2 !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 400 !important;
+  text-transform: none !important;
+}
+.op-h3 {
+  font-family: 'Instrument Serif', serif !important;
+  font-size: 24px !important;
+  line-height: 1.3 !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 400 !important;
+  text-transform: none !important;
+}
+.op-body, p, li {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 17px !important;
+  line-height: 1.6 !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+.op-small {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+/* Economics Figure */
+.op-eco-fig {
+  font-family: 'Instrument Serif', serif !important;
+  font-size: 96px !important;
+  line-height: 1.1 !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  text-align: center;
+  font-weight: 400 !important;
+}
+@media (max-width: 767px) {
+  .op-eco-fig { font-size: 48px !important; }
+}
+.op-eco-yield {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 20px !important;
+  color: #a31621 !important;
+  text-align: center;
+  margin-top: 16px;
+}
+.op-eco-caveat {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  color: rgba(255,255,255,0.4) !important;
+  text-align: center;
+  margin-top: 48px;
+  margin-bottom: 80px;
+}
+
+/* Workings Table */
+.op-workings {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+.op-workings td, .op-workings th {
+  padding: 16px 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.2) !important;
+}
+.op-workings tr:last-child td {
+  border-bottom: none !important;
+}
+.op-workings td:last-child, .op-workings th:last-child {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* System Steps */
+.op-step {
+  display: flex;
+  position: relative;
+  margin-bottom: 80px;
+  align-items: center;
+}
+.op-step:last-child { margin-bottom: 0; }
+.op-step-num {
+  font-family: 'Instrument Serif', serif !important;
+  font-size: 120px !important;
+  color: rgba(255, 255, 255, 0.08) !important;
+  width: 50%;
+  text-align: center;
+  line-height: 1;
+}
+.op-step-content {
+  width: 50%;
+  padding: 0 4vw;
+}
+.op-step:nth-child(even) {
+  flex-direction: row-reverse;
+}
+.op-step-connector {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: -80px;
+  width: 1px;
+  background: #a31621;
+}
+.op-step:last-child .op-step-connector {
+  bottom: 0;
+}
+@media (max-width: 767px) {
+  .op-step { flex-direction: column !important; text-align: center; margin-bottom: 64px; }
+  .op-step-num { width: 100%; font-size: 80px !important; margin-bottom: 16px; }
+  .op-step-content { width: 100%; padding: 0; }
+  .op-step-connector { display: none; }
+}
+
+/* Form Styles Override */
+#apply-form {
+  max-width: 560px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.op-field {
+  margin-bottom: 0 !important;
+}
+.op-field label {
+  display: block !important;
+  font-size: 13px !important;
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  margin-bottom: 8px !important;
+}
+.op-input, .op-select {
+  width: 100% !important;
+  height: 44px !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(255,255,255,0.25) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 17px !important;
+  padding: 0 8px !important;
+  border-radius: 0 !important;
+  transition: border-color 0.2s !important;
+  box-sizing: border-box !important;
+}
+.op-input:focus, .op-select:focus {
+  outline: none !important;
+  border-bottom: 1px solid #fff !important;
+}
+.op-submit {
+  height: 44px;
+  background: #fff;
+  color: #000;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0 32px;
+  align-self: flex-start;
+  margin-top: 8px;
+  border-radius: 4px;
+}
+.op-submit:hover {
+  background: rgba(255,255,255,0.8);
+}
+
   </style>
 
   <link href="https://db.onlinewebfonts.com/c/95cecf452d3208890088a5b4c19c7ecf?family=Helvetica+Neue+ME" rel="stylesheet">
@@ -596,7 +931,7 @@
       position: relative;
       height: 500vh;
       width: 100%;
-      background: #000;
+      background: transparent;
     }
     #scene-inner {
       position: sticky;
@@ -862,6 +1197,13 @@
     @media (min-width: 768px) { #sec1 { padding: 80px; } }
     @media (min-width: 1024px) { #sec1 { padding: 128px; } }
     
+    .s1-eye {
+      color: rgba(29, 48, 69, 0.6);
+      font-size: 18px;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    
     .s1-h1 {
       font-size: clamp(2rem, 5vw, 5rem);
       font-weight: 300;
@@ -1021,11 +1363,16 @@
 </head>
 <body id="top">
   
+  
+  <video id="scene-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchiseoutpost.mp4" muted playsinline preload="auto" style="position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; pointer-events: none;"></video>
+  <canvas id="scene-canvas" width="1920" height="1080" style="position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; pointer-events: none; opacity: 0; transition: opacity 0.5s;"></canvas>
+
+  <div id="global-bg-poster"></div>
+  
   <!-- SCROLL SCENE -->
   <div id="scene-outer">
     <div id="scene-inner">
-      <video id="scene-video" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260821_114821_a8ca298f-be2c-4613-a4dd-51b69e16bbde.mp4" muted playsinline preload="auto"></video>
-      <canvas id="scene-canvas" width="1920" height="1080"></canvas>
+      
       
       <div id="scene-overlay">
         
@@ -1058,9 +1405,10 @@
         
         <!-- SECTION 1 -->
         <div class="scene-section" id="sec1">
-          <h1 class="s1-h1 stagger-child" style="transition-delay: 0ms">No property?<br>No problem.</h1>
-          <div class="s1-sub stagger-child" style="transition-delay: 150ms">You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.</div>
-          <a href="#apply" class="s1-btn stagger-child" style="transition-delay: 300ms">
+          <div class="s1-eye stagger-child" style="transition-delay: 0ms">Red Flag Outpost</div>
+          <h1 class="s1-h1 stagger-child" style="transition-delay: 150ms">No property?<br>No problem.</h1>
+          <div class="s1-sub stagger-child" style="transition-delay: 300ms">You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.</div>
+          <a href="#apply" class="s1-btn stagger-child" style="transition-delay: 450ms">
             <svg class="icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </a>
         </div>
@@ -1088,7 +1436,7 @@
         <!-- SECTION 3 -->
         <div class="scene-section" id="sec3">
           <div class="s3-content">
-            <div class="s3-eye stagger-child" style="transition-delay: 0ms">Red Flag Homes Network</div>
+            <div class="s3-eye stagger-child" style="transition-delay: 0ms">Red Flag Outpost</div>
             <h2 class="s3-h2 stagger-child" style="transition-delay: 150ms">Be part of<br>the revolution.</h2>
             <a href="#apply" class="s3-cta stagger-child" style="transition-delay: 300ms">
               <span class="s3-cta-text">Apply for Allocation</span>
@@ -1122,273 +1470,213 @@
     </div>
   </div>
 
-  <div class="op-layout op-parallax-fg" style="background: var(--outpost-void); position: relative; z-index: 10;">
+  <div class="op-layout op-parallax-fg" style="background: transparent; position: relative; z-index: 10;">
     <div class="op-content-col" style="padding-top: 80px;">
-<!-- STAT BAR -->
-      <section class="op-section op-stat-bar">
-        <div class="op-stat-figures">
-          <div class="op-h1 op-stat-val">₹75,000</div>
-          <div class="op-stat-arrow op-h1"><span>→</span></div>
-          <div class="op-h1 op-stat-val" id="stat-target">₹1,48,500</div>
-          <div class="op-h1 op-stat-val" style="color: var(--outpost-dust); font-size: 32px; align-self: flex-end; margin-bottom: 6px;">/mo</div>
-        </div>
-        <div class="op-stat-yield op-h3">≈ 2x yield spread</div>
-        <div class="op-stat-caveat op-small">Illustrative, 3-key Villa at 55% occupancy. Full workings below.</div>
-      </section>
 
-      <!-- TICKER -->
-      <section class="op-section" style="margin-top: 80px; padding: 0;">
-        <div class="op-ticker">
-          <div class="op-ticker-track">
-            <!-- Repeated items to ensure smooth infinite scroll -->
-            <div class="op-ticker-item">ASSET LIGHT · ZERO STAFF · CREATOR-LED MARKETING · AI-RUN OPERATIONS · LIFETIME SUPPORT · </div>
-            <div class="op-ticker-item">ASSET LIGHT · ZERO STAFF · CREATOR-LED MARKETING · AI-RUN OPERATIONS · LIFETIME SUPPORT · </div>
-            <div class="op-ticker-item">ASSET LIGHT · ZERO STAFF · CREATOR-LED MARKETING · AI-RUN OPERATIONS · LIFETIME SUPPORT · </div>
-            <div class="op-ticker-item">ASSET LIGHT · ZERO STAFF · CREATOR-LED MARKETING · AI-RUN OPERATIONS · LIFETIME SUPPORT · </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- INTRO -->
-      <section class="op-section op-intro">
-        <h2 class="op-h2" style="margin-bottom: 24px; color: var(--outpost-bone);">Most franchises hand you a business and leave you to run it. We hand you an asset and run it for you.</h2>
-        <p class="op-body">No staff to hire. No hospitality experience needed. No ops to learn. This is not a guessing game. It's a system. Here is exactly how your capital becomes a high-yield asset.</p>
-      </section>
-
-      <!-- EXECUTION MAP -->
-      <section class="op-section op-map" id="exec-map">
-        <div class="op-map-line"></div>
-        <div class="op-map-line-fill" id="map-line-fill"></div>
-        
-        <div class="op-phase phase-item">
-          <div class="op-phase-num">01</div>
-          <div class="op-phase-title">THE HUNT</div>
-          <p class="op-phase-desc op-body">We don't let you sign a bad lease. Using demand data from our managed portfolio, we assess your property — or help you find one in a high-demand, low-supply pocket.</p>
-          <ul class="op-phase-bullets op-body">
-            <li>Demand & occupancy-potential assessment</li>
-            <li>Lease negotiation support</li>
-            <li>Legal and risk review before you commit</li>
-          </ul>
-        </div>
-
-        <div class="op-phase phase-item">
-          <div class="op-phase-num">02</div>
-          <div class="op-phase-title">THE FLIP</div>
-          <p class="op-phase-desc op-body">Keys secured, our build team moves in. Ordinary spaces become premium, photograph-ready properties in under 45 days.</p>
-          <ul class="op-phase-bullets op-body">
-            <li>Signature interior transformation — Pinterest-forward, Greek-architecture accents</li>
-            <li>Furnishing, styling and decor procurement</li>
-            <li>Smart locks, keyless entry, high-speed WiFi</li>
-          </ul>
-        </div>
-
-        <div class="op-phase phase-item">
-          <div class="op-phase-num">03</div>
-          <div class="op-phase-title">THE DROP</div>
-          <p class="op-phase-desc op-body">We don't quietly list you and hope. Every property launches through content creators — building demand and a permanent content library from week one.</p>
-          <ul class="op-phase-bullets op-body">
-            <li>Creator stay campaign</li>
-            <li>Professional editorial shoot</li>
-            <li>Listing across Airbnb, Booking.com and direct</li>
-            <li>Direct booking setup — revenue that pays no platform commission</li>
-          </ul>
-        </div>
-
-        <div class="op-phase phase-item">
-          <div class="op-phase-num">04</div>
-          <div class="op-phase-title">THE YIELD</div>
-          <p class="op-phase-desc op-body">You step back. The system runs.</p>
-          <ul class="op-phase-bullets op-body">
-            <li>AI dynamic pricing, adjusting daily</li>
-            <li>24/7 automated guest messaging</li>
-            <li>Review and reputation management</li>
-            <li>Payouts twice monthly, 1st and 16th</li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- SETUP FLEX -->
-      <section class="op-section">
-        <h2 class="op-h2" style="margin-bottom: 24px; color: var(--outpost-bone);">SETUP FLEX</h2>
-        <p class="op-body" style="margin-bottom: 32px; color: var(--outpost-dust);">You don't need it all on day one. Pay 50% of setup upfront. The balance comes out of your booking payouts across the first nine months.</p>
-        <div class="op-h1" style="margin-bottom: 8px;">
-          <span style="font-size: 24px; color: var(--outpost-dust); font-family: 'Inter', sans-serif;">Villa day-one cash:</span> 
-          <span class="op-flex-strike">₹1,99,999</span> → ₹1,24,999
-        </div>
-        <p class="op-small" style="color: var(--outpost-dust);">10% convenience charge. Subject to availability and approval.</p>
-      </section>
-
-      <!-- THE MATH -->
-      <section class="op-section op-math" id="the-math">
-        <h2 class="op-h2" style="margin-bottom: 16px;">THE MATH</h2>
-        <p class="op-body" style="margin-bottom: 24px; color: var(--outpost-bone);">A realistic projection. 3-key Villa, whole-property lets.<br>
-        <span style="color: var(--outpost-dust);">Capital deployed: deposit ₹4,50,000 + franchise ₹49,999 + setup ₹1,50,000 = ₹6,49,999<br>
-        Assumptions: ADR ₹9,000 · rent ₹75,000/mo · operating costs ₹30,000/mo</span></p>
-
-        <div class="op-math-scroll">
-          <table class="op-table">
-            <thead>
-              <tr>
-                <th>Occupancy</th>
-                <th>45%</th>
-                <th class="highlight-col" style="color: var(--outpost-bone);">55%</th>
-                <th>65%</th>
-              </tr>
-            </thead>
+      <!-- THE ECONOMICS -->
+      <section class="op-section stagger-section">
+        <div class="op-container">
+          <span class="op-eyebrow stagger-child">THE ECONOMICS</span>
+          <div class="op-eco-fig stagger-child">₹75,000 &ndash; ₹1,48,500</div>
+          <div class="op-eco-yield stagger-child">≈ 2x yield spread</div>
+          <div class="op-eco-caveat stagger-child">Illustrative, 3-key Villa at 55% occupancy</div>
+          
+          <table class="op-workings stagger-child">
             <tbody>
               <tr>
-                <td>Monthly gross revenue</td>
-                <td>₹1,21,500</td>
-                <td class="highlight-col">₹1,48,500</td>
-                <td>₹1,75,500</td>
+                <td class="op-body">Gross monthly revenue</td>
+                <td class="op-body">₹1,48,500</td>
               </tr>
               <tr>
-                <td>Less Red Flag 13.5%</td>
-                <td>₹16,403</td>
-                <td class="highlight-col">₹20,048</td>
-                <td>₹23,693</td>
+                <td class="op-body">Less Red Flag 13.5%</td>
+                <td class="op-body">₹20,048</td>
               </tr>
               <tr>
-                <td>Less rent</td>
-                <td>₹75,000</td>
-                <td class="highlight-col">₹75,000</td>
-                <td>₹75,000</td>
+                <td class="op-body">Less rent</td>
+                <td class="op-body">₹75,000</td>
               </tr>
               <tr>
-                <td>Less operating</td>
-                <td>₹30,000</td>
-                <td class="highlight-col">₹30,000</td>
-                <td>₹30,000</td>
+                <td class="op-body">Less operating</td>
+                <td class="op-body">₹30,000</td>
               </tr>
               <tr>
-                <td style="color: var(--outpost-bone); font-weight: 500;">Net monthly to you</td>
-                <td style="color: var(--outpost-bone); font-weight: 500;">₹97</td>
-                <td class="highlight-col" style="color: var(--outpost-bone); font-weight: 500;">₹23,452</td>
-                <td style="color: var(--outpost-bone); font-weight: 500;">₹46,807</td>
-              </tr>
-              <tr>
-                <td style="color: var(--outpost-dust);">Return on capital</td>
-                <td style="color: var(--outpost-dust);">Breakeven</td>
-                <td class="highlight-col" style="color: var(--outpost-dust);">43%</td>
-                <td style="color: var(--outpost-dust);">86%</td>
+                <td class="op-body" style="color: rgba(255,255,255,0.95) !important;">Net monthly to you</td>
+                <td class="op-body" style="color: rgba(255,255,255,0.95) !important;">₹23,452</td>
               </tr>
             </tbody>
           </table>
         </div>
+      </section>
 
-        <div class="op-math-caveats">
-          <p class="op-body">Read this properly — we'd rather you understood it now than later:</p>
-          <p class="op-body">Breakeven is around 45% occupancy. Below that you're cash-negative against rent.</p>
-          <p class="op-body">A ten-point occupancy swing roughly doubles or halves your profit. That sensitivity is exactly why professional management matters — and why our commission is tied to your revenue.</p>
-          <p class="op-body">Illustrative figures. You get a property-specific projection during assessment, before you commit.</p>
-          <p class="op-body">No minimum guarantees. Performance-linked. We only earn when you earn.</p>
+      <!-- THE SYSTEM -->
+      <section class="op-section stagger-section">
+        <div class="op-container">
+          <span class="op-eyebrow stagger-child">THE SYSTEM</span>
+          <h2 class="op-h2 stagger-child" style="margin-bottom: 24px;">Most franchises hand you a business and leave you to run it. We hand you an asset and run it for you.</h2>
+          <p class="op-body stagger-child" style="margin-bottom: 80px; max-width: 800px;">No staff to hire. No hospitality experience needed. No ops to learn. This is not a guessing game. It's a system. Here is exactly how your capital becomes a high-yield asset.</p>
+
+          <div style="position: relative;">
+            <div class="op-step-connector"></div>
+            
+            <div class="op-step stagger-child">
+              <div class="op-step-num">01</div>
+              <div class="op-step-content">
+                <h3 class="op-h3" style="margin-bottom: 16px;">THE HUNT</h3>
+                <p class="op-body" style="margin-bottom: 16px;">We don't let you sign a bad lease. Using demand data from our managed portfolio, we assess your property — or help you find one in a high-demand, low-supply pocket.</p>
+                <ul class="op-body" style="padding-left: 20px;">
+                  <li>Demand & occupancy-potential assessment</li>
+                  <li>Lease negotiation support</li>
+                  <li>Legal and risk review before you commit</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="op-step stagger-child">
+              <div class="op-step-num">02</div>
+              <div class="op-step-content">
+                <h3 class="op-h3" style="margin-bottom: 16px;">THE FLIP</h3>
+                <p class="op-body" style="margin-bottom: 16px;">Keys secured, our build team moves in. Ordinary spaces become premium, photograph-ready properties in under 45 days.</p>
+                <ul class="op-body" style="padding-left: 20px;">
+                  <li>Signature interior transformation</li>
+                  <li>Furnishing, styling and decor procurement</li>
+                  <li>Smart locks, keyless entry, high-speed WiFi</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="op-step stagger-child">
+              <div class="op-step-num">03</div>
+              <div class="op-step-content">
+                <h3 class="op-h3" style="margin-bottom: 16px;">THE DROP</h3>
+                <p class="op-body" style="margin-bottom: 16px;">We don't quietly list you and hope. Every property launches through content creators — building demand and a permanent content library from week one.</p>
+                <ul class="op-body" style="padding-left: 20px;">
+                  <li>Creator stay campaign</li>
+                  <li>Professional editorial shoot</li>
+                  <li>Direct booking setup</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="op-step stagger-child">
+              <div class="op-step-num">04</div>
+              <div class="op-step-content">
+                <h3 class="op-h3" style="margin-bottom: 16px;">THE YIELD</h3>
+                <p class="op-body" style="margin-bottom: 16px;">You step back. The system runs.</p>
+                <ul class="op-body" style="padding-left: 20px;">
+                  <li>AI dynamic pricing, adjusting daily</li>
+                  <li>24/7 automated guest messaging</li>
+                  <li>Review and reputation management</li>
+                  <li>Payouts twice monthly</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- COMPARISON -->
-      <section class="op-section">
-        <h2 class="op-h2" style="margin-bottom: 40px;">WHY NOT A TRADITIONAL BNB</h2>
-        <table class="op-compare-table">
-          <thead>
-            <tr>
-              <th>Example</th>
-              <th>Traditional</th>
-              <th>RED FLAG OUTPOST</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Entry cost</td>
-              <td>₹2L – ₹50L</td>
-              <td>From ₹1,28,999</td>
-            </tr>
-            <tr>
-              <td>Staff to hire</td>
-              <td>10–15 people</td>
-              <td>Zero</td>
-            </tr>
-            <tr>
-              <td>Ops experience</td>
-              <td>Essential</td>
-              <td>None</td>
-            </tr>
-            <tr>
-              <td>Onboarding fee</td>
-              <td>Standard</td>
-              <td>Zero</td>
-            </tr>
-            <tr>
-              <td>Ongoing commission</td>
-              <td>17–20% typical</td>
-              <td>13.5–15%</td>
-            </tr>
-            <tr>
-              <td>Design</td>
-              <td>Template</td>
-              <td>Bespoke, brand-led</td>
-            </tr>
-            <tr>
-              <td>Marketing</td>
-              <td>Your problem</td>
-              <td>Creator-led, ours</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- THE COMPARISON -->
+      <section class="op-section stagger-section">
+        <div class="op-container">
+          <span class="op-eyebrow stagger-child">THE COMPARISON</span>
+          <h2 class="op-h2 stagger-child" style="margin-bottom: 40px;">Why not a traditional bnb</h2>
+          <table class="op-workings stagger-child" style="max-width: 800px;">
+            <thead>
+              <tr>
+                <th style="text-align: left; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.1);" class="op-body">Example</th>
+                <th style="text-align: left; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.1);" class="op-body">Traditional</th>
+                <th style="text-align: right; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.1);" class="op-body" style="color: var(--outpost-flare) !important;">RED FLAG OUTPOST</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="op-body">Entry cost</td>
+                <td class="op-body">₹2L – ₹50L</td>
+                <td class="op-body">From ₹1,28,999</td>
+              </tr>
+              <tr>
+                <td class="op-body">Staff to hire</td>
+                <td class="op-body">10–15 people</td>
+                <td class="op-body">Zero</td>
+              </tr>
+              <tr>
+                <td class="op-body">Ops experience</td>
+                <td class="op-body">Essential</td>
+                <td class="op-body">None</td>
+              </tr>
+              <tr>
+                <td class="op-body">Onboarding fee</td>
+                <td class="op-body">Standard</td>
+                <td class="op-body">Zero</td>
+              </tr>
+              <tr>
+                <td class="op-body">Ongoing comms</td>
+                <td class="op-body">17–20% typical</td>
+                <td class="op-body">13.5–15%</td>
+              </tr>
+              <tr>
+                <td class="op-body">Design</td>
+                <td class="op-body">Template</td>
+                <td class="op-body">Bespoke, brand-led</td>
+              </tr>
+              <tr>
+                <td class="op-body">Marketing</td>
+                <td class="op-body">Your problem</td>
+                <td class="op-body">Creator-led, ours</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
-      <!-- FORM -->
-      <section class="op-section op-form" id="apply">
-        <h2 class="op-h2" style="margin-bottom: 16px;">Deploy Your Capital</h2>
-        <p class="op-body" style="color: var(--outpost-dust); margin-bottom: 40px;">Ready to build a hospitality portfolio? Request an allocation spot with our expansion team.</p>
-        
-        <form id="apply-form">
-          <div class="op-field">
-            <label for="app-name">Full Name</label>
-            <input type="text" id="app-name" class="op-input" required>
-          </div>
-          <div class="op-field">
-            <label for="app-email">Email Address</label>
-            <input type="email" id="app-email" class="op-input" required>
-          </div>
-          <div class="op-field">
-            <label for="app-tel">Contact Number</label>
-            <input type="tel" id="app-tel" class="op-input" required>
-          </div>
-          <div class="op-field">
-            <label for="app-city">Target City</label>
-            <input type="text" id="app-city" class="op-input" required>
-          </div>
-          <div class="op-field">
-            <label for="app-property">Do you already have a property in mind?</label>
-            <select id="app-property" class="op-select" required>
-              <option value="" disabled selected>Select an option...</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-              <option value="Looking">Looking</option>
-            </select>
-          </div>
-          <div class="op-field op-field-heavy">
-            <label for="app-capital">Deployable Capital</label>
-            <select id="app-capital" class="op-select" required>
-              <option value="" disabled selected>Select an option...</option>
-              <option value="1.5-3L">₹1.5 Lakh – ₹3 Lakh (→ Studio)</option>
-              <option value="3-8L">₹3 Lakh – ₹8 Lakh (→ Villa)</option>
-              <option value="8L+">₹8 Lakh+ (→ Villa multi-property / Estate track)</option>
-            </select>
-          </div>
-          <button type="submit" class="op-btn" style="margin-top: 16px;">Apply for Allocation</button>
-        </form>
+      <!-- APPLY -->
+      <section class="op-section stagger-section" id="apply">
+        <div class="op-container">
+          <span class="op-eyebrow stagger-child">APPLY</span>
+          <h2 class="op-h2 stagger-child" style="margin-bottom: 16px;">Deploy Your Capital</h2>
+          <p class="op-body stagger-child" style="margin-bottom: 40px; max-width: 600px;">Ready to build a hospitality portfolio? Request an allocation spot with our expansion team.</p>
+          
+          <form id="apply-form" class="stagger-child">
+            <div class="op-field">
+              <label for="app-name">Full Name</label>
+              <input type="text" id="app-name" class="op-input" required>
+            </div>
+            <div class="op-field">
+              <label for="app-email">Email Address</label>
+              <input type="email" id="app-email" class="op-input" required>
+            </div>
+            <div class="op-field">
+              <label for="app-tel">Contact Number</label>
+              <input type="tel" id="app-tel" class="op-input" required>
+            </div>
+            <div class="op-field">
+              <label for="app-city">Target City</label>
+              <input type="text" id="app-city" class="op-input" required>
+            </div>
+            <div class="op-field">
+              <label for="app-property">Do you already have a property in mind?</label>
+              <select id="app-property" class="op-select" required>
+                <option value="" disabled selected>Select an option...</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Looking">Looking</option>
+              </select>
+            </div>
+            <div class="op-field">
+              <label for="app-capital">Deployable Capital</label>
+              <select id="app-capital" class="op-select" required>
+                <option value="" disabled selected>Select an option...</option>
+                <option value="1.5-3L">₹1.5 Lakh – ₹3 Lakh (→ Studio)</option>
+                <option value="3-8L">₹3 Lakh – ₹8 Lakh (→ Villa)</option>
+                <option value="8L+">₹8 Lakh+ (→ Villa multi-property / Estate track)</option>
+              </select>
+            </div>
+            <button type="submit" class="op-submit">Apply for Allocation</button>
+          </form>
+        </div>
       </section>
 
-      <!-- END CTA -->
-      <section class="op-section op-end">
-        <h1 class="op-h1">Be part of the revolution.</h1>
-        <p class="op-body">Founding Partner allocation is limited.</p>
-        <a href="#apply" class="op-btn">Apply for Allocation</a>
-      
-      </section>
 
-      <footer style="margin-top: 120px; border-top: 1px solid var(--outpost-fog); padding-top: 40px; display: flex; flex-direction: column; gap: 40px; color: var(--outpost-dust);">
+      <footer style="margin-top: 120px; border-top: 1px solid var(--outpost-fog); padding-top: 40px; display: flex; flex-direction: column; gap: 40px; color: var(--outpost-dust); padding-left: 4vw; padding-right: 4vw; padding-bottom: 120px; box-sizing: border-box;">
         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px;">
           
           <div style="flex: 1; min-width: 280px;">
@@ -1399,7 +1687,7 @@
           </div>
           
           <div style="flex: 1; min-width: 280px; max-width: 400px;">
-            <h3 class="op-h3" style="color: var(--outpost-bone); margin-bottom: 8px; font-family: 'Inter', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em;">The Inner Circle</h3>
+            <h3 class="op-h3" style="margin-bottom: 8px;">The Inner Circle</h3>
             <p class="op-small" style="margin-bottom: 16px;">Subscribe to receive exclusive access to unlisted properties and investment insights.</p>
             
             <form id="footer-newsletter" style="display: flex; gap: 8px; position: relative;">
@@ -1447,43 +1735,33 @@
     };
 
     // Single intersection observer
-    const sections = document.querySelectorAll('.op-section, .op-phase');
+    
+        const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const sections = document.querySelectorAll('.stagger-section');
     const observer = new IntersectionObserver((entries, obs) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('is-revealed');
-          
-          if (entry.target.classList.contains('op-stat-bar')) {
-            runStatCounter();
-          }
-          if (entry.target.id === 'exec-map') {
-            const phases = entry.target.querySelectorAll('.op-phase');
-            phases.forEach((p, i) => {
-              setTimeout(() => {
-                p.classList.add('is-revealed');
-                const fill = document.getElementById('map-line-fill');
-                if (fill) {
-                   const h = ((i + 1) / phases.length) * 100;
-                   fill.style.height = h + '%';
-                }
-              }, 120 * i);
+          if (!isReducedMotion) {
+            entry.target.classList.add('is-revealed');
+            const children = entry.target.querySelectorAll('.stagger-child');
+            children.forEach((child, index) => {
+              child.style.transitionDelay = `${index * 80}ms`;
+              child.classList.add('is-revealed');
             });
           }
-          
-          entry.target.addEventListener('transitionend', () => {
-            entry.target.style.willChange = 'auto';
-          });
-          
           obs.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15, rootMargin: "0px 0px -12% 0px" });
+    }, { threshold: 0.2 });
 
-    sections.forEach(s => {
-      // Map phases are handled via parent
-      if (!s.classList.contains('op-phase')) {
-        observer.observe(s);
-      }
+    sections.forEach(sec => {
+      observer.observe(sec);
+      const children = sec.querySelectorAll('.stagger-child');
+      children.forEach(child => {
+        child.style.opacity = '0';
+        child.style.transform = 'translateY(24px)';
+        child.style.transition = 'opacity 700ms ease-out, transform 700ms ease-out';
+      });
     });
     
     // Fog and Parallax rAF loop
@@ -1669,249 +1947,7 @@
   if (btnClose) btnClose.addEventListener('click', closeMenu);
   document.querySelectorAll('.menu-link').forEach(el => el.addEventListener('click', closeMenu));
   
-  // VIDEO SCRUB
-  const videoSrc = video.src;
-  
-  const LERP_TAU = 8;
-  const SNAP = 0.002;
-  const LRU_MAX = 24;
-  const LEAD = 24;
-  const WATCHDOG = 60000;
-  
-  let bank = [];
-  let lru = new Map();
-  let current = 0;
-  let target = 0;
-  let ready = false;
-  let reverted = false;
-  let painted = false;
-  let building = false;
-  let dur = 0;
-  
-  let lastTime = performance.now();
-  
-  const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  
-  function rAF(now) {
-    const dt = Math.min(0.1, (now - lastTime) / 1000);
-    lastTime = now;
-    
-    if (dur > 0 && !reverted) {
-      target = p * dur;
-      if (isReduced) {
-        current = target;
-      } else {
-        current += (target - current) * (1 - Math.exp(-dt * LERP_TAU));
-        if (Math.abs(target - current) < SNAP) current = target;
-      }
-      
-      if (ready && bank.length > 0) {
-        drawFrame();
-      } else {
-        // fallback
-        if (Math.abs(video.currentTime - current) > 0.01) {
-          video.currentTime = current;
-        }
-      }
-    } else if (reverted && dur > 0) {
-        target = p * dur;
-        current += (target - current) * (1 - Math.exp(-dt * LERP_TAU));
-        if (Math.abs(video.currentTime - current) > 0.01) {
-          video.currentTime = current;
-        }
-    }
-    
-    requestAnimationFrame(rAF);
-  }
-  requestAnimationFrame(rAF);
-  
-  video.addEventListener('loadedmetadata', () => {
-    dur = video.duration || 0;
-    if (!isReduced && window.VideoDecoder && window.MP4Box) {
-      buildBank();
-    }
-  });
-  // fallback if metadata not firing
-  setTimeout(() => {
-    if (dur === 0 && video.duration) {
-      dur = video.duration;
-      if (!isReduced && window.VideoDecoder && window.MP4Box) {
-        buildBank();
-      }
-    }
-  }, 1000);
-  
-  let watchdogTimer;
-  
-  async function buildBank() {
-    if (building) return;
-    building = true;
-    
-    watchdogTimer = setTimeout(() => {
-      revertToFallback();
-    }, WATCHDOG);
-    
-    try {
-      const response = await fetch(videoSrc);
-      const buffer = await response.arrayBuffer();
-      buffer.fileStart = 0;
-      
-      const mp4boxfile = MP4Box.createFile();
-      let videoTrack = null;
-      let decoder = null;
-      let offscreen = null;
-      if (typeof OffscreenCanvas !== 'undefined') {
-        offscreen = new OffscreenCanvas(1920, 1080);
-      } else {
-        offscreen = document.createElement('canvas');
-        offscreen.width = 1920;
-        offscreen.height = 1080;
-      }
-      const ctx = offscreen.getContext('2d', { alpha: false });
-      
-      let samplesCount = 0;
-      let samplesProcessed = 0;
-      
-      decoder = new VideoDecoder({
-        output: async (frame) => {
-          ctx.drawImage(frame, 0, 0, 1920, 1080);
-          const ts = frame.timestamp; // microseconds
-          frame.close();
-          
-          let blob;
-          if (offscreen.convertToBlob) {
-             blob = await offscreen.convertToBlob({ type: 'image/webp', quality: 0.82 });
-          } else {
-             blob = await new Promise(resolve => offscreen.toBlob(resolve, 'image/webp', 0.82));
-          }
-          
-          bank.push({ ts, blob });
-          bank.sort((a, b) => a.ts - b.ts);
-          
-          samplesProcessed++;
-          if (samplesProcessed === samplesCount) {
-             ready = true;
-             clearTimeout(watchdogTimer);
-          } else if (samplesProcessed > 10) {
-             ready = true; // start rendering early
-          }
-        },
-        error: (e) => {
-          console.error("VideoDecoder error", e);
-          revertToFallback();
-        }
-      });
-      
-      mp4boxfile.onReady = (info) => {
-        videoTrack = info.videoTracks[0];
-        if (!videoTrack) return revertToFallback();
-        
-        let codec = videoTrack.codec;
-        if (codec.startsWith('vp08')) codec = 'vp8';
-        
-        let description = null;
-        for (const box of mp4boxfile.moov.traks[0].mdia.minf.stbl.stsd.entries) {
-          if (box.avcC || box.hvcC || box.vpcC || box.av1C) {
-            const stream = new DataStream(undefined, 0, DataStream.BIG_ENDIAN);
-            if (box.avcC) box.avcC.write(stream);
-            else if (box.hvcC) box.hvcC.write(stream);
-            else if (box.vpcC) box.vpcC.write(stream);
-            else if (box.av1C) box.av1C.write(stream);
-            description = new Uint8Array(stream.buffer, 8); 
-            break;
-          }
-        }
-        
-        decoder.configure({
-          codec: codec,
-          codedWidth: videoTrack.video.width,
-          codedHeight: videoTrack.video.height,
-          description: description,
-          hardwareAcceleration: 'prefer-hardware'
-        });
-        
-        mp4boxfile.setExtractionOptions(videoTrack.id, null, { nbSamples: 1000 });
-        mp4boxfile.start();
-      };
-      
-      mp4boxfile.onSamples = (id, user, samples) => {
-        samplesCount = samples.length;
-        let i = 0;
-        
-        function pushNext() {
-           if (i >= samples.length) return;
-           if (decoder.state === 'closed') return;
-           if (decoder.decodeQueueSize > LEAD) {
-              setTimeout(pushNext, 10);
-              return;
-           }
-           const s = samples[i];
-           const chunk = new EncodedVideoChunk({
-             type: s.is_sync ? 'key' : 'delta',
-             timestamp: s.cts * 1000000 / s.timescale,
-             duration: s.duration * 1000000 / s.timescale,
-             data: s.data
-           });
-           decoder.decode(chunk);
-           i++;
-           pushNext();
-        }
-        pushNext();
-      };
-      
-      mp4boxfile.appendBuffer(buffer);
-      mp4boxfile.flush();
-      
-    } catch (err) {
-      console.error(err);
-      revertToFallback();
-    }
-  }
-  
-  function revertToFallback() {
-    reverted = true;
-    ready = false;
-    canvas.style.opacity = 0;
-  }
-  
-  let drawBusy = false;
-  async function drawFrame() {
-    if (drawBusy || bank.length === 0) return;
-    drawBusy = true;
-    
-    const t = current * 1e6;
-    let idx = 0;
-    for (let i = 0; i < bank.length; i++) {
-       if (bank[i].ts > t) {
-          idx = Math.max(0, i - 1);
-          break;
-       }
-       idx = i;
-    }
-    
-    let bitmap = lru.get(idx);
-    if (!bitmap) {
-       bitmap = await createImageBitmap(bank[idx].blob);
-       lru.set(idx, bitmap);
-       if (lru.size > LRU_MAX) {
-          const firstKey = lru.keys().next().value;
-          const old = lru.get(firstKey);
-          if (old) old.close();
-          lru.delete(firstKey);
-       }
-    }
-    
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    
-    if (!painted) {
-       painted = true;
-       canvas.style.opacity = 1;
-    }
-    
-    drawBusy = false;
-  }
-})();
+  })();
 </script>
 
 </body>

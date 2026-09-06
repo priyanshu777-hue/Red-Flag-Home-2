@@ -1,71 +1,147 @@
 const fs = require('fs');
+let html = fs.readFileSync('franchise.html', 'utf8');
 
-function fixHTML(filename) {
-    if (!fs.existsSync(filename)) return;
-    let html = fs.readFileSync(filename, 'utf8');
+// 1. Remove background, margins, border-radius from .op-section, make it full-bleed
+html = html.replace(/\.op-section \{[^}]*\}/, 
+  `.op-section {
+      width: 100%;
+      background: rgba(10, 12, 18, 0.94);
+      padding: 120px 4vw;
+      margin: 0;
+      border-radius: 0;
+      box-sizing: border-box;
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+      will-change: transform, opacity;
+    }`);
 
-    // 1. Right Rail Labels - remove min-height that causes text overflow, add clear border gap
-    html = html.replace('.rail-btn {\n        min-height: 2.5rem !important;', '.rail-btn {\n        min-height: max-content !important;\n        border-top: 1px solid rgba(255,255,255,0.4) !important;');
+// Also fix mobile padding for .op-section
+html = html.replace(/\.op-section \{ padding: 32px 24px; border-radius: 12px; \}/, 
+  `.op-section { padding: 80px 24px; border-radius: 0; margin: 0; width: 100%; }`);
+
+// Make op-content-col 100% wide with 0 padding so op-section touches edges
+html = html.replace(/\.op-content-col \{[^}]*\}/, 
+  `.op-content-col {
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+    }`);
+html = html.replace(/\.op-layout \{[\s\S]*?flex-direction: column;\s*\}/, 
+  `.op-layout {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }`);
+
+// 2. Remove the empty apply block
+html = html.replace(/<!-- END CTA -->[\s\S]*?<section class="op-section op-end" style="display: flex; justify-content: center; padding: 40px 0;">[\s\S]*?<a href="#apply" class="op-btn">Apply for Allocation<\/a>[\s\S]*?<\/section>/, '<!-- END CTA -->');
+
+// 3. Typography cleanup
+// Add CSS block before </style> to override typography globally
+const typoCSS = `
+    /* GLOBAL TYPOGRAPHY ENFORCEMENT */
+    h1, h2, h3, h4, h5, h6, .op-h1, .op-h2, .op-h3, .s1-h1, .s2-h2, .s3-h2, .op-stat-val {
+      font-family: 'Instrument Serif', serif !important;
+      font-weight: 400 !important;
+      color: rgba(255, 255, 255, 0.95) !important;
+    }
+    body, p, li, td, th, span, div, a, input, select, button, label, .op-body, .op-small, .s1-eye, .s2-eye, .s3-eye, .op-btn, .op-input, .op-select, .op-label, .op-ticker-item {
+      font-family: 'Inter', sans-serif;
+    }
     
-    // 2. Hero subtitle truncated
-    html = html.replace(/white-space: nowrap;\s*overflow: hidden;\s*text-overflow: ellipsis;/g, '');
-
-    // 3. "Book Direct & Save" font size on mobile
-    const bookTitleFix = `
-      #book-container .display.text-trim {
-        font-size: clamp(2rem, 8vw, 3rem) !important;
-      }
-    `;
-    if (!html.includes('#book-container .display.text-trim')) {
-        html = html.replace('/* Right Rail Shrink & Move */', bookTitleFix + '\n      /* Right Rail Shrink & Move */');
+    /* Body & Secondary Text */
+    .op-body, p, li, th, td, .op-input, .op-select, .op-phase-desc, .op-phase-bullets {
+      font-size: 17px !important;
+      line-height: 1.6 !important;
+      color: rgba(255, 255, 255, 0.72) !important;
     }
-
-    // 4. Broken image in Handpicked Homes panel
-    // We will just remove the image tag completely for that panel if it's broken, or for all panels on mobile
-    // Actually the user said "Remove the broken image reference and reduce the panel's height so there is no empty space"
-    // So let's change b4-panel height and remove the image.
-    html = html.replace('<div class="b4-panel-img-wrap"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/handpicked.jpeg" class="b4-panel-img" alt="Handpicked Homes"  /></div>', '');
     
-    // Reduce height of b4-panel on mobile:
-    html = html.replace('.b4-panel {\n        height: auto !important;', '.b4-panel {\n        height: auto !important;\n        padding: 2rem 1.5rem !important;');
-
-    // 5. Polaroid images too large
-    // In Explore section (journal)
-    const journalImgFix = `
-      .journal-img-wrap {
-        aspect-ratio: 16/9 !important;
-      }
-    `;
-    if (!html.includes('.journal-img-wrap {\\n        aspect-ratio: 16/9 !important;')) {
-        html = html.replace('/* Right Rail Shrink & Move */', journalImgFix + '\n      /* Right Rail Shrink & Move */');
+    /* Hero Headings */
+    .s1-h1, .s2-h2, .s3-h2 {
+      font-size: 56px !important;
+      line-height: 1.1 !important;
+      text-transform: none !important;
+    }
+    
+    /* Section Headings */
+    .op-h2 {
+      font-size: 40px !important;
+      line-height: 1.2 !important;
+      text-transform: none !important;
+    }
+    
+    /* Sub-headings */
+    .op-h3 {
+      font-size: 24px !important;
+      line-height: 1.3 !important;
+      text-transform: none !important;
+    }
+    
+    /* Small Labels */
+    .op-small, .s1-eye, .s2-eye, .s3-eye, .op-label, .op-phase-num, label {
+      font-size: 13px !important;
+      letter-spacing: 0.12em !important;
+      text-transform: uppercase !important;
+      color: rgba(255, 255, 255, 0.72) !important;
     }
 
-    // 6. franchise.html headings and maths table
-    const franchiseFix = `
-      .prog-section {
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-        box-sizing: border-box !important;
-        overflow: hidden !important;
-      }
-      .prog-display {
-        font-size: clamp(1.5rem, 8vw, 6rem) !important;
-        word-break: break-word !important;
-      }
-      .vs-table-wrapper {
-        width: 100% !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-      }
-    `;
-    if (!html.includes('.prog-section {\\n        padding-left: 1.5rem !important;')) {
-        html = html.replace('/* Right Rail Shrink & Move */', franchiseFix + '\n      /* Right Rail Shrink & Move */');
+    /* Form Cleanup */
+    #apply-form {
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
     }
+    .op-field {
+      margin-bottom: 0 !important;
+    }
+    .op-input, .op-select {
+      height: 44px !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255,255,255,0.25) !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+      padding: 0 8px !important;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .op-input:focus, .op-select:focus {
+      outline: none !important;
+      border-bottom: 1px solid #fff !important;
+    }
+    
+    #apply-form button[type="submit"] {
+      height: 48px;
+      background: #fff;
+      color: #000;
+      border: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 8px !important;
+      width: auto;
+      align-self: flex-start;
+      padding: 0 32px;
+      font-size: 14px;
+    }
+    #apply-form button[type="submit"]:hover {
+      background: rgba(255,255,255,0.8);
+    }
+`;
 
-    fs.writeFileSync(filename, html);
-}
+html = html.replace('</style>', typoCSS + '\n  </style>');
 
-fixHTML('index.html');
-fixHTML('franchise.html');
+// Fix footer inline styles for Inner Circle so it picks up .op-h3 and .op-small
+html = html.replace(/<h3 class="op-h3"[^>]*>The Inner Circle<\/h3>/, '<h3 class="op-h3" style="margin-bottom: 8px;">The Inner Circle</h3>');
 
-console.log('Fixed requested issues.');
+// Give footer padding so it doesn't touch the edge of the screen now that op-content-col has no padding
+html = html.replace(/<footer style="([^"]*)">/, '<footer style="$1 padding-left: 4vw; padding-right: 4vw; padding-bottom: 120px; box-sizing: border-box;">');
+
+
+fs.writeFileSync('franchise.html', html);
+console.log('Applied fixes');
