@@ -298,7 +298,44 @@
     #franchise-overlay { position: absolute; inset: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 0; pointer-events: none; }
     #franchise { background: var(--background); color: var(--foreground); padding: 8rem 1.5rem; text-align: center;  position: relative; overflow: hidden; }
     .franchise-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: center;  position: relative; z-index: 1; }
-    .franchise-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--raw-color-velvet-500); margin-bottom: 1rem; font-family: var(--typeface-ui); font-weight: 600; }
+    @keyframes sweep-gradient {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .franchise-label { 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .franchise-label::before,
+    .franchise-label::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 1px;
+      background: rgba(163,22,33,0.4);
+    }
+    .franchise-label span {
+      font-size: 32px;
+      font-family: "Michroma", var(--typeface-ui), sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      font-weight: 300;
+      background: linear-gradient(110deg, #A31621 0%, #ffffff 50%, #A31621 100%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: sweep-gradient 3s linear infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .franchise-label span {
+        animation: none;
+        background-position: 50% 0;
+      }
+    }
     .franchise-header { margin-bottom: 1.5rem; }
     .franchise-subtitle { margin-bottom: 4rem; max-width: 600px; line-height: 1.5; }
     .franchise-stats { display: flex; align-items: center; justify-content: center; gap: 2rem; margin-bottom: 1rem; width: 100%; }
@@ -696,7 +733,8 @@
 .ft-card--light {
   background: var(--surface-gallery);
   color: var(--foreground-accent);
-  border: 1px solid var(--hairline);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* ── One video, three cells ───────────────────────────────────────────
@@ -728,6 +766,13 @@
   border-radius: inherit;
   pointer-events: none;
 }
+.ft-asset::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(10,5,5,0.6);
+  z-index: 1;
+}
 
 .ft-asset > video {
   position: absolute;
@@ -737,7 +782,7 @@
   height: var(--win-h);
   max-width: none;
   object-fit: cover;
-  opacity: 0.3;
+  opacity: 0.18;
 }
 
 /* ── Placement ────────────────────────────────────────────────────────
@@ -768,7 +813,13 @@
   --win-y: 0px;
 }
 
-.ft-contact { grid-column: 3; grid-row: 3 / 4; }
+.ft-contact {
+  grid-column: 3; grid-row: 3 / 4;
+  --win-h: calc(100% + var(--r1) + var(--r2) + var(--gap) * 2);
+  --bg-x: 100%; --bg-y: 100%;
+  --win-x: calc(-200% - var(--gap) * 2);
+  --win-y: calc(-1 * (var(--r1) + var(--r2) + var(--gap) * 2));
+}
 
 /* ── Card label ───────────────────────────────────────────────────── */
 .ft-tag {
@@ -845,10 +896,10 @@
 #newsletter-input {
   flex: 1 1 auto;
   min-height: 44px;
-  padding: 10px 0;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--hairline);
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   color: var(--foreground-accent);
   font: inherit;
   outline: none;
@@ -1038,7 +1089,13 @@
     --win-x: 0px;
     --win-y: -275.5556%;                /* −496 / 180 */
   }
-  .ft-contact { grid-column: 2; grid-row: 5 / 6; }
+  .ft-contact {
+    grid-column: 2; grid-row: 5 / 6;
+    --win-h: 375.5556%;
+    --bg-x: 100%; --bg-y: 100%;
+    --win-x: calc(-100% - var(--gap));
+    --win-y: -275.5556%;
+  }
 }
 
 /* ── One column ───────────────────────────────────────────────────────
@@ -1194,8 +1251,6 @@
       #footer {
         padding-left: 20px !important;
         padding-right: 20px !important;
-        padding-top: 56px !important;
-        padding-bottom: 56px !important;
         box-sizing: border-box !important;
         width: 100% !important;
         max-width: 100% !important;
@@ -1340,7 +1395,6 @@
       /* Small labels to 12px */
       .book-label,
       .field-group label,
-      .franchise-label,
       .stat-label,
       .stat-disclaimer,
       .ac-badge,
@@ -1350,6 +1404,14 @@
       .ft-mark {
         font-size: 12px !important;
         line-height: 1.4 !important;
+      }
+      
+      .franchise-label span {
+        font-size: 20px !important;
+      }
+      .franchise-label::before,
+      .franchise-label::after {
+        width: 32px !important;
       }
 
       /* Block 3 Philosophy mobile handling */
@@ -1570,6 +1632,45 @@
       .ft-mark,
       .ft-nav-row span {
         font-size: 12px !important;
+      }
+
+      /* Red Flag Outpost Specific Mobile Overrides */
+      .stat-yield {
+        text-align: center !important;
+        font-size: 16px !important;
+        width: 100% !important;
+        display: block !important;
+      }
+      .stat-disclaimer {
+        text-align: center !important;
+        width: 100% !important;
+        display: block !important;
+      }
+      .franchise-points {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        gap: 8px !important;
+      }
+      .point-item {
+        width: 240px !important;
+        text-align: center !important;
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+        box-sizing: border-box !important;
+        display: block !important;
+      }
+      .franchise-action {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        padding-bottom: 80px !important; /* Space for chat button */
+      }
+      .franchise-action .btn-pill {
+        width: 240px !important;
+        box-sizing: border-box !important;
       }
 
       /* Right Rail Shrink & Move */
@@ -1880,7 +1981,7 @@
   <video autoplay muted loop playsinline  id="franchise-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/host.mp4"  muted loop playsinline></video>
   <div id="franchise-overlay"></div>
   <div class="franchise-container">
-    <div class="franchise-label">RED FLAG OUTPOST</div>
+    <div class="franchise-label"><span>RED FLAG OUTPOST</span></div>
     <div class="franchise-header display text-trim">
       <span class="italic">N</span>o property? <span class="italic">N</span>o problem.
     </div>
@@ -2133,8 +2234,11 @@
       </div>
     </section>
 
-    <!-- CONTACT — opaque light cell -->
-    <section class="ft-card ft-card--light ft-contact">
+    <!-- CONTACT — union cell -->
+    <section class="ft-card ft-card--union ft-contact">
+      <span class="ft-asset" aria-hidden="true">
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="metadata"></video>
+      </span>
       <div class="ft-tag"><span>CONTACT</span></div>
       <div class="ft-contact-row">
         <span>hello@redflaghomes.in</span>
@@ -2891,6 +2995,107 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(cycleWords, 1200);
 });
 
+(function() {
+  const particleStyle = document.createElement('style');
+  particleStyle.textContent = `
+    @media (prefers-reduced-motion: reduce) {
+      .particle-container { display: none !important; }
+    }
+    .particle-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .particle {
+      position: absolute;
+      background-color: var(--foreground-accent);
+      border-radius: 50%;
+      animation: 
+        particle-float var(--duration) linear infinite,
+        particle-sway var(--sway-duration) ease-in-out infinite alternate;
+      animation-delay: var(--delay), var(--sway-delay);
+      opacity: var(--opacity);
+      width: var(--size);
+      height: var(--size);
+      left: var(--left);
+      top: 110%;
+    }
+    @keyframes particle-float {
+      0% { top: 110%; }
+      100% { top: -10%; }
+    }
+    @keyframes particle-sway {
+      0% { transform: translateX(-15px); }
+      100% { transform: translateX(15px); }
+    }
+  `;
+  document.head.appendChild(particleStyle);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const isMobile = window.innerWidth < 768;
+    const count = isMobile ? 20 : 40;
+    const sections = [document.getElementById('block3'), document.getElementById('journal')];
+
+    sections.forEach(sec => {
+      if (!sec) return;
+      sec.style.position = 'relative';
+      
+      Array.from(sec.children).forEach(child => {
+        if (!child.classList.contains('particle-container')) {
+          const style = window.getComputedStyle(child);
+          if (style.position === 'static') {
+            child.style.position = 'relative';
+          }
+          child.style.zIndex = '1';
+        }
+      });
+
+      const container = document.createElement('div');
+      container.className = 'particle-container';
+
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+
+        const tier = Math.random();
+        let size, opacity, duration;
+        
+        if (tier < 0.33) {
+          size = (1 + Math.random() * 0.5).toFixed(2);
+          opacity = (0.1 + Math.random() * 0.1).toFixed(2);
+          duration = (25 + Math.random() * 5).toFixed(2);
+        } else if (tier < 0.66) {
+          size = (1.5 + Math.random() * 0.5).toFixed(2);
+          opacity = (0.2 + Math.random() * 0.15).toFixed(2);
+          duration = (20 + Math.random() * 5).toFixed(2);
+        } else {
+          size = (2 + Math.random() * 1).toFixed(2);
+          opacity = (0.35 + Math.random() * 0.15).toFixed(2);
+          duration = (15 + Math.random() * 5).toFixed(2);
+        }
+
+        const swayDuration = (3 + Math.random() * 4).toFixed(2);
+        const left = (Math.random() * 100).toFixed(2);
+        const delay = (-(Math.random() * duration)).toFixed(2);
+        const swayDelay = (-(Math.random() * swayDuration)).toFixed(2);
+
+        p.style.setProperty('--size', size + 'px');
+        p.style.setProperty('--opacity', opacity);
+        p.style.setProperty('--duration', duration + 's');
+        p.style.setProperty('--sway-duration', swayDuration + 's');
+        p.style.setProperty('--left', left + '%');
+        p.style.setProperty('--delay', delay + 's');
+        p.style.setProperty('--sway-delay', swayDelay + 's');
+
+        container.appendChild(p);
+      }
+      sec.insertBefore(container, sec.firstChild);
+    });
+  });
+})();
 </script>
+<script src="transitions.js"></script>
 </body>
 </html>
