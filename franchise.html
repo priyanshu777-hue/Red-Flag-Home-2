@@ -9,8 +9,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script type="importmap">
-{ "imports": { "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs" } }
+{ "imports": { 
+  "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs",
+  "d3": "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm"
+} }
 </script>
 <style>
 :root{
@@ -204,6 +208,198 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 .occ{display:flex;justify-content:center;gap:.5rem;margin:3rem 0 2rem;flex-wrap:wrap}
 .occ button{border:1px solid rgba(255,255,255,.2);padding:.5rem 1.25rem;font-size:.8125rem;letter-spacing:.1em;transition:all .3s var(--ease-glide)}
 .occ button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+
+/* Projected 6-Month Occupancy Trend D3 Chart */
+.occupancy-chart-wrap{
+  margin:2.5rem 0 3.5rem;
+  padding:1.75rem 1.75rem 1.25rem;
+  background:rgba(18,19,17,0.7);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;
+  position:relative;
+}
+@media(max-width:640px){
+  .occupancy-chart-wrap{padding:1.25rem 1rem 1rem;margin:2rem 0 2.5rem}
+}
+.occupancy-chart-header{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:1rem;
+  margin-bottom:1.5rem;
+  padding-bottom:1rem;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.occupancy-chart-title{
+  font-size:1rem;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--white);
+  margin-bottom:.35rem;
+}
+.occupancy-chart-subtitle{
+  font-size:.8125rem;
+  color:rgba(255,255,255,0.6);
+  line-height:1.4;
+}
+.occupancy-chart-legend{
+  display:flex;
+  align-items:center;
+  gap:1.25rem;
+  font-size:.75rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.65);
+}
+@media(max-width:640px){
+  .occupancy-chart-legend{gap:.75rem;font-size:.6875rem}
+}
+.legend-item{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+}
+.legend-swatch-above{
+  width:10px;
+  height:10px;
+  border-radius:2px;
+  background:var(--accent);
+}
+.legend-swatch-ramp{
+  width:10px;
+  height:10px;
+  border-radius:2px;
+  background:rgba(255,255,255,0.28);
+}
+.legend-line{
+  width:16px;
+  height:2px;
+  border-top:2px dashed rgba(229,35,27,0.85);
+}
+.occupancy-d3-chart{
+  width:100%;
+  height:280px;
+  position:relative;
+  overflow:visible;
+}
+@media(max-width:640px){
+  .occupancy-d3-chart{height:230px}
+}
+/* D3 Chart Elements */
+.d3-axis text{
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  font-size:11px;
+  fill:rgba(255,255,255,0.55);
+}
+.d3-axis-x text{
+  font-size:12px;
+  font-weight:500;
+  fill:rgba(255,255,255,0.85);
+}
+.d3-axis line,.d3-axis path{
+  stroke:rgba(255,255,255,0.1);
+}
+.d3-grid line{
+  stroke:rgba(255,255,255,0.06);
+  stroke-dasharray:2 2;
+}
+.d3-bar{
+  cursor:pointer;
+  transition:filter .2s ease;
+}
+.d3-bar:hover{
+  filter:brightness(1.22);
+}
+.d3-bar-val{
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  font-size:11px;
+  font-weight:600;
+  fill:#ffffff;
+  text-anchor:middle;
+  pointer-events:none;
+}
+.d3-breakeven-line{
+  stroke:var(--accent);
+  stroke-width:1.5;
+  stroke-dasharray:4 4;
+}
+.d3-breakeven-badge{
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  fill:var(--accent);
+}
+/* Tooltip */
+.d3-chart-tooltip{
+  position:absolute;
+  pointer-events:none;
+  z-index:999;
+  padding:10px 14px;
+  background:rgba(14,16,14,0.96);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:8px;
+  box-shadow:0 12px 28px rgba(0,0,0,0.6);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  color:#fff;
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  font-size:12px;
+  line-height:1.4;
+  opacity:0;
+  transform:translate(-50%,-100%);
+  margin-top:-10px;
+  transition:opacity .2s ease,transform .2s ease;
+  white-space:nowrap;
+}
+.d3-chart-tooltip.visible{
+  opacity:1;
+}
+.d3-tooltip-month{
+  font-weight:600;
+  font-size:13px;
+  color:#ffffff;
+  margin-bottom:4px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.d3-tooltip-status{
+  font-size:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:2px 6px;
+  border-radius:4px;
+  font-weight:600;
+}
+.d3-tooltip-status.profitable{
+  background:rgba(34,197,94,0.16);
+  color:#4ade80;
+  border:1px solid rgba(34,197,94,0.3);
+}
+.d3-tooltip-status.ramp{
+  background:rgba(245,158,11,0.16);
+  color:#fbbf24;
+  border:1px solid rgba(245,158,11,0.3);
+}
+.d3-tooltip-row{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  color:rgba(255,255,255,0.7);
+  font-size:11.5px;
+  margin-top:3px;
+}
+.d3-tooltip-row b{
+  color:#ffffff;
+  font-weight:500;
+  font-variant-numeric:tabular-nums;
+}
+
 table.fin{width:100%;border-collapse:collapse}
 table.fin td{padding:1.125rem 0;border-bottom:1px solid rgba(255,255,255,.12);font-size:.9375rem}
 table.fin td:last-child{text-align:right;font-variant-numeric:tabular-nums}
@@ -359,6 +555,436 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Toast Notification System */
+#toast-container {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  pointer-events: none;
+  max-width: 380px;
+  width: calc(100vw - 32px);
+}
+
+@media (max-width: 768px) {
+  #toast-container {
+    right: 16px;
+    bottom: 80px; /* Above mobile dock */
+    max-width: calc(100vw - 32px);
+  }
+}
+
+.toast-item {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px 16px;
+  background: rgba(16, 18, 16, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  color: #f4f4f2;
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  overflow: hidden;
+  opacity: 0;
+  transform: translate3d(32px, 16px, 0) scale(0.95);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-item.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.toast-item.is-hiding {
+  opacity: 0;
+  transform: translate3d(28px, 12px, 0) scale(0.95);
+  pointer-events: none;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin-bottom: 3px;
+}
+
+.toast-message {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.82);
+  word-break: break-word;
+}
+
+.toast-close-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  padding: 0 0 0 4px;
+  font-size: 1.25rem;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.toast-close-btn:hover {
+  color: #ffffff;
+}
+
+.toast-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.toast-progress-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--accent, #E5231B);
+  transform-origin: left;
+  animation: toastCountdown 3s linear forwards;
+}
+
+.toast-success .toast-progress-fill {
+  background: #22c55e;
+}
+
+.toast-error .toast-progress-fill {
+  background: #ef4444;
+}
+
+.toast-warning .toast-progress-fill {
+  background: #f59e0b;
+}
+
+@keyframes toastCountdown {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+/* Chatbot & Google Search Grounding Styles */
+#chat-trigger-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--red, #ff3b30);
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 290;
+  box-shadow: 0 6px 18px rgba(255, 59, 48, 0.4);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+#chat-trigger-btn:hover {
+  transform: scale(1.06);
+  background: #e02f25;
+}
+#chat-trigger-btn svg { width: 22px; height: 22px; }
+
+#chatbot-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 294;
+}
+#chatbot-container {
+  position: fixed;
+  bottom: 80px;
+  left: 1.5rem;
+  width: 400px;
+  max-width: calc(100vw - 3rem);
+  height: 560px;
+  max-height: calc(100vh - 100px);
+  background: rgba(14, 14, 18, 0.95);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  z-index: 295;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.06);
+}
+#chatbot-header {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(22, 20, 24, 0.95);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.chatbot-header-info { display: flex; flex-direction: column; gap: 2px; }
+.chatbot-header-title { font-weight: 600; color: #fff; display: flex; align-items: center; gap: 6px; }
+.chatbot-header-sub { font-size: 0.72rem; color: rgba(255, 255, 255, 0.6); display: flex; align-items: center; gap: 4px; }
+.chatbot-header-sub .google-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(66, 133, 244, 0.15);
+  border: 1px solid rgba(66, 133, 244, 0.35);
+  color: #70aaff;
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+#chatbot-close-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#chatbot-close-btn:hover { color: #fff; }
+
+#chatbot-messages {
+  flex: 1;
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+}
+.chat-msg {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  max-width: 86%;
+  line-height: 1.55;
+  white-space: normal;
+  word-break: break-word;
+}
+.chat-msg.user {
+  align-self: flex-end;
+  background: var(--red, #ff3b30);
+  color: #fff;
+  border-bottom-right-radius: 2px;
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.25);
+}
+.chat-msg.model {
+  align-self: flex-start;
+  background: rgba(28, 27, 34, 0.85);
+  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom-left-radius: 2px;
+}
+.chat-msg-body p { margin: 0 0 0.5rem 0; }
+.chat-msg-body p:last-child { margin-bottom: 0; }
+.chat-msg-body ul { margin: 0.4rem 0 0.4rem 1.1rem; padding: 0; list-style-type: disc; }
+.chat-msg-body li { margin-bottom: 0.25rem; }
+.chat-msg-body strong { color: #fff; font-weight: 600; }
+
+.grounding-box {
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+}
+.grounding-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+.grounding-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(66, 133, 244, 0.15);
+  border: 1px solid rgba(66, 133, 244, 0.35);
+  color: #93c5fd;
+  font-size: 0.72rem;
+}
+.grounding-queries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+.grounding-query-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1px 6px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+}
+.grounding-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+.grounding-source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  text-decoration: none;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  transition: all 0.15s ease;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.grounding-source-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.grounding-source-link svg {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.chat-suggestions-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 0.4rem;
+}
+.chat-suggestions-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 2px;
+}
+.chat-suggestions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.chat-suggestion-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.chat-suggestion-chip:hover {
+  background: rgba(255, 59, 48, 0.2);
+  border-color: rgba(255, 59, 48, 0.4);
+  color: #fff;
+}
+
+#chatbot-input-area {
+  display: flex;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(20, 18, 22, 0.95);
+  gap: 8px;
+}
+#chatbot-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  padding: 0.55rem 0.75rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#chatbot-input:focus {
+  border-color: rgba(255, 59, 48, 0.6);
+  background: rgba(255, 255, 255, 0.09);
+}
+#chatbot-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+#chatbot-submit {
+  background: var(--red, #ff3b30);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  transition: background 0.2s ease, opacity 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+#chatbot-submit:hover { background: #e02f25; }
+#chatbot-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.typing-indicator { display: flex; gap: 4px; padding: 0.8rem 1rem; align-items: center; }
+.typing-indicator span { width: 6px; height: 6px; background: rgba(255, 255, 255, 0.6); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 </style>
 </head>
 <body>
@@ -382,7 +1008,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 
   <div id="stage">
     <div class="layer" id="canvasWrap">
-      <img id="poster" src="https://storage.getlayers.ai/assets/house-22508188f8/scene/sequence/desktop/000.webp" alt="" fetchpriority="high">
+      <img id="poster" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/scenes/sequence/desktop/000.webp" alt="" fetchpriority="high">
       <canvas id="seq" aria-hidden="true"></canvas>
     </div>
 
@@ -423,7 +1049,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 
     <!-- echo -->
     <div class="layer" id="echoLayer">
-      <div class="img"><img src="https://storage.getlayers.ai/assets/house-22508188f8/scene/interior-echo.webp" alt="Sunlit open-plan living space behind floor-to-ceiling glazing"></div>
+      <div class="img"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/scenes/interior-echo.webp" alt="Sunlit open-plan living space behind floor-to-ceiling glazing"></div>
       <article id="echoPanel" aria-labelledby="echo-title">
         <div class="eng rise clip t-title" id="echoLead" data-lines="Illustrative yield|3-key villa" style="color:rgba(255,255,255,.95)"></div>
         <div class="mid">
@@ -446,7 +1072,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 
     <!-- details -->
     <div class="layer" id="detailsLayer">
-      <div class="img"><img src="https://storage.getlayers.ai/assets/house-22508188f8/scene/interior-details.webp" alt="Dusk-lit lounge with walnut-panelled walls"></div>
+      <div class="img"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/scenes/interior-details.webp" alt="Dusk-lit lounge with walnut-panelled walls"></div>
       <div class="cross" aria-hidden="true"><i></i><i></i></div>
       <h2 id="dTitle" class="t-title"><span>We hand you an asset</span><span>and run it for you</span></h2>
       <dl style="display:contents">
@@ -471,8 +1097,8 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 
       <div id="showreel">
         <video id="reel" muted loop playsinline preload="metadata" crossorigin="anonymous"
-          poster="https://storage.getlayers.ai/assets/house-22508188f8/scene/showreel-poster.webp" aria-label="Red Flag Outpost showreel">
-          <source src="https://storage.getlayers.ai/assets/house-22508188f8/scene/showreel.mp4" type="video/mp4">
+          poster="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/scenes/showreel-poster.webp" aria-label="Red Flag Outpost showreel">
+          <source src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/scenes/showreel.mp4" type="video/mp4">
         </video>
       </div>
     </div>
@@ -495,6 +1121,22 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
       <button type="button" data-o="55">55%</button>
       <button type="button" data-o="60" aria-pressed="true">60%</button>
       <button type="button" data-o="65">65%</button>
+    </div>
+
+    <!-- Projected 6-Month Occupancy Trend (D3.js Bar Chart) -->
+    <div class="occupancy-chart-wrap" id="occupancyChartWrap">
+      <div class="occupancy-chart-header">
+        <div>
+          <h3 class="occupancy-chart-title">Projected 6-Month Occupancy Trend</h3>
+          <p class="occupancy-chart-subtitle">Ramp-up trajectory from launch to mature portfolio run-rate</p>
+        </div>
+        <div class="occupancy-chart-legend">
+          <span class="legend-item"><span class="legend-swatch-above"></span> Profitable (&gt;42%)</span>
+          <span class="legend-item"><span class="legend-swatch-ramp"></span> Ramp Phase</span>
+          <span class="legend-item"><span class="legend-line"></span> Breakeven (42%)</span>
+        </div>
+      </div>
+      <div id="occupancy-d3-chart" class="occupancy-d3-chart"></div>
     </div>
 
     <table class="fin">
@@ -611,7 +1253,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
     </div>
   </div>
   <figure>
-    <div class="port"><img src="https://storage.getlayers.ai/assets/house-22508188f8/scene/interior-echo.webp" alt="Sunlit open-plan living space behind floor-to-ceiling glazing"></div>
+    <div class="port"><img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/scenes/interior-echo.webp" alt="Sunlit open-plan living space behind floor-to-ceiling glazing"></div>
     <div class="copy">
       <span class="qm" aria-hidden="true">“</span>
       <blockquote><div class="eng rise t-headline" id="quoteEng" data-lines="Most franchises hand you a business and leave you to run it. We hand you an asset and run it for you."></div></blockquote>
@@ -648,7 +1290,6 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
         <select id="f-client" name="client" required><option value="">Select</option><option>Yes</option><option>No</option></select>
       </div>
       <button type="submit">Request allocation</button>
-      <p id="formMsg" role="status" style="color:var(--accent);font-size:.875rem"></p>
     </form>
   </div>
 </section>
@@ -657,7 +1298,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 
 <!-- FOOTER -->
 <footer id="foot">
-  <img src="https://storage.getlayers.ai/assets/house-22508188f8/footer/footer-bg.webp" alt="">
+  <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/footer/footer-bg.webp" alt="">
   <div class="tint" aria-hidden="true"></div>
   <div class="content">
     <div class="cta">
@@ -828,10 +1469,12 @@ function toggleLine(id,on){
   if(e&&e.on!==on){e.on=on;setOn(e.letters,on)}
 }
 
+const P=spring(90,26);
+
 /* ---------- sequence canvas ---------- */
 const TIER=(innerWidth<1024||matchMedia("(hover:none) and (pointer:coarse)").matches)
   ?{name:"mobile",count:105,w:1280,h:720}:{name:"desktop",count:210,w:1920,h:1080};
-const BASE="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset";
+const BASE="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/scenes/sequence/";
 const canvas=document.getElementById("seq");canvas.width=TIER.w;canvas.height=TIER.h;
 const ctx=canvas.getContext("2d");
 const frames=new Array(TIER.count).fill(null);
@@ -852,10 +1495,10 @@ async function loadFrames(){
       img.src=BASE+TIER.name+"/"+String(i).padStart(3,"0")+".webp";
       let ok=img;try{await img.decode()}catch{ok=null}
       frames[i]=ok;settled++;loadedRatio=settled/TIER.count;
-      if(ok)draw(true);
+      if(ok){try{draw(true)}catch(e){}}
     }
   };
-  await Promise.all(Array.from({length:6},pump));
+  await Promise.all(Array.from({length:6},()=>pump().catch(()=>{})));
 }
 loadFrames();
 
@@ -887,7 +1530,6 @@ setTimeout(()=>{if(!exiting){loadedRatio=1;clockStart=0}},8000);
 
 /* ---------- scene driving ---------- */
 const scene=document.getElementById("scene");
-const P=spring(90,26);
 let last=performance.now(),flags={};
 const el={
   canvasWrap:document.getElementById("canvasWrap"),
@@ -1043,7 +1685,7 @@ const TICK=["9–12% commission","Cleaning handled","Maintenance handled","Zero 
 const row=document.getElementById("tickRow");
 for(let r=0;r<2;r++)TICK.forEach(x=>{const s=document.createElement("span");s.textContent=x+" ·";row.appendChild(s)});
 
-/* ---------- economics toggle ---------- */
+/* ---------- economics toggle & D3.js occupancy trends ---------- */
 const DATA={
   45:{gross:121500,comm:12758,clean:16500,payout:92242,net:5242,roc:"10%"},
   55:{gross:148500,comm:15593,clean:18500,payout:114407,net:27407,roc:"51%"},
@@ -1051,6 +1693,302 @@ const DATA={
   65:{gross:175500,comm:18428,clean:22300,payout:134772,net:47772,roc:"88%"}
 };
 const inr=n=>"₹"+n.toLocaleString("en-IN");
+
+const ADR=9000;
+const BREAKEVEN_OCC=42;
+
+const OCC_TRENDS={
+  45:[
+    {month:"Month 1",short:"M1",occ:32,stage:"Creator Drop",note:"Launch campaign & initial creator showcase"},
+    {month:"Month 2",short:"M2",occ:38,stage:"OTA Launch",note:"Channel distribution & guest review pace"},
+    {month:"Month 3",short:"M3",occ:44,stage:"Breakeven",note:"Direct booking engine live · Breakeven passed"},
+    {month:"Month 4",short:"M4",occ:48,stage:"Weekend Surge",note:"Strong weekend pacing & word of mouth"},
+    {month:"Month 5",short:"M5",occ:52,stage:"Repeat Demand",note:"Repeat bookings & corporate midweeks"},
+    {month:"Month 6",short:"M6",occ:56,stage:"Target Run-Rate",note:"Mature seasonal baseline run-rate"}
+  ],
+  55:[
+    {month:"Month 1",short:"M1",occ:38,stage:"Creator Drop",note:"Launch campaign & creator stays"},
+    {month:"Month 2",short:"M2",occ:46,stage:"Optimization",note:"Dynamic pricing & verified reviews"},
+    {month:"Month 3",short:"M3",occ:53,stage:"Steady Demand",note:"Direct bookings ramp & weekend sellouts"},
+    {month:"Month 4",short:"M4",occ:58,stage:"Superhost Pace",note:"High listing rank across Airbnb & OTAs"},
+    {month:"Month 5",short:"M5",occ:63,stage:"Brand Velocity",note:"Repeat guests & direct referral bookings"},
+    {month:"Month 6",short:"M6",occ:67,stage:"Target Run-Rate",note:"Mature 55% target average run-rate"}
+  ],
+  60:[
+    {month:"Month 1",short:"M1",occ:42,stage:"Creator Drop",note:"Launch campaign & creator distribution"},
+    {month:"Month 2",short:"M2",occ:52,stage:"Rapid Traction",note:"Viral guest photography & algorithm boost"},
+    {month:"Month 3",short:"M3",occ:59,stage:"High Yield",note:"Consistent weeklong occupancy pacing"},
+    {month:"Month 4",short:"M4",occ:64,stage:"Brand Momentum",note:"Direct bookings save 15-18% OTA fees"},
+    {month:"Month 5",short:"M5",occ:68,stage:"Peak Pacing",note:"Advance bookings for upcoming quarters"},
+    {month:"Month 6",short:"M6",occ:72,stage:"Target Run-Rate",note:"Mature 60% portfolio target baseline"}
+  ],
+  65:[
+    {month:"Month 1",short:"M1",occ:46,stage:"Creator Drop",note:"High-buzz launch & creator showcase"},
+    {month:"Month 2",short:"M2",occ:56,stage:"Strong Velocity",note:"Waitlist demand & premium ADR capture"},
+    {month:"Month 3",short:"M3",occ:64,stage:"High Yield",note:"Direct referral bookings dominate"},
+    {month:"Month 4",short:"M4",occ:69,stage:"Prime Momentum",note:"Midweek corporate & extended stays"},
+    {month:"Month 5",short:"M5",occ:74,stage:"Max Pacing",note:"High yield with premium rate surges"},
+    {month:"Month 6",short:"M6",occ:78,stage:"Target Run-Rate",note:"Top-tier 65% annualized portfolio pace"}
+  ]
+};
+
+let currentOccTier = 60;
+
+function initOccupancyChart(){
+  const container = document.getElementById("occupancy-d3-chart");
+  if(!container) return;
+  const d3 = window.d3;
+  if(!d3) return;
+
+  container.innerHTML = "";
+
+  let tooltip = document.getElementById("occupancy-chart-tooltip");
+  if(!tooltip){
+    tooltip = document.createElement("div");
+    tooltip.id = "occupancy-chart-tooltip";
+    tooltip.className = "d3-chart-tooltip";
+    container.appendChild(tooltip);
+  }
+
+  const rect = container.getBoundingClientRect();
+  const width = Math.max(280, rect.width || container.clientWidth || 600);
+  const height = Math.max(200, container.clientHeight || 280);
+  const isMobile = width < 520;
+
+  const margin = {
+    top: 30,
+    right: isMobile ? 12 : 24,
+    bottom: 34,
+    left: isMobile ? 36 : 46
+  };
+
+  const svg = d3.select(container)
+    .append("svg")
+    .attr("width", "100%")
+    .attr("height", height)
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "none")
+    .style("overflow", "visible");
+
+  const defs = svg.append("defs");
+
+  const gradProfitable = defs.append("linearGradient")
+    .attr("id", "barGradProfitable")
+    .attr("x1", "0%").attr("y1", "0%")
+    .attr("x2", "0%").attr("y2", "100%");
+  gradProfitable.append("stop").attr("offset", "0%").attr("stop-color", "#ff3b30");
+  gradProfitable.append("stop").attr("offset", "100%").attr("stop-color", "#c71b14");
+
+  const gradRamp = defs.append("linearGradient")
+    .attr("id", "barGradRamp")
+    .attr("x1", "0%").attr("y1", "0%")
+    .attr("x2", "0%").attr("y2", "100%");
+  gradRamp.append("stop").attr("offset", "0%").attr("stop-color", "rgba(255,255,255,0.42)");
+  gradRamp.append("stop").attr("offset", "100%").attr("stop-color", "rgba(255,255,255,0.20)");
+
+  const data = OCC_TRENDS[currentOccTier] || OCC_TRENDS[60];
+
+  const xScale = d3.scaleBand()
+    .domain(data.map(d => isMobile ? d.short : d.month))
+    .range([margin.left, width - margin.right])
+    .padding(isMobile ? 0.26 : 0.36);
+
+  const yScale = d3.scaleLinear()
+    .domain([0, 100])
+    .range([height - margin.bottom, margin.top]);
+
+  // Horizontal Grid Lines
+  const yTicks = [20, 40, 60, 80, 100];
+  svg.append("g")
+    .attr("class", "d3-grid")
+    .selectAll("line")
+    .data(yTicks)
+    .join("line")
+    .attr("x1", margin.left)
+    .attr("x2", width - margin.right)
+    .attr("y1", d => yScale(d))
+    .attr("y2", d => yScale(d));
+
+  // Breakeven Reference Line (42%)
+  const breakevenY = yScale(BREAKEVEN_OCC);
+  const beGroup = svg.append("g").attr("class", "d3-breakeven-group");
+  
+  beGroup.append("line")
+    .attr("class", "d3-breakeven-line")
+    .attr("x1", margin.left)
+    .attr("x2", width - margin.right)
+    .attr("y1", breakevenY)
+    .attr("y2", breakevenY);
+
+  beGroup.append("text")
+    .attr("class", "d3-breakeven-badge")
+    .attr("x", width - margin.right)
+    .attr("y", breakevenY - 6)
+    .attr("text-anchor", "end")
+    .text("42% Breakeven");
+
+  // X Axis
+  const xAxis = d3.axisBottom(xScale).tickSize(0).tickPadding(10);
+  svg.append("g")
+    .attr("class", "d3-axis d3-axis-x")
+    .attr("transform", `translate(0, ${height - margin.bottom})`)
+    .call(xAxis);
+
+  // Y Axis
+  const yAxis = d3.axisLeft(yScale).ticks(5).tickFormat(d => d + "%").tickSize(0).tickPadding(8);
+  svg.append("g")
+    .attr("class", "d3-axis d3-axis-y")
+    .attr("transform", `translate(${margin.left}, 0)`)
+    .call(yAxis);
+
+  // Bars Group
+  const barsGroup = svg.append("g").attr("class", "d3-bars-group");
+
+  const bars = barsGroup.selectAll(".d3-bar")
+    .data(data, (d, i) => i)
+    .join("rect")
+    .attr("class", "d3-bar")
+    .attr("rx", 4)
+    .attr("ry", 4)
+    .attr("x", d => xScale(isMobile ? d.short : d.month))
+    .attr("width", xScale.bandwidth())
+    .attr("y", height - margin.bottom)
+    .attr("height", 0)
+    .attr("fill", d => d.occ >= BREAKEVEN_OCC ? "url(#barGradProfitable)" : "url(#barGradRamp)")
+    .attr("opacity", 0.95);
+
+  bars.transition()
+    .duration(700)
+    .delay((_, i) => i * 50)
+    .ease(d3.easeCubicOut)
+    .attr("y", d => yScale(d.occ))
+    .attr("height", d => Math.max(0, (height - margin.bottom) - yScale(d.occ)));
+
+  // Value labels above bars
+  const labelsGroup = svg.append("g").attr("class", "d3-labels-group");
+  const labels = labelsGroup.selectAll(".d3-bar-val")
+    .data(data, (d, i) => i)
+    .join("text")
+    .attr("class", "d3-bar-val")
+    .attr("x", d => xScale(isMobile ? d.short : d.month) + xScale.bandwidth() / 2)
+    .attr("y", height - margin.bottom)
+    .attr("opacity", 0)
+    .text(d => d.occ + "%");
+
+  labels.transition()
+    .duration(700)
+    .delay((_, i) => i * 50 + 120)
+    .ease(d3.easeCubicOut)
+    .attr("y", d => yScale(d.occ) - 7)
+    .attr("opacity", 1);
+
+  // Tooltip interactions
+  bars.on("mouseenter", function(event, d) {
+    d3.select(this)
+      .transition().duration(150)
+      .attr("opacity", 1);
+
+    const isProfitable = d.occ >= BREAKEVEN_OCC;
+    const estRev = Math.round(ADR * 30 * (d.occ / 100));
+    const variance = d.occ - BREAKEVEN_OCC;
+
+    tooltip.innerHTML = `
+      <div class="d3-tooltip-month">
+        <span>${d.month} · ${d.stage}</span>
+        <span class="d3-tooltip-status ${isProfitable ? 'profitable' : 'ramp'}">${isProfitable ? 'Profitable' : 'Ramp Phase'}</span>
+      </div>
+      <div class="d3-tooltip-row">
+        <span>Projected Occupancy:</span>
+        <b>${d.occ}%</b>
+      </div>
+      <div class="d3-tooltip-row">
+        <span>Est. Monthly Gross:</span>
+        <b>${inr(estRev)}</b>
+      </div>
+      <div class="d3-tooltip-row">
+        <span>Vs Breakeven:</span>
+        <b style="color:${isProfitable ? '#4ade80' : '#fbbf24'}">${variance >= 0 ? '+' + variance + '%' : variance + '%'}</b>
+      </div>
+      <div class="d3-tooltip-row" style="margin-top:5px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px;color:rgba(255,255,255,0.6);font-size:11px;">
+        <span>${d.note}</span>
+      </div>
+    `;
+
+    const barX = xScale(isMobile ? d.short : d.month) + xScale.bandwidth() / 2;
+    const barY = yScale(d.occ);
+
+    tooltip.style.left = barX + "px";
+    tooltip.style.top = barY + "px";
+    tooltip.classList.add("visible");
+  })
+  .on("mousemove", function(event, d) {
+    const barX = xScale(isMobile ? d.short : d.month) + xScale.bandwidth() / 2;
+    const barY = yScale(d.occ);
+    tooltip.style.left = barX + "px";
+    tooltip.style.top = barY + "px";
+  })
+  .on("mouseleave", function() {
+    d3.select(this)
+      .transition().duration(150)
+      .attr("opacity", 0.95);
+    tooltip.classList.remove("visible");
+  });
+}
+
+function updateOccupancyChart(tier){
+  currentOccTier = Number(tier) || 60;
+  const container = document.getElementById("occupancy-d3-chart");
+  if(!container) return;
+  const d3 = window.d3;
+  if(!d3){
+    initOccupancyChart();
+    return;
+  }
+
+  const svg = d3.select(container).select("svg");
+  if(svg.empty()){
+    initOccupancyChart();
+    return;
+  }
+
+  const rect = container.getBoundingClientRect();
+  const width = Math.max(280, rect.width || container.clientWidth || 600);
+  const height = Math.max(200, container.clientHeight || 280);
+  const isMobile = width < 520;
+
+  const margin = {
+    top: 30,
+    right: isMobile ? 12 : 24,
+    bottom: 34,
+    left: isMobile ? 36 : 46
+  };
+
+  const data = OCC_TRENDS[currentOccTier] || OCC_TRENDS[60];
+
+  const yScale = d3.scaleLinear()
+    .domain([0, 100])
+    .range([height - margin.bottom, margin.top]);
+
+  const bars = svg.selectAll(".d3-bar")
+    .data(data, (d, i) => i);
+
+  bars.transition()
+    .duration(550)
+    .ease(d3.easeCubicOut)
+    .attr("y", d => yScale(d.occ))
+    .attr("height", d => Math.max(0, (height - margin.bottom) - yScale(d.occ)))
+    .attr("fill", d => d.occ >= BREAKEVEN_OCC ? "url(#barGradProfitable)" : "url(#barGradRamp)");
+
+  const labels = svg.selectAll(".d3-bar-val")
+    .data(data, (d, i) => i);
+
+  labels.transition()
+    .duration(550)
+    .ease(d3.easeCubicOut)
+    .attr("y", d => yScale(d.occ) - 7)
+    .text(d => d.occ + "%");
+}
+
 function setOcc(o){
   const d=DATA[o];
   document.getElementById("gross").innerHTML=inr(d.gross)+'<span style="font-size:.4em;letter-spacing:0"> /mo</span>';
@@ -1062,16 +2000,387 @@ function setOcc(o){
   document.getElementById("r-roc").textContent=d.roc;
   document.querySelectorAll(".occ button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.o===String(o))));
   document.querySelector(".illus").textContent="Illustrative, 3-key Villa at "+o+"% occupancy · ADR ₹9,000 · capital deployed ₹6,49,999";
+  updateOccupancyChart(o);
 }
 document.querySelectorAll(".occ button").forEach(b=>b.addEventListener("click",()=>setOcc(b.dataset.o)));
 setOcc(60);
 
+// Initialize Chart with ResizeObserver
+function setupOccupancyChart(){
+  if(window.d3){
+    initOccupancyChart();
+  } else {
+    const s = document.querySelector('script[src*="d3"]');
+    if(s){
+      s.addEventListener('load', initOccupancyChart);
+    } else {
+      setTimeout(setupOccupancyChart, 50);
+    }
+  }
+}
+setupOccupancyChart();
+
+const chartContainer = document.getElementById("occupancy-d3-chart");
+if(chartContainer && typeof ResizeObserver !== "undefined"){
+  let resizeTimer;
+  const ro = new ResizeObserver(()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(()=>{
+      initOccupancyChart();
+    }, 120);
+  });
+  ro.observe(chartContainer);
+}
+
+/* ---------- Toast Notification System ---------- */
+window.showToast = function(options) {
+  const opts = typeof options === 'string' ? { message: options } : (options || {});
+  const type = opts.type || 'success';
+  const duration = typeof opts.duration === 'number' ? opts.duration : 3000;
+  const message = opts.message || '';
+  const title = opts.title || (
+    type === 'success' ? 'Success' :
+    type === 'error' ? 'Notice' :
+    type === 'warning' ? 'Attention' : 'Red Flag Outpost'
+  );
+
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.setAttribute('role', 'region');
+    container.setAttribute('aria-label', 'Notifications');
+    container.setAttribute('aria-live', 'polite');
+    document.body.appendChild(container);
+  }
+
+  let iconSvg = '';
+  if (type === 'success') {
+    iconSvg = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+  } else if (type === 'error') {
+    iconSvg = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+  } else if (type === 'warning') {
+    iconSvg = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+  } else {
+    iconSvg = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent, #E5231B)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+  }
+
+  const toast = document.createElement('div');
+  toast.className = 'toast-item toast-' + type;
+  toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+  toast.innerHTML = 
+    '<div class="toast-icon">' + iconSvg + '</div>' +
+    '<div class="toast-content">' +
+      (title ? '<div class="toast-title">' + title + '</div>' : '') +
+      '<div class="toast-message">' + message + '</div>' +
+    '</div>' +
+    '<button type="button" class="toast-close-btn" aria-label="Dismiss notification">&times;</button>' +
+    '<div class="toast-progress-bar"><div class="toast-progress-fill"></div></div>';
+
+  container.appendChild(toast);
+
+  // Fade in from the bottom-right corner
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      toast.classList.add('is-visible');
+    });
+  });
+
+  let dismissTimer = null;
+  const dismiss = () => {
+    if (dismissTimer) {
+      clearTimeout(dismissTimer);
+      dismissTimer = null;
+    }
+    toast.classList.remove('is-visible');
+    toast.classList.add('is-hiding');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 360);
+  };
+
+  const closeBtn = toast.querySelector('.toast-close-btn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', dismiss);
+  }
+
+  // Disappear after 3 seconds
+  dismissTimer = setTimeout(dismiss, duration);
+
+  return { dismiss: dismiss };
+};
+
 /* ---------- form ---------- */
-document.getElementById("applyForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  document.getElementById("formMsg").textContent="Thank you. Our expansion team will be in touch within two working days.";
-  e.target.reset();
-});
+const applyFormEl = document.getElementById("applyForm");
+if (applyFormEl) {
+  applyFormEl.addEventListener("submit", e => {
+    e.preventDefault();
+    if (typeof window.showToast === 'function') {
+      window.showToast({
+        title: 'Allocation Request Received',
+        message: 'Thank you. Our expansion team will be in touch within two working days.',
+        type: 'success',
+        duration: 3000
+      });
+    }
+    e.target.reset();
+  });
+}
+
+/* ---------- Google Search Grounded Chatbot ---------- */
+(function() {
+  const triggerBtn = document.getElementById('chat-trigger-btn');
+  const chatContainer = document.getElementById('chatbot-container');
+  const overlay = document.getElementById('chatbot-overlay');
+  const closeBtn = document.getElementById('chatbot-close-btn');
+  const chatForm = document.getElementById('chatbot-input-area');
+  const chatInput = document.getElementById('chatbot-input');
+  const chatMessages = document.getElementById('chatbot-messages');
+  const chatSubmit = document.getElementById('chatbot-submit');
+
+  if (!triggerBtn || !chatContainer) return;
+
+  function toggleChat() {
+    const isShown = chatContainer.style.display === 'flex';
+    chatContainer.style.display = isShown ? 'none' : 'flex';
+    if (overlay) overlay.style.display = isShown ? 'none' : 'block';
+    if (!isShown && chatInput) chatInput.focus();
+  }
+
+  triggerBtn.addEventListener('click', toggleChat);
+  if (closeBtn) closeBtn.addEventListener('click', toggleChat);
+  if (overlay) overlay.addEventListener('click', toggleChat);
+
+  let chatHistory = [];
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function formatMarkdown(text) {
+    if (!text) return '';
+    let html = escapeHtml(text);
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+
+    const lines = html.split('\n');
+    let result = [];
+    let inList = false;
+
+    for (let line of lines) {
+      let trimmed = line.trim();
+      if (!trimmed) {
+        if (inList) {
+          result.push('</ul>');
+          inList = false;
+        }
+        continue;
+      }
+
+      if (trimmed.startsWith('* ') || trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+        if (!inList) {
+          result.push('<ul>');
+          inList = true;
+        }
+        result.push(`<li>${trimmed.replace(/^[\*\-•]\s*/, '')}</li>`);
+      } else if (/^\d+\.\s/.test(trimmed)) {
+        if (inList) {
+          result.push('</ul>');
+          inList = false;
+        }
+        const numEnd = trimmed.indexOf(' ') + 1;
+        result.push(`<p><strong>${trimmed.slice(0, numEnd)}</strong>${trimmed.slice(numEnd)}</p>`);
+      } else {
+        if (inList) {
+          result.push('</ul>');
+          inList = false;
+        }
+        result.push(`<p>${trimmed}</p>`);
+      }
+    }
+
+    if (inList) result.push('</ul>');
+    return result.join('');
+  }
+
+  function addMessage(role, text, sources = [], searchQueries = []) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-msg ${role}`;
+
+    if (role === 'user') {
+      msgDiv.textContent = text;
+    } else {
+      let contentHtml = `<div class="chat-msg-body">${formatMarkdown(text)}</div>`;
+
+      if ((searchQueries && searchQueries.length > 0) || (sources && sources.length > 0)) {
+        contentHtml += `
+          <div class="grounding-box">
+            <div class="grounding-header">
+              <span class="grounding-badge">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"/></svg>
+                Google Search Grounded
+              </span>
+              <span>Live Market Data</span>
+            </div>
+        `;
+
+        if (searchQueries && searchQueries.length > 0) {
+          contentHtml += `
+            <div class="grounding-queries">
+              <span>Searched:</span>
+              ${searchQueries.map(q => `<span class="grounding-query-pill">"${escapeHtml(q)}"</span>`).join(' ')}
+            </div>
+          `;
+        }
+
+        if (sources && sources.length > 0) {
+          contentHtml += `
+            <div class="grounding-sources">
+              ${sources.slice(0, 4).map(s => {
+                let domain = '';
+                try { domain = new URL(s.uri).hostname.replace('www.', ''); } catch(e){ domain = 'Source'; }
+                return `
+                  <a href="${escapeHtml(s.uri)}" target="_blank" rel="noopener noreferrer" class="grounding-source-link" title="${escapeHtml(s.title || domain)}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    <span>${escapeHtml(domain)}</span>
+                  </a>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+
+        contentHtml += `</div>`;
+      }
+
+      msgDiv.innerHTML = contentHtml;
+    }
+
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function addTypingIndicator() {
+    const ind = document.createElement('div');
+    ind.className = 'chat-msg model typing-indicator';
+    ind.id = 'typing-indicator-f';
+    ind.innerHTML = '<span></span><span></span><span></span>';
+    chatMessages.appendChild(ind);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function removeTypingIndicator() {
+    const ind = document.getElementById('typing-indicator-f');
+    if (ind) ind.remove();
+  }
+
+  document.querySelectorAll('.franchise-prompt-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prompt = btn.getAttribute('data-prompt');
+      if (prompt && chatInput) {
+        chatInput.value = prompt;
+        if (chatForm) chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    });
+  });
+
+  if (chatForm) {
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      chatInput.value = '';
+      addMessage('user', text);
+      addTypingIndicator();
+      chatSubmit.disabled = true;
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            history: chatHistory,
+            message: text
+          })
+        });
+
+        removeTypingIndicator();
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          addMessage('model', errData.error || 'Sorry, I encountered an error connecting to the search-grounded advisor.');
+        } else {
+          const data = await res.json();
+          addMessage('model', data.text, data.sources || [], data.searchQueries || []);
+          chatHistory.push({ role: 'user', parts: [{ text }] });
+          chatHistory.push({ role: 'model', parts: [{ text: data.text }] });
+        }
+      } catch (err) {
+        removeTypingIndicator();
+        addMessage('model', 'Network error while fetching real-time market data.');
+      }
+
+      chatSubmit.disabled = false;
+      chatInput.focus();
+    });
+  }
+})();
 </script>
+
+<div id="chatbot-overlay"></div>
+<button id="chat-trigger-btn" aria-label="Open AI Market Concierge">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 11.996c0 2.29.9 4.36 2.373 5.86l-1.07 3.32a.75.75 0 0 0 .937.937l3.32-1.07A8.956 8.956 0 0 0 12 20.25Z" /></svg>
+</button>
+<div id="chatbot-container">
+  <div id="chatbot-header">
+    <div style="display:flex;align-items:center;gap:10px;flex:1;">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:20px;height:20px;color:var(--red, #ff3b30);flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 11.996c0 2.29.9 4.36 2.373 5.86l-1.07 3.32a.75.75 0 0 0 .937.937l3.32-1.07A8.956 8.956 0 0 0 12 20.25Z" /></svg>
+      <div class="chatbot-header-info">
+        <div class="chatbot-header-title">Franchise & Market Advisor</div>
+        <div class="chatbot-header-sub">
+          <span class="google-badge-pill">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"/></svg>
+            Google Search Grounded
+          </span>
+          <span>· Real-time stats</span>
+        </div>
+      </div>
+    </div>
+    <button id="chatbot-close-btn" aria-label="Close advisor"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+  </div>
+  <div id="chatbot-messages">
+    <div class="chat-msg model">
+      <div class="chat-msg-body">
+        <p>Welcome to Red Flag Network intelligence. I am grounded with real-time <strong>Google Search data</strong> to provide verified market intelligence for villa owners and franchise partners.</p>
+        <p>Inquire about local luxury hospitality yields, current occupancy benchmarks, state homestay regulations, or regional seasonal dynamics.</p>
+      </div>
+    </div>
+    <div class="chat-suggestions-wrap">
+      <div class="chat-suggestions-title">Live Market Queries</div>
+      <div class="chat-suggestions-list">
+        <button type="button" class="chat-suggestion-chip franchise-prompt-chip" data-prompt="What are the current 2026 luxury villa occupancy rates and average daily rates (ADR) in Goa?">📈 Goa villa ADR & occupancy</button>
+        <button type="button" class="chat-suggestion-chip franchise-prompt-chip" data-prompt="What is the current luxury homestay tourism demand and seasonal yield in Himachal Pradesh?">🏔️ Himachal homestay yields</button>
+        <button type="button" class="chat-suggestion-chip franchise-prompt-chip" data-prompt="What are the government homestay registration rules and incentives in Uttarakhand?">📜 Uttarakhand homestay policy</button>
+        <button type="button" class="chat-suggestion-chip franchise-prompt-chip" data-prompt="What is the market difference between self-managed villas vs franchise boutique networks in India?">💼 Franchise vs DIY returns</button>
+      </div>
+    </div>
+  </div>
+  <form id="chatbot-input-area">
+    <input type="text" id="chatbot-input" placeholder="Ask market, ADR, regulation, or occupancy queries..." autocomplete="off" />
+    <button type="submit" id="chatbot-submit">
+      <span>Query</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </button>
+  </form>
+</div>
 </body>
 </html>

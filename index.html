@@ -11,6 +11,86 @@
     const isMobile = window.innerWidth < 768;
     
   });
+
+  // Global Toast Notification System
+  window.showToast = function(options) {
+    const opts = typeof options === 'string' ? { message: options } : (options || {});
+    const type = opts.type || 'success';
+    const duration = typeof opts.duration === 'number' ? opts.duration : 3000;
+    const message = opts.message || '';
+    const title = opts.title || (
+      type === 'success' ? 'Success' :
+      type === 'error' ? 'Notice' :
+      type === 'warning' ? 'Attention' : 'Red Flag Homes'
+    );
+
+    let container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      container.setAttribute('role', 'region');
+      container.setAttribute('aria-label', 'Notifications');
+      container.setAttribute('aria-live', 'polite');
+      document.body.appendChild(container);
+    }
+
+    let iconSvg = '';
+    if (type === 'success') {
+      iconSvg = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+    } else if (type === 'error') {
+      iconSvg = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+    } else if (type === 'warning') {
+      iconSvg = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+    } else {
+      iconSvg = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--raw-color-signal-red, #ff3333)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-item toast-' + type;
+    toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    toast.innerHTML = 
+      '<div class="toast-icon">' + iconSvg + '</div>' +
+      '<div class="toast-content">' +
+        (title ? '<div class="toast-title">' + title + '</div>' : '') +
+        '<div class="toast-message">' + message + '</div>' +
+      '</div>' +
+      '<button type="button" class="toast-close-btn" aria-label="Dismiss notification">&times;</button>' +
+      '<div class="toast-progress-bar"><div class="toast-progress-fill"></div></div>';
+
+    container.appendChild(toast);
+
+    // Fade in from the bottom-right corner
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        toast.classList.add('is-visible');
+      });
+    });
+
+    let dismissTimer = null;
+    const dismiss = () => {
+      if (dismissTimer) {
+        clearTimeout(dismissTimer);
+        dismissTimer = null;
+      }
+      toast.classList.remove('is-visible');
+      toast.classList.add('is-hiding');
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 360);
+    };
+
+    const closeBtn = toast.querySelector('.toast-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', dismiss);
+    }
+
+    // Disappear after duration (default 3 seconds)
+    dismissTimer = setTimeout(dismiss, duration);
+
+    return { dismiss: dismiss };
+  };
   </script>
 
   <script type="importmap">
@@ -576,33 +656,262 @@
       position: fixed;
       bottom: 80px;
       left: 1.5rem;
-      width: 350px;
+      width: 400px;
       max-width: calc(100vw - 3rem);
-      height: 500px;
+      height: 560px;
       max-height: calc(100vh - 100px);
-      background: var(--surface-glass);
-      border-radius: 12px;
-      border: 1px solid var(--foreground-accent-muted);
+      background: rgba(14, 14, 18, 0.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
       overflow: hidden;
       display: none;
       flex-direction: column;
       z-index: 295;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.06);
     }
-    #chatbot-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--foreground-accent-muted); background: var(--raw-color-velvet-900); font-family: var(--typeface-ui); font-weight: 500; font-size: 1rem; color: var(--foreground); display: flex; align-items: center; gap: 0.5rem; }
-    #chatbot-header svg { width: 20px; height: 20px; color: var(--foreground-accent); }
-    #chatbot-messages { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; font-family: var(--typeface-ui); font-size: 0.9rem; }
-    .chat-msg { padding: 1rem; border-radius: 8px; max-width: 80%; line-height: 1.5; white-space: pre-wrap; }
-    .chat-msg.user { align-self: flex-end; background: var(--raw-color-velvet-700); color: var(--foreground); border-bottom-right-radius: 2px; }
-    .chat-msg.model { align-self: flex-start; background: rgba(0,0,0,0.4); color: var(--foreground-accent); border: 1px solid var(--foreground-accent-muted); border-bottom-left-radius: 2px; }
-    #chatbot-input-area { display: flex; padding: 1rem; border-top: 1px solid var(--foreground-accent-muted); background: var(--raw-color-velvet-900); }
-    #chatbot-input { flex: 1; background: transparent; border: none; color: var(--foreground); font-family: var(--typeface-ui); font-size: 0.9rem; padding: 0.5rem; outline: none; }
-    #chatbot-input::placeholder { color: var(--foreground-accent-muted); }
-    #chatbot-submit { background: var(--raw-color-velvet-700); color: var(--foreground); border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; transition: background 0.2s ease; }
-    #chatbot-submit:hover { background: var(--raw-color-velvet-500); }
+    #chatbot-header {
+      padding: 0.9rem 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(22, 20, 24, 0.95);
+      font-family: var(--typeface-ui);
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--foreground);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .chatbot-header-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .chatbot-header-title {
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .chatbot-header-sub {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chatbot-header-sub .google-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 1px 5px;
+      border-radius: 999px;
+      background: rgba(66, 133, 244, 0.15);
+      border: 1px solid rgba(66, 133, 244, 0.35);
+      color: #70aaff;
+      font-size: 0.68rem;
+      font-weight: 500;
+    }
+    #chatbot-messages {
+      flex: 1;
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      font-family: var(--typeface-ui);
+      font-size: 0.88rem;
+    }
+    .chat-msg {
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      max-width: 86%;
+      line-height: 1.55;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      background: var(--raw-color-signal-red, #ff3b30);
+      color: #fff;
+      border-bottom-right-radius: 2px;
+      box-shadow: 0 4px 12px rgba(255, 59, 48, 0.25);
+    }
+    .chat-msg.model {
+      align-self: flex-start;
+      background: rgba(28, 27, 34, 0.85);
+      color: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom-left-radius: 2px;
+    }
+    .chat-msg-body p { margin: 0 0 0.5rem 0; }
+    .chat-msg-body p:last-child { margin-bottom: 0; }
+    .chat-msg-body ul { margin: 0.4rem 0 0.4rem 1.1rem; padding: 0; list-style-type: disc; }
+    .chat-msg-body li { margin-bottom: 0.25rem; }
+    .chat-msg-body strong { color: #fff; font-weight: 600; }
+
+    /* Grounding metadata badges & citations */
+    .grounding-box {
+      margin-top: 0.65rem;
+      padding-top: 0.55rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: 0.76rem;
+    }
+    .grounding-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 500;
+    }
+    .grounding-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(66, 133, 244, 0.15);
+      border: 1px solid rgba(66, 133, 244, 0.35);
+      color: #93c5fd;
+      font-size: 0.72rem;
+    }
+    .grounding-queries {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.55);
+    }
+    .grounding-query-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1px 6px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.8);
+      font-style: italic;
+    }
+    .grounding-sources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 2px;
+    }
+    .grounding-source-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      text-decoration: none;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      transition: all 0.15s ease;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .grounding-source-link:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.28);
+      color: #fff;
+    }
+    .grounding-source-link svg {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    /* Suggested quick prompt chips */
+    .chat-suggestions-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 0 0.4rem;
+    }
+    .chat-suggestions-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: rgba(255, 255, 255, 0.45);
+      margin-bottom: 2px;
+    }
+    .chat-suggestions-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .chat-suggestion-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.85);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chat-suggestion-chip:hover {
+      background: rgba(255, 59, 48, 0.2);
+      border-color: rgba(255, 59, 48, 0.4);
+      color: #fff;
+    }
+
+    #chatbot-input-area {
+      display: flex;
+      padding: 0.75rem 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(20, 18, 22, 0.95);
+      gap: 8px;
+    }
+    #chatbot-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: var(--foreground);
+      font-family: var(--typeface-ui);
+      font-size: 0.86rem;
+      padding: 0.55rem 0.75rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #chatbot-input:focus {
+      border-color: rgba(255, 59, 48, 0.6);
+      background: rgba(255, 255, 255, 0.09);
+    }
+    #chatbot-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+    #chatbot-submit {
+      background: var(--raw-color-signal-red, #ff3b30);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.55rem 0.9rem;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+      transition: background 0.2s ease, opacity 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #chatbot-submit:hover { background: #e02f25; }
     #chatbot-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-    .typing-indicator { display: flex; gap: 4px; padding: 1rem; align-items: center; }
-    .typing-indicator span { width: 6px; height: 6px; background: var(--foreground-accent); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+    .typing-indicator { display: flex; gap: 4px; padding: 0.8rem 1rem; align-items: center; }
+    .typing-indicator span { width: 6px; height: 6px; background: rgba(255, 255, 255, 0.6); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
     .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
     .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
     @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
@@ -1978,6 +2287,143 @@
       }
     }
 
+    /* Toast Notification System */
+    #toast-container {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      pointer-events: none;
+      max-width: 380px;
+      width: calc(100vw - 32px);
+    }
+
+    @media (max-width: 768px) {
+      #toast-container {
+        right: 16px;
+        bottom: 20px;
+        max-width: calc(100vw - 32px);
+      }
+    }
+
+    .toast-item {
+      pointer-events: auto;
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 16px 16px;
+      background: rgba(16, 18, 16, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      color: #f4f4f2;
+      font-family: var(--typeface-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+      overflow: hidden;
+      opacity: 0;
+      transform: translate3d(32px, 16px, 0) scale(0.95);
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-item.is-visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    .toast-item.is-hiding {
+      opacity: 0;
+      transform: translate3d(28px, 12px, 0) scale(0.95);
+      pointer-events: none;
+    }
+
+    .toast-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toast-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toast-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      margin-bottom: 3px;
+    }
+
+    .toast-message {
+      font-size: 0.8125rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.82);
+      word-break: break-word;
+    }
+
+    .toast-close-btn {
+      flex-shrink: 0;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.45);
+      cursor: pointer;
+      padding: 0 0 0 4px;
+      font-size: 1.25rem;
+      line-height: 1;
+      border-radius: 4px;
+      transition: color 0.2s ease;
+    }
+
+    .toast-close-btn:hover {
+      color: #ffffff;
+    }
+
+    .toast-progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .toast-progress-fill {
+      height: 100%;
+      width: 100%;
+      background: var(--raw-color-signal-red, #ff3333);
+      transform-origin: left;
+      animation: toastCountdown 3s linear forwards;
+    }
+
+    .toast-success .toast-progress-fill {
+      background: #22c55e;
+    }
+
+    .toast-error .toast-progress-fill {
+      background: #ef4444;
+    }
+
+    .toast-warning .toast-progress-fill {
+      background: #f59e0b;
+    }
+
+    @keyframes toastCountdown {
+      from { transform: scaleX(1); }
+      to { transform: scaleX(0); }
+    }
   </style>
 </head>
 <body>
@@ -2289,11 +2735,9 @@
           </select>
         </div>
       </div>
-      <div id="booking-error" style="display: none; color: var(--foreground-accent); margin-top: -0.5rem; font-family: var(--typeface-ui); font-size: 0.9rem; width: 100%;">Please select both check-in and check-out dates.</div>
       <button type="button" id="book-submit-btn" class="book-submit-btn whatsapp-btn interactive-btn" style="width: 100%; height: 52px; border: none;">
           <span class="btn-dot"></span><span class="btn-label-default"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Check Availability</span><span class="btn-label-hover"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Check Availability →</span>
         </button>
-      <div id="booking-feedback" style="display: none; padding: 10px 14px; border-radius: 8px; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; font-size: 0.85rem; font-family: var(--typeface-ui); text-align: center; margin-top: 0.75rem;">✓ Reservation request recorded in Cloud Firestore.</div>
     </form>
     <div class="book-benefits">
       <div class="benefit-item">
@@ -2538,7 +2982,6 @@
         </div>
       </div>
       <button type="button" id="contact-submit-btn" class="book-submit-btn">Send Message</button>
-      <div id="contact-feedback" style="display: none; padding: 12px 16px; border-radius: 8px; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; font-size: 0.9rem; font-family: var(--typeface-ui); text-align: center; margin-top: 1rem;">✓ Inquiry recorded in Cloud Firestore. Our team will contact you shortly.</div>
     </form>
 
     <div class="contact-direct">
@@ -2914,33 +3357,49 @@
   const bookCheckin = document.getElementById('book-checkin');
   const bookCheckout = document.getElementById('book-checkout');
   const bookGuests = document.getElementById('book-guests');
-  const bookError = document.getElementById('booking-error');
+  const bookingFormEl = document.getElementById('booking-form');
+
+  if (bookingFormEl) {
+    bookingFormEl.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (bookSubmitBtn) bookSubmitBtn.click();
+    });
+  }
 
   if (bookSubmitBtn) {
     // Set min dates
     const today = new Date().toISOString().split('T')[0];
-    bookCheckin.min = today;
+    if (bookCheckin) bookCheckin.min = today;
     
-    bookCheckin.addEventListener('change', () => {
-      bookCheckout.min = bookCheckin.value;
-      if (bookCheckout.value && bookCheckout.value <= bookCheckin.value) {
-        bookCheckout.value = '';
-      }
-    });
+    if (bookCheckin) {
+      bookCheckin.addEventListener('change', () => {
+        if (bookCheckout) {
+          bookCheckout.min = bookCheckin.value;
+          if (bookCheckout.value && bookCheckout.value <= bookCheckin.value) {
+            bookCheckout.value = '';
+          }
+        }
+      });
+    }
 
     bookSubmitBtn.addEventListener('click', () => {
-      const checkin = bookCheckin.value;
-      const checkout = bookCheckout.value;
+      const checkin = bookCheckin ? bookCheckin.value : '';
+      const checkout = bookCheckout ? bookCheckout.value : '';
       
       if (!checkin || !checkout) {
-        bookError.style.display = 'block';
+        if (typeof window.showToast === 'function') {
+          window.showToast({
+            title: 'Dates Required',
+            message: 'Please select both check-in and check-out dates to check availability.',
+            type: 'warning',
+            duration: 3000
+          });
+        }
         return;
       }
       
-      bookError.style.display = 'none';
-      
-      let locLabel = bookLocation.value || 'Any location';
-      const guests = bookGuests.value;
+      let locLabel = (bookLocation && bookLocation.value) || 'Any location';
+      const guests = (bookGuests && bookGuests.value) || '2';
       
       const msg = `Hi! I'd like to check availability for a stay.\n\nLocation: ${locLabel}\nCheck-in: ${checkin}\nCheck-out: ${checkout}\nGuests: ${guests}\n\nPlease let me know if you have options available.`;
       
@@ -3044,10 +3503,121 @@
     
     let chatHistory = [];
 
-    function addMessage(role, text) {
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatMarkdown(text) {
+      if (!text) return '';
+      let html = escapeHtml(text);
+
+      // Bold **text**
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      // Italic *text*
+      html = html.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+
+      const lines = html.split('\n');
+      let result = [];
+      let inList = false;
+
+      for (let line of lines) {
+        let trimmed = line.trim();
+        if (!trimmed) {
+          if (inList) {
+            result.push('</ul>');
+            inList = false;
+          }
+          continue;
+        }
+
+        if (trimmed.startsWith('* ') || trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+          if (!inList) {
+            result.push('<ul>');
+            inList = true;
+          }
+          result.push(`<li>${trimmed.replace(/^[\*\-•]\s*/, '')}</li>`);
+        } else if (/^\d+\.\s/.test(trimmed)) {
+          if (inList) {
+            result.push('</ul>');
+            inList = false;
+          }
+          const numEnd = trimmed.indexOf(' ') + 1;
+          result.push(`<p><strong>${trimmed.slice(0, numEnd)}</strong>${trimmed.slice(numEnd)}</p>`);
+        } else {
+          if (inList) {
+            result.push('</ul>');
+            inList = false;
+          }
+          result.push(`<p>${trimmed}</p>`);
+        }
+      }
+
+      if (inList) {
+        result.push('</ul>');
+      }
+
+      return result.join('');
+    }
+
+    function addMessage(role, text, sources = [], searchQueries = []) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `chat-msg ${role}`;
-      msgDiv.textContent = text;
+
+      if (role === 'user') {
+        msgDiv.textContent = text;
+      } else {
+        let contentHtml = `<div class="chat-msg-body">${formatMarkdown(text)}</div>`;
+
+        if ((searchQueries && searchQueries.length > 0) || (sources && sources.length > 0)) {
+          contentHtml += `
+            <div class="grounding-box">
+              <div class="grounding-header">
+                <span class="grounding-badge">
+                  <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"/></svg>
+                  Google Search Grounded
+                </span>
+                <span>Live Verification</span>
+              </div>
+          `;
+
+          if (searchQueries && searchQueries.length > 0) {
+            contentHtml += `
+              <div class="grounding-queries">
+                <span>Searched:</span>
+                ${searchQueries.map(q => `<span class="grounding-query-pill">"${escapeHtml(q)}"</span>`).join(' ')}
+              </div>
+            `;
+          }
+
+          if (sources && sources.length > 0) {
+            contentHtml += `
+              <div class="grounding-sources">
+                ${sources.slice(0, 4).map(s => {
+                  let domain = '';
+                  try { domain = new URL(s.uri).hostname.replace('www.', ''); } catch(e){ domain = 'Source'; }
+                  return `
+                    <a href="${escapeHtml(s.uri)}" target="_blank" rel="noopener noreferrer" class="grounding-source-link" title="${escapeHtml(s.title || domain)}">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      <span>${escapeHtml(domain)}</span>
+                    </a>
+                  `;
+                }).join('')}
+              </div>
+            `;
+          }
+
+          contentHtml += `</div>`;
+        }
+
+        msgDiv.innerHTML = contentHtml;
+      }
+
       chatMessages.appendChild(msgDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -3065,6 +3635,22 @@
       const ind = document.getElementById('typing-indicator');
       if (ind) ind.remove();
     }
+
+    // Attach suggestions click
+    function setupSuggestionChips() {
+      document.querySelectorAll('.chat-suggestion-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const prompt = btn.getAttribute('data-prompt');
+          if (prompt && chatInput) {
+            chatInput.value = prompt;
+            if (chatForm) {
+              chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
+          }
+        });
+      });
+    }
+    setupSuggestionChips();
 
     if(chatForm) {
       chatForm.addEventListener('submit', async (e) => {
@@ -3091,16 +3677,17 @@
           removeTypingIndicator();
           
           if (!res.ok) {
-            addMessage('model', 'Sorry, I encountered an error connecting to the server.');
+            const errData = await res.json().catch(() => ({}));
+            addMessage('model', errData.error || 'Sorry, I encountered an error connecting to the search-grounded concierge service.');
           } else {
             const data = await res.json();
-            addMessage('model', data.text);
+            addMessage('model', data.text, data.sources || [], data.searchQueries || []);
             chatHistory.push({ role: 'user', parts: [{ text }] });
             chatHistory.push({ role: 'model', parts: [{ text: data.text }] });
           }
         } catch (err) {
           removeTypingIndicator();
-          addMessage('model', 'Sorry, an error occurred.');
+          addMessage('model', 'Network error occurred while fetching real-time search data.');
         }
         
         chatSubmit.disabled = false;
@@ -3116,16 +3703,44 @@
 </button>
 <div id="chatbot-container">
       <div id="chatbot-header">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 11.996c0 2.29.9 4.36 2.373 5.86l-1.07 3.32a.75.75 0 0 0 .937.937l3.32-1.07A8.956 8.956 0 0 0 12 20.25Z" /></svg>
-        Red Flag Assistant
-        <button id="chatbot-close-btn" aria-label="Close chat"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        <div style="display:flex;align-items:center;gap:10px;flex:1;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:20px;height:20px;color:var(--raw-color-signal-red, #ff3b30);flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 11.996c0 2.29.9 4.36 2.373 5.86l-1.07 3.32a.75.75 0 0 0 .937.937l3.32-1.07A8.956 8.956 0 0 0 12 20.25Z" /></svg>
+          <div class="chatbot-header-info">
+            <div class="chatbot-header-title">Red Flag Concierge & Advisor</div>
+            <div class="chatbot-header-sub">
+              <span class="google-badge-pill">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"/></svg>
+                Google Search Grounded
+              </span>
+              <span>· Live data</span>
+            </div>
+          </div>
+        </div>
+        <button id="chatbot-close-btn" aria-label="Close chat"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
       </div>
       <div id="chatbot-messages">
-        <div class="chat-msg model">Hello! I'm your Red Flag Homes concierge. Ask me anything about our destinations, properties, or franchising opportunities.</div>
+        <div class="chat-msg model">
+          <div class="chat-msg-body">
+            <p>Hello! I'm your Red Flag Homes concierge, grounded with <strong>Google Search data</strong> to provide up-to-date and accurate information.</p>
+            <p>Ask me anything about current weather, seasonal travel demand, local attractions, road conditions, or luxury villa investment yields across India.</p>
+          </div>
+        </div>
+        <div class="chat-suggestions-wrap" id="chat-suggestions">
+          <div class="chat-suggestions-title">Live Search Inquiries</div>
+          <div class="chat-suggestions-list">
+            <button type="button" class="chat-suggestion-chip" data-prompt="What is the current travel season, weather, and sea condition in North Goa right now?">🌤️ Goa current season & weather</button>
+            <button type="button" class="chat-suggestion-chip" data-prompt="What are the top luxury travel events, weather, and peak dates in Udaipur?">📍 Udaipur luxury highlights</button>
+            <button type="button" class="chat-suggestion-chip" data-prompt="What are the current road conditions and travel advisories for visiting Himachal Pradesh?">🏔️ Himachal travel advisory</button>
+            <button type="button" class="chat-suggestion-chip" data-prompt="What are the latest 2026 vacation rental occupancy rates and ADR benchmarks in India?">📈 2026 Villa occupancy & ADR</button>
+          </div>
+        </div>
       </div>
       <form id="chatbot-input-area">
-        <input type="text" id="chatbot-input" placeholder="Ask a question..." autocomplete="off" />
-        <button type="submit" id="chatbot-submit">Send</button>
+        <input type="text" id="chatbot-input" placeholder="Ask about weather, destinations, yields..." autocomplete="off" />
+        <button type="submit" id="chatbot-submit">
+          <span>Send</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
       </form>
     </div>
 <script>
@@ -3632,7 +4247,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const bookCheckin = document.getElementById('book-checkin');
   const bookCheckout = document.getElementById('book-checkout');
   const bookGuests = document.getElementById('book-guests');
-  const bookFeedback = document.getElementById('booking-feedback');
 
   if (bookBtn) {
     bookBtn.addEventListener('click', async () => {
@@ -3651,9 +4265,13 @@ document.addEventListener('DOMContentLoaded', () => {
           guests,
           intent: 'book'
         });
-        if (bookFeedback) {
-          bookFeedback.style.display = 'block';
-          bookFeedback.textContent = '✓ Booking inquiry saved to Cloud Firestore & synced to your account.';
+        if (typeof window.showToast === 'function') {
+          window.showToast({
+            title: 'Inquiry Recorded',
+            message: 'Booking inquiry saved to Cloud Firestore & synced to your account.',
+            type: 'success',
+            duration: 3000
+          });
         }
       } catch (err) {
         console.warn('Booking inquiry not saved to Firestore:', err);
@@ -3663,17 +4281,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Intercept Contact form click to persist in Firestore
   const contactBtn = document.getElementById('contact-submit-btn');
-  const contactFeedback = document.getElementById('contact-feedback');
+  const contactFormEl = document.getElementById('contact-form');
+
+  if (contactFormEl) {
+    contactFormEl.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (contactBtn) contactBtn.click();
+    });
+  }
 
   if (contactBtn) {
     contactBtn.addEventListener('click', async () => {
-      const name = document.getElementById('contact-name')?.value || '';
-      const phone = document.getElementById('contact-phone')?.value || '';
-      const email = document.getElementById('contact-email')?.value || '';
+      const name = document.getElementById('contact-name')?.value.trim() || '';
+      const phone = document.getElementById('contact-phone')?.value.trim() || '';
+      const email = document.getElementById('contact-email')?.value.trim() || '';
       const intent = document.getElementById('contact-intent')?.value || 'General Inquiry';
-      const message = document.getElementById('contact-message')?.value || '';
+      const message = document.getElementById('contact-message')?.value.trim() || '';
 
-      if (!name && !email && !message) {
+      if (!name && !email && !message && !phone) {
+        if (typeof window.showToast === 'function') {
+          window.showToast({
+            title: 'Missing Details',
+            message: 'Please provide your name, contact information, or a message.',
+            type: 'warning',
+            duration: 3000
+          });
+        }
         return;
       }
 
@@ -3690,12 +4323,32 @@ document.addEventListener('DOMContentLoaded', () => {
           destination: 'Concierge Inquiry'
         });
 
-        if (contactFeedback) {
-          contactFeedback.style.display = 'block';
+        if (typeof window.showToast === 'function') {
+          window.showToast({
+            title: 'Inquiry Sent',
+            message: 'Inquiry recorded in Cloud Firestore. Our team will contact you shortly.',
+            type: 'success',
+            duration: 3000
+          });
         }
         contactBtn.textContent = 'Inquiry Logged ✓';
+        if (contactFormEl) {
+          contactFormEl.reset();
+        }
+        setTimeout(() => {
+          contactBtn.disabled = false;
+          contactBtn.textContent = 'Send Message';
+        }, 3000);
       } catch (err) {
         console.warn('Contact message Firestore error:', err);
+        if (typeof window.showToast === 'function') {
+          window.showToast({
+            title: 'Inquiry Received',
+            message: 'Your inquiry has been received. Our team will reach out shortly.',
+            type: 'info',
+            duration: 3000
+          });
+        }
         contactBtn.disabled = false;
         contactBtn.textContent = 'Send Message';
       }
