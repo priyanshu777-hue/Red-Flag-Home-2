@@ -129,7 +129,19 @@
       text-decoration: none;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .nav-brand:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+    .nav-brand-logo {
+      height: 34px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
     }
     .nav-brand-dot {
       width: 7px;
@@ -864,15 +876,15 @@
 
   <!-- TOP NAVBAR -->
   <header id="scene-nav">
-    <a href="#top" class="nav-brand" aria-label="Red Flag Outpost Home">
-      <span class="nav-brand-dot"></span>
+    <a href="index.html" class="nav-brand" aria-label="Return to Homepage">
+      <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Logo" class="nav-brand-logo" />
       <span>RED FLAG OUTPOST</span>
     </a>
     
     <nav class="nav-links-center" aria-label="Primary Navigation">
-      <a href="#top" class="nav-link active">Home</a>
-      <a href="#echo" class="nav-link">Outpost</a>
-      <a href="#details" class="nav-link">Economics</a>
+      <a href="index.html" class="nav-link">Main Home</a>
+      <a href="#top" class="nav-link active">Outpost</a>
+      <a href="#echo" class="nav-link">Economics</a>
       <a href="#reviews" class="nav-link">Stories</a>
       <a href="index.html#book" class="nav-link">Book a Stay</a>
     </nav>
@@ -895,6 +907,7 @@
       <svg class="icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
     </button>
     <div class="menu-links-list">
+      <a href="index.html" class="menu-link-item">Home Page</a>
       <a href="#top" class="menu-link-item active">Red Flag Outpost</a>
       <a href="#echo" class="menu-link-item">Outpost Yield</a>
       <a href="#details" class="menu-link-item">Economics</a>
@@ -906,8 +919,8 @@
   <!-- FLOATING DOCK -->
   <nav class="op-dock" aria-label="Red Flag Outpost">
     <div class="op-dock-inner">
-      <a href="#top" class="op-dock-brand" aria-label="Home">
-        <span class="op-dock-dot"></span>
+      <a href="index.html" class="op-dock-brand" aria-label="Return to Homepage">
+        <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Logo" style="height: 20px; width: auto; display: block;" />
         <span class="op-dock-wordmark">RED FLAG OUTPOST</span>
       </a>
       <div class="op-dock-links">

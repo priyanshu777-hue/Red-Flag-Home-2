@@ -1134,13 +1134,23 @@
       position: fixed;
       top: 1.5rem;
       left: 1.5rem;
-      z-index: 300;
-      display: block;
+      z-index: 350;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    #site-logo:hover {
+      transform: scale(1.05);
+      opacity: 0.95;
     }
     #site-logo img {
       width: auto;
-      max-height: 40px;
+      max-height: 42px;
       display: block;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
     }
     @media (max-width: 640px) {
       #site-logo {
@@ -1806,8 +1816,8 @@
   </style>
 </head>
 <body>
-    <a href="index.html" id="site-logo" aria-label="Go to homepage">
-      <img  src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Logo" />
+    <a href="franchise.html" id="site-logo" aria-label="Red Flag Outpost" title="Red Flag Outpost">
+      <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Logo" />
     </a>
 
 <div id="vignette"></div>
