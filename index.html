@@ -1149,6 +1149,13 @@
       display: block;
       filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
     }
+    #index-auth-mount {
+      position: fixed;
+      top: 1.5rem;
+      right: 3.5rem;
+      z-index: 350;
+      pointer-events: auto;
+    }
     @media (max-width: 640px) {
       #site-logo {
         top: 1rem;
@@ -1156,6 +1163,10 @@
       }
       #site-logo img {
         max-height: 32px;
+      }
+      #index-auth-mount {
+        top: 0.9rem;
+        right: 2.75rem;
       }
     }
 
@@ -1810,6 +1821,163 @@
       .aurora-headline-wrapper { width: 100%; box-sizing: border-box; }
     }
 
+    /* KEY PARTNER CITIES & DEVELOPMENT HUBS STRIP */
+    .partner-hubs-strip {
+      position: relative;
+      width: 100%;
+      background: #080608;
+      border-top: 1px solid rgba(229, 35, 27, 0.25);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      z-index: 25;
+      height: 52px;
+      box-sizing: border-box;
+    }
+    .hubs-strip-lead {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px 0 24px;
+      background: #080608;
+      height: 100%;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+      z-index: 2;
+      box-shadow: 10px 0 20px rgba(8, 6, 8, 0.9);
+    }
+    .hubs-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #E5231B;
+      box-shadow: 0 0 8px rgba(229, 35, 27, 0.8);
+      animation: hubPulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes hubPulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+    .hubs-lead-title {
+      font-family: 'Michroma', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      white-space: nowrap;
+    }
+    .hubs-marquee-viewport {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      mask-image: linear-gradient(to right, transparent, black 20px, black calc(100% - 28px), transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 20px, black calc(100% - 28px), transparent);
+    }
+    .hubs-ticker-track {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      animation: hubTicker 45s linear infinite;
+      will-change: transform;
+    }
+    .partner-hubs-strip:hover .hubs-ticker-track {
+      animation-play-state: paused;
+    }
+    .hubs-ticker-set {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      padding-right: 16px;
+    }
+    .hub-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 999px;
+      padding: 5px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.88);
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .hub-item:hover {
+      background: rgba(229, 35, 27, 0.14);
+      border-color: rgba(229, 35, 27, 0.45);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+    .hub-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #E5231B;
+      flex-shrink: 0;
+    }
+    .hub-name {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .hub-tag {
+      font-size: 9.5px;
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 0.04em;
+      font-weight: 400;
+      padding-left: 6px;
+      border-left: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .hub-sep {
+      color: rgba(229, 35, 27, 0.35);
+      font-size: 12px;
+      font-weight: 300;
+    }
+    @keyframes hubTicker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hubs-ticker-track {
+        animation: none;
+      }
+      .hubs-marquee-viewport {
+        overflow-x: auto;
+      }
+    }
+    @media (max-width: 768px) {
+      .partner-hubs-strip {
+        height: 46px;
+      }
+      .hubs-strip-lead {
+        padding: 0 12px 0 14px;
+        gap: 6px;
+      }
+      .hubs-lead-title {
+        font-size: 8.5px;
+        letter-spacing: 0.1em;
+      }
+      .hub-item {
+        padding: 4px 10px;
+        gap: 6px;
+      }
+      .hub-name {
+        font-size: 10px;
+      }
+      .hub-tag {
+        display: none;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1823,6 +1991,7 @@
     <a href="franchise.html" id="site-logo" aria-label="Red Flag Outpost" title="Red Flag Outpost">
       <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Logo" />
     </a>
+    <div id="index-auth-mount"></div>
 
 <div id="vignette"></div>
 
@@ -1856,6 +2025,218 @@
     
       </div>
 </section>
+
+<!-- KEY PARTNER CITIES & DEVELOPMENT HUBS CREDIBILITY STRIP -->
+<div id="partner-hubs-strip" class="partner-hubs-strip" aria-label="Key Partner Cities and Development Hubs">
+  <div class="hubs-strip-lead">
+    <span class="hubs-status-dot" aria-hidden="true"></span>
+    <span class="hubs-lead-title">Partner Cities &amp; Hubs</span>
+  </div>
+  <div class="hubs-marquee-viewport">
+    <div class="hubs-ticker-track">
+      <div class="hubs-ticker-set">
+        <button type="button" class="hub-item" data-city="Goa" title="Explore Goa Outposts">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="4"/><path d="M3 18c2.5-1.5 5.5-1.5 8 0s5.5 1.5 8 0"/><path d="M2 21c3-1.5 6-1.5 9 0s6 1.5 9 0"/></svg>
+          </span>
+          <span class="hub-name">Goa</span>
+          <span class="hub-tag">Coastal Outposts</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Rishikesh" title="Explore Rishikesh Outposts">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l6-11 5 9 3-4 4 6H3z"/><path d="M3 21c4-1.5 8 1.5 12 0s5-1.5 6 0"/></svg>
+          </span>
+          <span class="hub-name">Rishikesh</span>
+          <span class="hub-tag">Ganges Foothills</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Alibaug" title="Explore Alibaug Outposts">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M12 5l7 8h-7"/><path d="M12 8L6 13h6"/><path d="M4 19c3-1.5 6 1.5 8 0s5-1.5 8 0"/></svg>
+          </span>
+          <span class="hub-name">Alibaug</span>
+          <span class="hub-tag">Coastal Corridor</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Udaipur" title="Explore Udaipur Outposts">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 3-7 7-7 12v6h14v-6c0-5-3-9-7-12z"/><path d="M9 21v-4a3 3 0 0 1 6 0v4"/><circle cx="12" cy="3" r="1.2" fill="currentColor"/></svg>
+          </span>
+          <span class="hub-name">Udaipur</span>
+          <span class="hub-tag">Mewar Estates</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Kasauli" title="Explore Kasauli Outposts">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l4.5 6h-2.5l3.5 5.5h-3l2.5 4.5H7l2.5-4.5h-3l3.5-5.5H7.5L12 3z"/><path d="M12 19v3"/></svg>
+          </span>
+          <span class="hub-name">Kasauli</span>
+          <span class="hub-tag">Himachal Ridge</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Coorg" title="Explore Coorg Outposts">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 3 3 7.5 3 12.5c0 5 4 7.5 9 7.5s9-2.5 9-7.5c0-5-4-9.5-9-9.5z"/><path d="M12 3c0 6-3 9.5-7 11.5"/><path d="M12 11.5c3-1 6-3.5 7-7.5"/></svg>
+          </span>
+          <span class="hub-name">Coorg</span>
+          <span class="hub-tag">Highland Reserve</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Lonavala" title="Explore Lonavala Outposts">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20L8 8l5 6 3-3 5 9H3z"/><circle cx="18" cy="6" r="1.8"/></svg>
+          </span>
+          <span class="hub-name">Lonavala</span>
+          <span class="hub-tag">Western Ghats</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Jaipur" title="Explore Jaipur Outposts">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V10l3-2v3l5-4 5 4v-3l3 2v11H4z"/><path d="M10 21v-5a2 2 0 0 1 4 0v5"/></svg>
+          </span>
+          <span class="hub-name">Jaipur</span>
+          <span class="hub-tag">Rajputana Corridor</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Bengaluru" title="Bengaluru Regional Development Hub">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="12" y1="12" x2="21" y2="7"/><line x1="12" y1="12" x2="3" y2="7"/></svg>
+          </span>
+          <span class="hub-name">Bengaluru Hub</span>
+          <span class="hub-tag">South Development HQ</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Mumbai" title="Mumbai West Coast Operations">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="6" height="13" rx="1"/><rect x="14" y="4" width="6" height="17" rx="1"/><path d="M2 21h20"/><circle cx="17" cy="8" r="1"/></svg>
+          </span>
+          <span class="hub-name">Mumbai Hub</span>
+          <span class="hub-tag">West Operations</span>
+        </button>
+        <span class="hub-sep" aria-hidden="true">/</span>
+
+        <button type="button" class="hub-item" data-city="Delhi NCR" title="Delhi NCR Capital Development Office">
+          <span class="hub-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18v2H3z"/><path d="M6 6v14M10 6v14M14 6v14M18 6v14"/><path d="M2 20h20v2H2z"/></svg>
+          </span>
+          <span class="hub-name">Delhi NCR Hub</span>
+          <span class="hub-tag">Capital Office</span>
+        </button>
+      </div>
+
+      <!-- DUPLICATE SET FOR SEAMLESS INFINITE TICKER -->
+      <div class="hubs-ticker-set" aria-hidden="true">
+        <button type="button" class="hub-item" data-city="Goa" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="4"/><path d="M3 18c2.5-1.5 5.5-1.5 8 0s5.5 1.5 8 0"/><path d="M2 21c3-1.5 6-1.5 9 0s6 1.5 9 0"/></svg>
+          </span>
+          <span class="hub-name">Goa</span>
+          <span class="hub-tag">Coastal Outposts</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Rishikesh" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l6-11 5 9 3-4 4 6H3z"/><path d="M3 21c4-1.5 8 1.5 12 0s5-1.5 6 0"/></svg>
+          </span>
+          <span class="hub-name">Rishikesh</span>
+          <span class="hub-tag">Ganges Foothills</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Alibaug" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M12 5l7 8h-7"/><path d="M12 8L6 13h6"/><path d="M4 19c3-1.5 6 1.5 8 0s5-1.5 8 0"/></svg>
+          </span>
+          <span class="hub-name">Alibaug</span>
+          <span class="hub-tag">Coastal Corridor</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Udaipur" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 3-7 7-7 12v6h14v-6c0-5-3-9-7-12z"/><path d="M9 21v-4a3 3 0 0 1 6 0v4"/><circle cx="12" cy="3" r="1.2" fill="currentColor"/></svg>
+          </span>
+          <span class="hub-name">Udaipur</span>
+          <span class="hub-tag">Mewar Estates</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Kasauli" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l4.5 6h-2.5l3.5 5.5h-3l2.5 4.5H7l2.5-4.5h-3l3.5-5.5H7.5L12 3z"/><path d="M12 19v3"/></svg>
+          </span>
+          <span class="hub-name">Kasauli</span>
+          <span class="hub-tag">Himachal Ridge</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Coorg" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 3 3 7.5 3 12.5c0 5 4 7.5 9 7.5s9-2.5 9-7.5c0-5-4-9.5-9-9.5z"/><path d="M12 3c0 6-3 9.5-7 11.5"/><path d="M12 11.5c3-1 6-3.5 7-7.5"/></svg>
+          </span>
+          <span class="hub-name">Coorg</span>
+          <span class="hub-tag">Highland Reserve</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Lonavala" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20L8 8l5 6 3-3 5 9H3z"/><circle cx="18" cy="6" r="1.8"/></svg>
+          </span>
+          <span class="hub-name">Lonavala</span>
+          <span class="hub-tag">Western Ghats</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Jaipur" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V10l3-2v3l5-4 5 4v-3l3 2v11H4z"/><path d="M10 21v-5a2 2 0 0 1 4 0v5"/></svg>
+          </span>
+          <span class="hub-name">Jaipur</span>
+          <span class="hub-tag">Rajputana Corridor</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Bengaluru" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="12" y1="12" x2="21" y2="7"/><line x1="12" y1="12" x2="3" y2="7"/></svg>
+          </span>
+          <span class="hub-name">Bengaluru Hub</span>
+          <span class="hub-tag">South Development HQ</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Mumbai" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="6" height="13" rx="1"/><rect x="14" y="4" width="6" height="17" rx="1"/><path d="M2 21h20"/><circle cx="17" cy="8" r="1"/></svg>
+          </span>
+          <span class="hub-name">Mumbai Hub</span>
+          <span class="hub-tag">West Operations</span>
+        </button>
+        <span class="hub-sep">/</span>
+
+        <button type="button" class="hub-item" data-city="Delhi NCR" tabindex="-1">
+          <span class="hub-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18v2H3z"/><path d="M6 6v14M10 6v14M14 6v14M18 6v14"/><path d="M2 20h20v2H2z"/></svg>
+          </span>
+          <span class="hub-name">Delhi NCR Hub</span>
+          <span class="hub-tag">Capital Office</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <section id="book" class="section-container">
   <video autoplay muted loop playsinline preload="auto" id="book-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/pool.mp4"></video>
@@ -1912,6 +2293,7 @@
       <button type="button" id="book-submit-btn" class="book-submit-btn whatsapp-btn interactive-btn" style="width: 100%; height: 52px; border: none;">
           <span class="btn-dot"></span><span class="btn-label-default"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Check Availability</span><span class="btn-label-hover"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Check Availability →</span>
         </button>
+      <div id="booking-feedback" style="display: none; padding: 10px 14px; border-radius: 8px; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; font-size: 0.85rem; font-family: var(--typeface-ui); text-align: center; margin-top: 0.75rem;">✓ Reservation request recorded in Cloud Firestore.</div>
     </form>
     <div class="book-benefits">
       <div class="benefit-item">
@@ -2155,7 +2537,8 @@
           <textarea id="contact-message" class="book-input" style="min-height: 120px; padding-top: 1rem; resize: vertical;" placeholder="How can we help?"></textarea>
         </div>
       </div>
-      <button type="button" class="book-submit-btn">Send Message</button>
+      <button type="button" id="contact-submit-btn" class="book-submit-btn">Send Message</button>
+      <div id="contact-feedback" style="display: none; padding: 12px 16px; border-radius: 8px; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; font-size: 0.9rem; font-family: var(--typeface-ui); text-align: center; margin-top: 1rem;">✓ Inquiry recorded in Cloud Firestore. Our team will contact you shortly.</div>
     </form>
 
     <div class="contact-direct">
@@ -2565,6 +2948,33 @@
       window.open(whatsappUrl, '_blank');
     });
   }
+
+  // Key Partner Cities / Hubs Strip Interaction
+  document.querySelectorAll('.hub-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const city = item.getAttribute('data-city');
+      if (!city) return;
+      if (bookLocation) {
+        bookLocation.value = city;
+        bookLocation.focus();
+        bookLocation.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+        bookLocation.style.borderColor = '#E5231B';
+        bookLocation.style.boxShadow = '0 0 12px rgba(229, 35, 27, 0.4)';
+        setTimeout(() => {
+          bookLocation.style.borderColor = '';
+          bookLocation.style.boxShadow = '';
+        }, 1600);
+      }
+      const bookSec = document.getElementById('book');
+      if (bookSec) {
+        if (typeof lenis !== 'undefined' && lenis && typeof lenis.scrollTo === 'function') {
+          lenis.scrollTo(bookSec, { offset: -20 });
+        } else {
+          bookSec.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  });
 
 
     
@@ -3189,5 +3599,108 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 <script src="transitions.js"></script>
+<script type="module">
+  import { 
+    mountAuthNavigation, 
+    onUserChange, 
+    getCurrentUser, 
+    signInWithGoogle, 
+    submitBookingInquiry 
+  } from './firebase-client.js';
+
+  // Mount Account / Auth Navigation on index.html
+  mountAuthNavigation('index-auth-mount');
+
+  // Pre-fill contact details if signed in
+  const contactName = document.getElementById('contact-name');
+  const contactEmail = document.getElementById('contact-email');
+
+  onUserChange((user) => {
+    if (user) {
+      if (contactName && !contactName.value && user.displayName) {
+        contactName.value = user.displayName;
+      }
+      if (contactEmail && !contactEmail.value && user.email) {
+        contactEmail.value = user.email;
+      }
+    }
+  });
+
+  // Intercept Booking form click to persist in Firestore
+  const bookBtn = document.getElementById('book-submit-btn');
+  const bookLocation = document.getElementById('book-location');
+  const bookCheckin = document.getElementById('book-checkin');
+  const bookCheckout = document.getElementById('book-checkout');
+  const bookGuests = document.getElementById('book-guests');
+  const bookFeedback = document.getElementById('booking-feedback');
+
+  if (bookBtn) {
+    bookBtn.addEventListener('click', async () => {
+      const checkin = bookCheckin ? bookCheckin.value : '';
+      const checkout = bookCheckout ? bookCheckout.value : '';
+      if (!checkin || !checkout) return;
+
+      const destination = (bookLocation && bookLocation.value) || 'Any destination';
+      const guests = bookGuests ? bookGuests.value : '2';
+
+      try {
+        await submitBookingInquiry({
+          destination,
+          checkin,
+          checkout,
+          guests,
+          intent: 'book'
+        });
+        if (bookFeedback) {
+          bookFeedback.style.display = 'block';
+          bookFeedback.textContent = '✓ Booking inquiry saved to Cloud Firestore & synced to your account.';
+        }
+      } catch (err) {
+        console.warn('Booking inquiry not saved to Firestore:', err);
+      }
+    }, true);
+  }
+
+  // Intercept Contact form click to persist in Firestore
+  const contactBtn = document.getElementById('contact-submit-btn');
+  const contactFeedback = document.getElementById('contact-feedback');
+
+  if (contactBtn) {
+    contactBtn.addEventListener('click', async () => {
+      const name = document.getElementById('contact-name')?.value || '';
+      const phone = document.getElementById('contact-phone')?.value || '';
+      const email = document.getElementById('contact-email')?.value || '';
+      const intent = document.getElementById('contact-intent')?.value || 'General Inquiry';
+      const message = document.getElementById('contact-message')?.value || '';
+
+      if (!name && !email && !message) {
+        return;
+      }
+
+      contactBtn.disabled = true;
+      contactBtn.textContent = 'Recording Inquiry...';
+
+      try {
+        await submitBookingInquiry({
+          name,
+          phone,
+          email,
+          intent,
+          message,
+          destination: 'Concierge Inquiry'
+        });
+
+        if (contactFeedback) {
+          contactFeedback.style.display = 'block';
+        }
+        contactBtn.textContent = 'Inquiry Logged ✓';
+      } catch (err) {
+        console.warn('Contact message Firestore error:', err);
+        contactBtn.disabled = false;
+        contactBtn.textContent = 'Send Message';
+      }
+    });
+  }
+</script>
 </body>
 </html>

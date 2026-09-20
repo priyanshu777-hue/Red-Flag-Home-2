@@ -1,2307 +1,1077 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Red Flag Outpost</title>
-  <meta name="description" content="You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --outpost-void: #06080B;
-      --outpost-deep: #0C1117;
-      --outpost-fog: #1A2129;
-      --outpost-bone: #E8E4DF;
-      --outpost-dust: #8A8F96;
-      --outpost-brand-red: #E5231B;
-      --raw-color-sage-500: #E5231B;
-      --outpost-flare: #E5231B;
-    }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Red Flag Outpost — No property? No problem.</title>
+<meta name="description" content="You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs" } }
+</script>
+<style>
+:root{
+  --black:#000000; --white:#ffffff;
+  --glass:#0a0b09; --glass-raised:#121311;
+  --forest:#212623; --sand:#f4f0eb; --sand-sunk:#e2ddd5;
+  --ink:#2c2e2a; --accent:#E5231B;
+  --ease-glide:cubic-bezier(.25,1,.5,1);
+  --ease-settle:cubic-bezier(.16,1,.3,1);
+  --track-caps:.22em;
+}
+html{font-size:16px;scroll-behavior:auto}
+@media (max-width:1440px){html{font-size:1.111111vw}}
+@media (max-width:1024px){html{font-size:1.5625vw}}
+@media (max-width:640px){html{font-size:4.444444vw}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  background:var(--black);color:var(--white);
+  -webkit-font-smoothing:antialiased;overflow-x:clip;
+}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-stopped{overflow:hidden}
+html.locked{position:relative;overflow:hidden;height:100%}
+img,video{display:block;max-width:100%}
+a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid currentColor;outline-offset:4px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+video::-webkit-media-controls,video::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
 
-    html {
-      scroll-behavior: smooth;
-    }
+/* ---------- type ---------- */
+.t-display{font-size:2.5rem;line-height:.9;letter-spacing:-.04em}
+@media(min-width:640px){.t-display{font-size:4.5rem}}
+@media(min-width:1024px){.t-display{font-size:6.5rem}}
+.t-title{font-size:1rem;letter-spacing:-.02em;text-transform:uppercase}
+@media(min-width:768px){.t-title{font-size:1.25rem}}
+.t-headline{font-size:1.5rem;line-height:1.15;letter-spacing:-.02em;text-transform:uppercase}
+@media(min-width:768px){.t-headline{font-size:2rem}}
+.t-body{font-size:.875rem;line-height:1.5;letter-spacing:-.01em}
+@media(min-width:768px){.t-body{font-size:1rem;line-height:1.5}}
+.t-lead{font-size:1rem;font-weight:500;letter-spacing:-.01em;text-transform:uppercase}
+@media(min-width:768px){.t-lead{font-size:1.25rem}}
+.t-caption{font-size:.8125rem;letter-spacing:var(--track-caps);text-transform:uppercase}
+.muted{color:rgba(255,255,255,.7)}
 
-    body {
-      background: var(--outpost-void);
-      color: var(--outpost-bone);
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      line-height: 1.7;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
+/* ---------- letters ---------- */
+.lt{display:inline-block;will-change:transform,opacity,filter}
+.wd{display:inline-block}
+.eng{display:flex;flex-wrap:wrap;column-gap:.28em;line-height:1.1}
+.eng.clip .wd{overflow:hidden;padding-bottom:1rem;margin-bottom:-.875rem;
+  -webkit-mask-image:linear-gradient(to bottom,#000 45%,transparent);mask-image:linear-gradient(to bottom,#000 45%,transparent)}
+.slide .lt{opacity:0;transform:translateX(-40px);filter:blur(12px);transition:opacity .75s var(--ease-settle),transform .75s var(--ease-settle),filter .75s var(--ease-settle)}
+.slide .lt.on{opacity:1;transform:translateX(0);filter:blur(0)}
+.rise .lt{opacity:0;transform:translateY(105%);filter:blur(12px);transition:opacity 1.2s var(--ease-settle),transform 1.2s var(--ease-settle),filter 1.2s var(--ease-settle)}
+.rise .lt.on{opacity:1;transform:translateY(0);filter:blur(0)}
 
-    /* FAST FULL-SCREEN LOADER */
-    #preloader {
-      position: fixed;
-      inset: 0;
-      background: #000000;
-      color: #E8E4DF;
-      z-index: 999999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 400ms ease, visibility 400ms ease;
-      pointer-events: auto;
-    }
-    #preloader.loaded {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-    .preloader-track {
-      width: 140px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 2px;
-      overflow: hidden;
-      position: relative;
-    }
-    .preloader-fill {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 0%;
-      background: #E5231B;
-      transition: width 0.15s ease-out;
-    }
+/* ---------- preloader ---------- */
+#pre{position:fixed;inset:0;z-index:200;color:var(--white)}
+#pre .cols{position:absolute;inset:0;display:flex}
+#pre .cols i{flex:1;height:100%;background:var(--black);transform:scaleY(1);transition:transform 1.2s cubic-bezier(.76,0,.24,1)}
+#pre .cols i:nth-child(odd){transform-origin:top}
+#pre .cols i:nth-child(even){transform-origin:bottom}
+#pre.out .cols i{transform:scaleY(0)}
+#pre .lbl{position:absolute;left:1.5rem;top:1.5rem;transition:opacity .8s,transform .8s}
+@media(min-width:768px){#pre .lbl{left:2.5rem;top:2.5rem}}
+#pre.out .lbl{opacity:0;transform:translateY(-40px)}
+#pre .rule{position:absolute;left:1.5rem;right:1.5rem;top:50%;height:1px;transform:translateY(-50%) scaleX(1);transform-origin:right;background:rgba(255,255,255,.15);transition:transform .8s cubic-bezier(.83,0,.17,1)}
+@media(min-width:768px){#pre .rule{left:2.5rem;right:2.5rem}}
+#pre.out .rule{transform:translateY(-50%) scaleX(0)}
+#pre .rule b{display:block;height:100%;background:var(--white);transform-origin:left;transform:scaleX(0)}
+#pre .num{position:absolute;left:1.5rem;right:1.5rem;bottom:1.5rem;height:.9em;font-variant-numeric:tabular-nums;transition:opacity .8s,transform .8s}
+@media(min-width:768px){#pre .num{left:2.5rem;right:2.5rem;bottom:2.5rem}}
+#pre.out .num{opacity:0;transform:translateX(-40px)}
+#pre .num span{position:absolute;bottom:0;white-space:nowrap}
 
-    /* PREVENT IOS PLAY BUTTON OVERLAY & HIDE WEBKIT MEDIA CONTROLS */
-    video::-webkit-media-controls,
-    video::-webkit-media-controls-start-playback-button {
-      display: none !important;
-      -webkit-appearance: none;
-    }
+/* ---------- scene ---------- */
+#scene{position:relative;z-index:50;background:var(--black);height:1400vh}
+#stage{position:sticky;top:0;height:100dvh;width:100%;overflow:hidden}
+.layer{position:absolute;inset:0}
+#canvasWrap{z-index:1}
+#canvasWrap img,#canvasWrap canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#grid{z-index:2;pointer-events:none;opacity:0;transition:opacity .8s cubic-bezier(.55,.085,.68,.53)}
+#grid.on{opacity:1}
+.rules{position:absolute;left:2rem;right:2rem;top:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);pointer-events:none}
+.rules i{border:none!important}
+@media(max-width:767.98px){.rules{left:1.5rem;right:1.5rem}}
+.hero{position:absolute;inset:0;z-index:5;pointer-events:none}
+.hero .exit{position:absolute;inset:0}
+.hero .w{position:absolute}
+.s-tl{left:2.5rem;top:2.5rem}.s-tr{right:2.5rem;top:2.5rem}
+.s-cl{left:2.5rem;top:50%;transform:translateY(-50%)}
+.s-cr{right:2.5rem;top:50%;transform:translateY(-50%)}
+.s-c{left:50%;top:50%;transform:translate(-50%,-50%)}
+.s-bl{left:2.5rem;bottom:2.5rem}.s-br{right:2.5rem;bottom:2.5rem}
+@media(max-width:767.98px){
+  .s-tl{left:1.5rem;top:6rem}.s-tr{right:1.5rem;top:6rem}
+  .s-cl{left:1.5rem}.s-cr{right:1.5rem}
+  .s-bl{left:1.5rem;bottom:13rem}.s-br{right:1.5rem;bottom:13rem}
+}
+.desc{position:absolute;bottom:2.5rem;width:20rem;color:rgba(255,255,255,.7)}
+.desc.r{right:2.5rem;text-align:right}.desc.l{left:2.5rem}
+@media(max-width:767.98px){.desc{left:1.5rem;right:1.5rem;bottom:7rem;width:auto;text-align:left}}
 
-    /* VIDEO BACKGROUND */
-    #scene-video {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-      pointer-events: none;
-      opacity: 1;
-      transition: opacity 0.3s ease-out;
-    }
+/* ---------- echo ---------- */
+#echoLayer{z-index:10;overflow:hidden}
+#echoLayer .img{position:absolute;inset:0}
+#echoLayer .img img{width:100%;height:100%;object-fit:cover}
+#echoPanel{position:absolute;inset-block:0;left:0;z-index:15;width:50%;display:flex;flex-direction:column;justify-content:space-between;
+  border-right:1px solid rgba(255,255,255,.08);background:rgba(18,19,17,.45);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);padding:3.5rem}
+@media(max-width:767.98px){#echoPanel{width:100%;padding:3rem 2rem 8rem}}
+#echoPanel .mid{margin-top:2.5rem;flex:1;display:flex;flex-direction:column;justify-content:center}
+#echoPanel h2{display:flex;align-items:flex-start;margin-bottom:1.5rem;text-transform:uppercase}
+#echoPanel sup{margin-left:.25rem;margin-top:.12em;font-size:.35em;line-height:1}
+#echoPanel .mid p{max-width:85%;color:rgba(255,255,255,.7)}
+@media(max-width:767.98px){#echoPanel .mid p{max-width:none}}
+#echoPanel .foot{margin-top:2rem;display:flex;flex-direction:column;gap:.75rem}
+.icons{display:flex;gap:1rem}
+.icons svg{width:1.5rem;height:1.5rem;transition:transform .2s var(--ease-glide)}
+.icons a:hover svg{transform:scale(1.1)}
 
-    /* TOP HEADER */
-    #scene-nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-      pointer-events: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 32px 36px;
-      color: #FFFFFF;
-      transition: color 400ms, background 400ms;
-      box-sizing: border-box;
-    }
-    .nav-brand {
-      font-family: 'Michroma', sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #FFFFFF;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-    .nav-brand:hover {
-      opacity: 0.9;
-      transform: scale(1.02);
-    }
-    .nav-brand-logo {
-      height: 34px;
-      width: auto;
-      display: block;
-      object-fit: contain;
-      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
-    }
-    .nav-brand-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #E5231B;
-      box-shadow: 0 0 10px #E5231B;
-    }
-    .nav-links-center {
-      display: none;
-      align-items: center;
-      gap: 32px;
-    }
-    @media (min-width: 1024px) {
-      .nav-links-center { display: flex; }
-    }
-    .nav-link {
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.75);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-link:hover { color: #FFFFFF; }
-    .nav-link.active { color: #FFFFFF; border-bottom: 2px solid #E5231B; padding-bottom: 2px; }
+/* ---------- details ---------- */
+#detailsLayer{z-index:20;overflow:hidden}
+#detailsLayer .img{position:absolute;inset:0}
+#detailsLayer .img img{width:100%;height:100%;object-fit:cover}
+.cross{position:absolute;inset:0;z-index:22;pointer-events:none}
+.cross i:first-child{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(255,255,255,.18)}
+.cross i:last-child{position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(255,255,255,.18)}
+#dTitle{position:absolute;left:2.5rem;top:2.5rem;z-index:25;display:flex;flex-direction:column;text-transform:uppercase;line-height:1.1}
+@media(max-width:767.98px){#dTitle{left:1.5rem;top:1.5rem}}
+.stat{position:absolute;z-index:25;display:flex;flex-direction:column-reverse;gap:.75rem}
+.stat dt{color:rgba(255,255,255,.7);text-transform:uppercase}
+.stat dd{font-variant-numeric:tabular-nums;line-height:.9;letter-spacing:-.04em;font-size:2rem}
+@media(min-width:768px){.stat dd{font-size:4rem}}
+@media(min-width:1024px){.stat dd{font-size:5.5rem}}
+.st-tr{right:2.5rem;top:2.5rem;align-items:flex-end;text-align:right}
+.st-bl{bottom:2.5rem;left:2.5rem}
+.st-br{bottom:2.5rem;right:2.5rem;align-items:flex-end;text-align:right}
+@media(max-width:767.98px){
+  .stat{max-width:42%;gap:.5rem}
+  .st-tr{right:1.5rem;top:9rem}.st-bl{bottom:8rem;left:1.5rem}.st-br{bottom:8rem;right:1.5rem}
+}
+#star{position:absolute;left:50%;top:50%;z-index:30;width:156.25rem;aspect-ratio:1;translate:-50% -50%;pointer-events:none}
+#star svg{width:100%;height:100%;display:block}
+#showreel{position:absolute;left:50%;top:50%;z-index:40;width:65vw;aspect-ratio:65/37}
+#showreel video{width:100%;height:100%;object-fit:cover;filter:grayscale(1);transition:filter .6s var(--ease-glide)}
+#showreel video:hover{filter:grayscale(0)}
+.ov{position:absolute;top:50%;z-index:45}
+#ovLead{left:2.5rem;width:48vw}
+#ovAside{right:2.5rem;width:22vw;display:flex;flex-direction:column;align-items:flex-end;text-align:right;color:rgba(255,255,255,.7);gap:.5rem}
+#ovTop{position:absolute;left:2.5rem;right:2.5rem;top:2.5rem;z-index:45;display:flex;align-items:center;gap:.75rem;
+  border-top:1px solid rgba(255,255,255,.22);padding-top:1rem;text-transform:uppercase;transition:transform .35s var(--ease-glide),border-color .35s,color .35s}
+#ovTop:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.85)}
+@media(max-width:767.98px){.ov,#ovTop{display:none}}
+#badge{position:fixed;left:0;top:0;z-index:110;pointer-events:none;opacity:0}
+#badge b{display:block;translate:-50% -50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);
+  border-radius:.25rem;padding:.625rem 1.5rem;font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:var(--track-caps);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 
-    .nav-right-actions {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .nav-alloc-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #FFFFFF;
-      text-decoration: none;
-      padding: 8px 18px;
-      border-radius: 999px;
-      transition: background 0.2s, border-color 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .nav-alloc-btn:hover {
-      background: #E5231B;
-      border-color: #E5231B;
-    }
+/* ---------- arrow link ---------- */
+.alink{display:inline-flex;width:fit-content;align-items:center;gap:.75rem;transition:opacity .35s var(--ease-glide),transform .35s var(--ease-glide),background-color .35s,border-color .35s}
+.alink svg{width:1.125rem;height:1.125rem;transition:transform .35s var(--ease-glide)}
+.alink:hover svg{transform:translate(2px,2px)}
+.alink.plain:hover{opacity:.8;transform:translateY(2px)}
+.alink.glass{border-radius:.25rem;border:1px solid rgba(255,255,255,.08);background:rgba(10,11,9,.75);padding:.875rem 1.75rem;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.alink.glass:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.22);background:rgba(18,19,17,.95)}
+#quoteCta{position:absolute;right:2.5rem;top:2.5rem;z-index:10}
+@media(max-width:767.98px){#quoteCta{right:1.5rem;top:1.5rem}}
 
-    /* FLOATING DOCK */
-    .op-dock {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 999;
-      pointer-events: auto;
-    }
-    .op-dock-inner {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      background: rgba(10, 12, 18, 0.88);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      padding: 8px 14px 8px 18px;
-      border-radius: 999px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
-    }
-    .op-dock-brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      color: #FFFFFF;
-    }
-    .op-dock-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #E5231B;
-      box-shadow: 0 0 8px #E5231B;
-    }
-    .op-dock-wordmark {
-      font-family: 'Michroma', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      color: #FFFFFF;
-      white-space: nowrap;
-    }
-    .op-dock-links {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .op-dock-link {
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.65);
-      text-decoration: none;
-      padding: 4px 8px;
-      border-radius: 6px;
-      transition: color 0.2s;
-      white-space: nowrap;
-    }
-    .op-dock-link:hover, .op-dock-link.active {
-      color: #FFFFFF;
-    }
-    .op-dock-cta {
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      background: #E5231B;
-      color: #FFFFFF;
-      text-decoration: none;
-      padding: 7px 16px;
-      border-radius: 999px;
-      transition: transform 0.2s, background 0.2s;
-      white-space: nowrap;
-    }
-    .op-dock-cta:hover {
-      background: #ff332b;
-      transform: translateY(-1px);
-    }
-    @media (max-width: 767px) {
-      .op-dock-links { display: none; }
-      .op-dock-inner { gap: 12px; padding: 6px 12px 6px 14px; }
-    }
+/* ---------- ticker ---------- */
+#ticker{position:relative;z-index:50;background:var(--black);border-block:1px solid rgba(255,255,255,.12);overflow:hidden;padding:1rem 0}
+#ticker div{display:flex;width:max-content;animation:tick 40s linear infinite}
+#ticker span{padding-right:2rem;font-size:.8125rem;letter-spacing:var(--track-caps);text-transform:uppercase;color:rgba(255,255,255,.7);white-space:nowrap}
+@keyframes tick{to{transform:translateX(-50%)}}
 
-    /* HERO SCROLL SCENE */
-    #scene-outer {
-      position: relative;
-      width: 100%;
-      height: 360vh;
-    }
-    #scene-inner {
-      position: sticky;
-      top: 0;
-      width: 100%;
-      height: 100vh;
-      height: 100svh;
-      overflow: hidden;
-    }
-    #scene-overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-    .scene-section {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease-out;
-      will-change: opacity, transform;
-    }
-    .scene-section.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
+/* ---------- dark content sections ---------- */
+.sec{position:relative;z-index:50;background:var(--black);padding:10rem 0}
+@media(max-width:767.98px){.sec{padding:6rem 0}}
+.wrap{width:100%;max-width:68.75rem;margin:0 auto;padding:0 2.5rem}
+@media(max-width:767.98px){.wrap{padding:0 1.5rem}}
+.eyebrow{font-size:.6875rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem}
+.h-sec{font-size:1.5rem;line-height:1.15;letter-spacing:-.02em;margin-bottom:2.5rem}
+@media(min-width:768px){.h-sec{font-size:2rem}}
 
-    /* HERO STATEMENT SLOTS */
-    .hero-slot {
-      position: absolute;
-      font-family: 'Instrument Serif', serif;
-      font-size: clamp(3.2rem, 7vw, 7.5rem);
-      font-weight: 300;
-      line-height: 1.0;
-      color: #FFFFFF;
-      text-shadow: 0 4px 24px rgba(0,0,0,0.6);
-      will-change: transform, opacity;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .hero-desc {
-      position: absolute;
-      font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      line-height: 1.65;
-      color: rgba(255, 255, 255, 0.88);
-      max-width: 380px;
-      text-shadow: 0 2px 12px rgba(0,0,0,0.7);
-      will-change: transform, opacity;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .slot-top-left { top: 18%; left: 8%; }
-    .slot-center-right { top: 44%; right: 10%; }
-    .slot-bottom-left { bottom: 18%; left: 8%; }
-    .desc-right { bottom: 18%; right: 10%; text-align: left; }
+/* economics */
+.figure{font-size:2.25rem;line-height:1;letter-spacing:-.04em;text-align:center}
+@media(min-width:768px){.figure{font-size:3.25rem}}
+.spread{color:var(--accent);text-align:center;margin-top:1.25rem;font-size:1.25rem}
+.illus{text-align:center;color:rgba(255,255,255,.55);font-size:.8125rem;margin-top:3rem}
+.occ{display:flex;justify-content:center;gap:.5rem;margin:3rem 0 2rem;flex-wrap:wrap}
+.occ button{border:1px solid rgba(255,255,255,.2);padding:.5rem 1.25rem;font-size:.8125rem;letter-spacing:.1em;transition:all .3s var(--ease-glide)}
+.occ button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+table.fin{width:100%;border-collapse:collapse}
+table.fin td{padding:1.125rem 0;border-bottom:1px solid rgba(255,255,255,.12);font-size:.9375rem}
+table.fin td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
+.caveats{margin-top:2.5rem;display:flex;flex-direction:column;gap:.75rem;color:rgba(255,255,255,.6);font-size:.875rem;line-height:1.6}
 
-    .slot-top-right { top: 18%; right: 8%; }
-    .slot-center-left { top: 44%; left: 10%; }
-    .slot-bottom-right { bottom: 18%; right: 8%; }
-    .desc-left { bottom: 18%; left: 10%; text-align: left; }
+/* tiers */
+.tiers{display:grid;gap:1.5rem;grid-template-columns:1fr}
+@media(min-width:768px){.tiers{grid-template-columns:1fr 1fr}}
+.tier{border:1px solid rgba(255,255,255,.14);padding:2.5rem}
+.tier.feat{border-color:var(--accent)}
+.tier h3{font-size:1rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.5rem}
+@media(min-width:768px){.tier h3{font-size:1.25rem}}
+.tier dl{display:flex;flex-direction:column;gap:.875rem}
+.tier .row{display:flex;justify-content:space-between;gap:1rem;font-size:.9375rem;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:.875rem}
+.tier .row b{font-weight:500;font-variant-numeric:tabular-nums}
+.estate{margin-top:2rem;border:1px solid rgba(255,255,255,.14);padding:1.75rem;font-size:.9375rem;line-height:1.6;color:rgba(255,255,255,.75)}
+.note{margin-top:2rem;text-align:center;color:var(--accent);font-size:.8125rem;letter-spacing:.18em;text-transform:uppercase}
+@media(max-width:767.98px){.note{font-size:.6875rem;letter-spacing:.12em;line-height:1.6;max-width:17.5rem;margin-inline:auto}}
 
-    .slot-center { top: 44%; left: 50%; transform: translateX(-50%); }
+/* branding */
+.bene{display:grid;gap:0;grid-template-columns:1fr}
+.bene div{border-top:1px solid rgba(255,255,255,.12);padding:1.5rem 0;display:grid;gap:.5rem}
+@media(min-width:768px){.bene div{grid-template-columns:16rem 1fr;gap:2rem}}
+.bene b{font-weight:500}
+.bene p{color:rgba(255,255,255,.65);font-size:.9375rem;line-height:1.6}
+.kits{display:grid;gap:2.5rem;margin-top:3.5rem;grid-template-columns:1fr}
+@media(min-width:768px){.kits{grid-template-columns:1fr 1fr}}
+.kits h4{font-size:.8125rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:1.25rem;color:var(--accent)}
+.kits li{list-style:none;padding:.5rem 0;color:rgba(255,255,255,.75);font-size:.9375rem;border-bottom:1px solid rgba(255,255,255,.08)}
 
-    .hero-arrow-btn {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFFFFF;
-      text-decoration: none;
-      -webkit-tap-highlight-color: transparent;
-      transition: background 0.3s, border-color 0.3s;
-    }
-    .hero-arrow-btn:hover {
-      background: #E5231B;
-      border-color: #E5231B;
-    }
+/* steps */
+.step{display:grid;gap:1.5rem;padding:3.5rem 0;border-top:1px solid rgba(255,255,255,.12)}
+@media(min-width:768px){.step{grid-template-columns:10rem 1fr;gap:3rem;align-items:start}}
+.step .n{font-size:3.5rem;line-height:.8;letter-spacing:-.04em;color:rgba(255,255,255,.1)}
+.step h3{font-size:1rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+@media(min-width:768px){.step h3{font-size:1.25rem}}
+.step p{color:rgba(255,255,255,.75);line-height:1.6;margin-bottom:1.25rem}
+.step li{list-style:none;color:rgba(255,255,255,.6);font-size:.9375rem;padding:.375rem 0}
 
-    /* Mobile Layout & Hero Stacking (Clearing Fixed Header) */
-    @media (max-width: 767px) {
-      #scene-nav {
-        padding: 14px 20px !important;
-        background: rgba(6, 8, 11, 0.92) !important;
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      }
-      .nav-alloc-btn {
-        padding: 6px 14px;
-        font-size: 11px;
-        letter-spacing: 0.1em;
-      }
-      #scene-inner {
-        height: 100svh !important;
-      }
-      .scene-section {
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: flex-start !important;
-        align-items: flex-start !important;
-        padding: 110px 24px 32px !important;
-        box-sizing: border-box !important;
-      }
-      .hero-slot {
-        position: static !important;
-        font-size: 38px !important;
-        line-height: 1.15 !important;
-        margin-bottom: 4px !important;
-        transform: none !important;
-      }
-      .hero-desc {
-        position: static !important;
-        margin-top: 14px !important;
-        max-width: 100% !important;
-        font-size: 14px !important;
-        letter-spacing: 0.02em !important;
-        line-height: 1.6 !important;
-        color: rgba(255, 255, 255, 0.85) !important;
-        transform: none !important;
-      }
-      .hero-arrow-btn {
-        position: static !important;
-        margin-top: 24px !important;
-        transform: none !important;
-      }
-      .op-dock-links {
-        display: none !important;
-      }
-      .op-dock-inner {
-        gap: 12px;
-        padding: 6px 12px 6px 14px;
-      }
-    }
+/* form */
+#apply{background:var(--sand);color:var(--ink)}
+#apply .eyebrow{color:var(--accent)}
+#apply form{max-width:35rem;margin-top:3rem;display:flex;flex-direction:column;gap:1.75rem}
+#apply label{display:block;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:#6b6d68;margin-bottom:.5rem}
+#apply input,#apply select{width:100%;height:2.75rem;background:transparent;border:none;border-bottom:1px solid rgba(44,46,42,.25);
+  color:var(--ink);font:inherit;font-size:1rem;border-radius:0}
+#apply input:focus,#apply select:focus{outline:none;border-bottom-color:var(--ink)}
+#apply button[type=submit]{margin-top:1rem;align-self:flex-start;background:var(--accent);color:#fff;padding:1rem 2.25rem;
+  font-size:.8125rem;letter-spacing:.16em;text-transform:uppercase;transition:opacity .3s}
+#apply button[type=submit]:hover{opacity:.88}
+#apply .limited{color:var(--accent);font-size:.8125rem;letter-spacing:.14em;text-transform:uppercase;margin-top:.75rem}
 
-    /* POST-HERO CONTENT SECTIONS */
-    .op-layout {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-    }
-    .op-section {
-      width: 100%;
-      background: rgba(10, 12, 18, 0.94);
-      padding: 160px 0;
-      margin: 0;
-      border: none;
-      box-sizing: border-box;
-      opacity: 0;
-      transform: translateY(24px);
-      will-change: transform, opacity;
-    }
-    /* 200px FADE FROM HERO IMAGE */
-    .op-section:first-of-type, .op-section-first {
-      background: linear-gradient(to bottom, transparent 0, rgba(10, 12, 18, 0.94) 200px, rgba(10, 12, 18, 0.94) 100%) !important;
-      padding-top: 200px !important;
-    }
-    .op-section.is-revealed {
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity 700ms ease-out, transform 700ms ease-out;
-    }
-    .op-section .stagger-child {
-      opacity: 0;
-      transform: translateY(24px);
-      will-change: transform, opacity;
-    }
-    .op-section.is-revealed .stagger-child.is-revealed {
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity 700ms ease-out, transform 700ms ease-out;
-    }
-    @media (max-width: 767px) {
-      .op-section {
-        padding: 96px 0;
-      }
-      .op-section:first-of-type, .op-section-first {
-        padding-top: 200px !important;
-      }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .op-section, .op-section .stagger-child, .stagger-child {
-        opacity: 1 !important;
-        transform: none !important;
-        transition: none !important;
-      }
-    }
+/* reviews */
+#reviews{position:relative;z-index:50;display:flex;flex-direction:column;background:var(--sand);color:var(--ink);padding:2.5rem}
+@media(min-width:768px){#reviews{height:100dvh}}
+@media(max-width:767.98px){#reviews{padding:5rem 1.5rem}}
+#reviews .head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;border-top:1px solid rgba(44,46,42,.18);padding-top:1rem}
+#reviews .head h2,#reviews .head p{display:flex;align-items:center;gap:.5rem;white-space:nowrap;font-size:.8125rem;font-weight:500;letter-spacing:var(--track-caps);text-transform:uppercase}
+#reviews .head p{color:var(--accent)}
+#reviews .pg{display:flex;gap:.5rem}
+#reviews .pg button{display:flex;width:2.75rem;height:2.75rem;align-items:center;justify-content:center;border:1px solid rgba(100,108,97,.2);opacity:.4;pointer-events:none}
+#reviews figure{margin-top:2.5rem;flex:1;display:grid;align-items:center;gap:2.5rem}
+@media(min-width:768px){#reviews figure{grid-template-columns:12.5rem 1fr}}
+@media(min-width:1024px){#reviews figure{grid-template-columns:23.75rem 1fr}}
+#reviews .port{position:relative;aspect-ratio:3/4;width:100%;overflow:hidden;background:var(--sand-sunk)}
+@media(max-width:767.98px){#reviews .port{max-width:15rem}}
+@media(min-width:768px){#reviews .port{transform:translateY(-4.375rem)}}
+#reviews .port img{width:100%;height:100%;object-fit:cover;filter:grayscale(1);transition:transform .6s var(--ease-glide)}
+#reviews .port:hover img{transform:scale(1.05)}
+#reviews .copy{display:flex;flex-direction:column}
+@media(min-width:768px){#reviews .copy{transform:translateY(4.5rem)}}
+#reviews .qm{font-size:3.5rem;font-weight:300;line-height:.5;margin-bottom:1rem}
+@media(min-width:768px){#reviews .qm{font-size:6rem;margin-bottom:2.5rem;transform:translate(-1.25rem,-6rem)}}
+#reviews blockquote{margin-bottom:2.5rem}
+#reviews figcaption .nm{font-size:1rem;font-weight:500;letter-spacing:-.01em;text-transform:uppercase}
+@media(min-width:768px){#reviews figcaption .nm{font-size:1.25rem}}
+#reviews figcaption .rl{margin-top:.5rem;color:rgba(44,46,42,.7);font-size:1rem}
 
-    .op-container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 4vw;
-      box-sizing: border-box;
-    }
+/* footer */
+#spacer{display:none}
+@media(min-width:768px){#spacer{display:block;height:85vh}}
+#foot{position:relative;background:var(--forest);color:var(--white);overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:5rem 1.5rem 6rem}
+@media(min-width:768px){#foot{position:fixed;left:0;right:0;bottom:0;height:85vh;z-index:10;padding:0;visibility:hidden}}
+#foot>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#foot .tint{position:absolute;inset:0;background:rgba(33,38,35,.2)}
+#foot .content{position:relative;z-index:15;display:flex;flex-direction:column;align-items:center;gap:2.5rem;width:100%}
+@media(min-width:768px){#foot .content{position:absolute;left:2rem;right:2rem;top:3.5rem;display:grid;grid-template-columns:repeat(4,1fr);align-items:start}}
+#foot .cta{display:flex;flex-direction:column;align-items:center;gap:2rem;text-align:center}
+@media(min-width:768px){#foot .cta{grid-column:span 2;max-width:31.5rem;align-items:flex-start;text-align:left;padding-left:1.25rem}}
+#foot nav ul{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;list-style:none}
+@media(min-width:768px){#foot nav{grid-column-start:4;padding-left:1.25rem}#foot nav ul{flex-direction:column;gap:1.125rem}}
+#foot nav a{display:inline-block;transition:transform .35s var(--ease-glide),opacity .35s}
+#foot nav a:hover{transform:translateX(4px);opacity:.7}
+#wordmark{position:relative;z-index:5;display:flex;width:100%;justify-content:center;margin-top:4rem}
+@media(min-width:768px){#wordmark{height:100%;align-items:flex-end;margin-top:0}}
+#wordmark span{text-align:center;font-size:18vw;line-height:.75;letter-spacing:-.04em}
+@media(min-width:768px){#wordmark span{font-size:13vw;white-space:nowrap;translate:0 calc(6vw - 5rem)}}
+#wordmark .wd{white-space:nowrap}
+.foot-legal{position:relative;z-index:15;width:100%;text-align:center;font-size:.75rem;color:rgba(255,255,255,.55);padding:1.5rem 1rem 0}
+@media(min-width:768px){.foot-legal{position:absolute;left:0;right:0;bottom:1.5rem;padding:0 1.5rem}}
 
-    /* TYPOGRAPHY STANDARDIZATION */
-    .op-eyebrow {
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      color: #E5231B;
-      text-transform: uppercase;
-      margin-bottom: 24px;
-      display: block;
-      font-weight: 600;
-    }
-    .op-h2 {
-      font-family: 'Instrument Serif', serif;
-      font-size: 32px;
-      line-height: 1.25;
-      color: rgba(255, 255, 255, 0.95);
-      font-weight: 400;
-    }
-    .op-h3 {
-      font-family: 'Instrument Serif', serif;
-      font-size: 20px;
-      line-height: 1.35;
-      color: rgba(255, 255, 255, 0.95);
-      font-weight: 400;
-    }
-    .op-body {
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      line-height: 1.7;
-      color: rgba(255, 255, 255, 0.72);
-    }
-    .op-small {
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.72);
-    }
+/* dock */
+#dock{position:fixed;left:0;right:0;bottom:2.5rem;z-index:100;display:flex;justify-content:center;pointer-events:none;
+  transition:opacity .35s var(--ease-glide),transform .35s var(--ease-glide)}
+#dock.hide{opacity:0;transform:translateY(40px);pointer-events:none}
+#dock nav{pointer-events:auto;position:relative}
+#dockMenu{position:absolute;left:0;right:0;bottom:100%;margin-bottom:.5rem;display:flex;flex-direction:column;gap:.75rem;
+  border:1px solid rgba(255,255,255,.1);background:rgba(10,11,9,.85);padding:1.25rem;border-radius:1.25rem;
+  backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);
+  opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .35s var(--ease-glide),transform .35s var(--ease-glide);list-style:none}
+#dockMenu.open{opacity:1;transform:translateY(0);pointer-events:auto}
+#dockBar{display:flex;height:4rem;width:22.5rem;align-items:center;justify-content:space-between;gap:1rem;
+  border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(10,11,9,.85);padding:0 1.25rem;
+  backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);transition:background-color .35s var(--ease-glide),border-color .35s,transform .35s var(--ease-glide)}
+#dockBar:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.22);background:rgba(18,19,17,.95)}
+.dock-desk{display:flex;align-items:center;justify-content:space-between;width:100%;gap:1rem}
+.dock-desk .mk{display:flex;align-items:center;gap:.625rem}
+.dock-desk .mk img{width:1.75rem;height:1.75rem;object-fit:contain;display:block}
+#dockApply{background:var(--accent);padding:.5rem 1.125rem;border-radius:999px;font-size:.75rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase}
+#menuBtn svg{width:1.375rem;height:1.375rem}
+.dock-mob{display:none}
 
-    /* ECHO / OUTPOST PANEL */
-    .echo-top-lines {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.6);
-      margin-bottom: 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 16px;
-    }
-    .echo-title {
-      font-family: 'Instrument Serif', serif;
-      font-size: clamp(48px, 9vw, 110px);
-      line-height: 1.0;
-      color: #FFFFFF;
-      text-align: center;
-      margin: 32px 0 24px 0;
-      font-weight: 300;
-      letter-spacing: -0.02em;
-    }
-    .echo-char {
-      display: inline-block;
-      opacity: 0.2;
-      transform: translateY(16px);
-      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-    }
-    .echo-char.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .echo-desc {
-      text-align: center;
-      max-width: 680px;
-      margin: 0 auto 40px auto;
-      font-size: 18px;
-      color: rgba(255, 255, 255, 0.85);
-    }
-    .op-eco-fig {
-      font-family: 'Instrument Serif', serif;
-      font-size: 64px;
-      line-height: 1.1;
-      color: rgba(255, 255, 255, 0.95);
-      text-align: center;
-      font-weight: 400;
-      margin-bottom: 16px;
-    }
-    @media (max-width: 767px) {
-      .op-eco-fig { font-size: 36px; }
-    }
-    .op-eco-yield {
-      font-family: 'Inter', sans-serif;
-      font-size: 18px;
-      font-weight: 500;
-      color: #E5231B;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    .op-eco-caveat {
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      color: rgba(255,255,255,0.45);
-      text-align: center;
-      margin-bottom: 48px;
-    }
-    .echo-bottom-lines {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: 'Michroma', sans-serif;
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.4);
-      margin-top: 48px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 20px;
-    }
+@media(max-width:767.98px){
+  #apply{padding-bottom:7rem}
+  #dock{bottom:0;left:0;right:0;width:100%;margin:0;padding:0}
+  #dock.hide{transform:none;opacity:1;pointer-events:auto}
+  #dock nav{width:100%}
+  #dockMenu,#menuBtn,#dockApply,.dock-desk{display:none!important}
+  #dockBar{
+    display:block;width:100%;max-width:100%;height:4.25rem;
+    border-radius:0;margin:0;padding:0;
+    border:none;border-top:1px solid rgba(255,255,255,.12);
+    background:rgba(10,11,9,.94);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    transform:none!important;
+  }
+  .dock-mob{
+    display:flex;width:100%;height:100%;align-items:center;justify-content:space-around;
+  }
+  .mob-tab{
+    flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:.25rem;text-decoration:none;color:rgba(255,255,255,.65);
+    transition:color .2s var(--ease-glide);-webkit-tap-highlight-color:transparent;
+  }
+  .mob-tab svg{width:1.25rem;height:1.25rem}
+  .mob-tab span{font-size:.5625rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1}
+  .mob-tab:hover,.mob-tab:active{color:#fff}
+  .mob-tab.mob-apply{color:var(--accent)}
+  .mob-tab.mob-apply:hover,.mob-tab.mob-apply:active{color:#ff3830}
+}
 
-    /* WORKINGS TABLE */
-    .op-workings {
-      width: 100%;
-      max-width: 620px;
-      margin: 0 auto;
-      border-collapse: collapse;
-    }
-    .op-workings td, .op-workings th {
-      padding: 16px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.14);
-    }
-    .op-workings tr:last-child td {
-      border-bottom: none;
-    }
-    .op-workings td:last-child, .op-workings th:last-child {
-      text-align: right;
-      color: rgba(255, 255, 255, 0.95);
-    }
-
-    /* STAT COUNTERS GRID (DETAILS) */
-    .stat-counters-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
-      margin-top: 48px;
-    }
-    @media (max-width: 767px) {
-      .stat-counters-grid {
-        grid-template-columns: 1fr;
-        gap: 28px;
-      }
-    }
-    .stat-card {
-      border-top: 1px solid rgba(255, 255, 255, 0.15);
-      padding-top: 28px;
-    }
-    .stat-number-row {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-      margin-bottom: 12px;
-    }
-    .stat-counter {
-      font-family: 'Instrument Serif', serif;
-      font-size: clamp(48px, 6vw, 76px);
-      line-height: 1.0;
-      color: #FFFFFF;
-    }
-    .stat-unit {
-      font-family: 'Instrument Serif', serif;
-      font-size: clamp(32px, 4vw, 48px);
-      color: #E5231B;
-    }
-    .stat-label {
-      font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    /* SYSTEM STEPS */
-    .op-step {
-      display: flex;
-      position: relative;
-      margin-bottom: 80px;
-      align-items: flex-start;
-      gap: 40px;
-    }
-    .op-step:last-child { margin-bottom: 0; }
-    .op-step-num {
-      font-family: 'Instrument Serif', serif;
-      font-size: 80px;
-      line-height: 0.8;
-      color: rgba(229, 35, 27, 0.85);
-      min-width: 90px;
-    }
-    .op-step-content {
-      flex: 1;
-    }
-    .op-step-connector {
-      position: absolute;
-      left: 45px;
-      top: 40px;
-      bottom: 40px;
-      width: 1px;
-      background: rgba(255, 255, 255, 0.1);
-      z-index: 0;
-    }
-    @media (max-width: 767px) {
-      .op-step { flex-direction: column; gap: 16px; margin-bottom: 56px; }
-      .op-step-num { font-size: 48px; min-width: auto; }
-      .op-step-connector { display: none; }
-    }
-
-    .op-btn {
-      display: inline-flex;
-      align-items: center;
-      background: transparent;
-      color: #FFFFFF;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      text-decoration: none;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      padding: 12px 28px;
-      cursor: pointer;
-      border-radius: 999px;
-      transition: background 0.3s, border-color 0.3s, color 0.3s;
-    }
-    .op-btn:hover {
-      background: #E5231B;
-      border-color: #E5231B;
-      color: #FFFFFF;
-    }
-
-    /* CLIENT STORIES (REVIEWS) */
-    .story-layout {
-      display: grid;
-      grid-template-columns: 1fr 1.3fr;
-      gap: 56px;
-      align-items: center;
-      margin-top: 40px;
-    }
-    @media (max-width: 860px) {
-      .story-layout {
-        grid-template-columns: 1fr;
-        gap: 36px;
-      }
-    }
-    .story-img-wrap {
-      position: relative;
-      overflow: hidden;
-      border-radius: 8px;
-      aspect-ratio: 4/3;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .story-interior-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      filter: brightness(0.9);
-      transition: transform 0.6s ease;
-    }
-    .story-img-wrap:hover .story-interior-img {
-      transform: scale(1.03);
-    }
-
-    /* REVEAL FOOTER */
-    .op-reveal-footer {
-      background: #06080B;
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 140px 4vw 80px 4vw;
-      position: relative;
-      z-index: 10;
-    }
-
-    /* APPLY SECTION (SAND SURFACE) */
-    #apply.sand-surface {
-      background: #F4EFEA;
-      color: #0C0C0C;
-      padding: 140px 4vw;
-      position: relative;
-      z-index: 20;
-    }
-    .sand-surface * {
-      box-sizing: border-box;
-    }
-    .sand-input, .sand-select {
-      width: 100%;
-      height: 44px;
-      border: none;
-      border-bottom: 1px solid rgba(12, 12, 12, 0.25);
-      background: transparent;
-      color: #0C0C0C;
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s;
-      border-radius: 0;
-    }
-    .sand-input:focus, .sand-select:focus {
-      border-bottom-color: #E5231B;
-    }
-    .sand-input::placeholder {
-      color: rgba(12, 12, 12, 0.35);
-    }
-
-    .icon {
-      width: 1em;
-      height: 1em;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
-
-    /* URGENCY BANNER (POST-HERO) */
-    .urgency-banner-wrap {
-      width: 100%;
-      background: rgba(229, 35, 27, 0.08);
-      border-bottom: 1px solid rgba(229, 35, 27, 0.22);
-      padding: 14px 20px;
-      text-align: center;
-      position: relative;
-      z-index: 20;
-    }
-    .urgency-banner-text {
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      font-variant: all-small-caps;
-      color: #E5231B;
-      font-weight: 600;
-      display: inline-block;
-    }
-
-    /* HORIZONTAL TICKER STRIP */
-    .op-ticker-strip {
-      width: 100%;
-      overflow: hidden;
-      background: #06080B;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 14px 0;
-      position: relative;
-      z-index: 15;
-      white-space: nowrap;
-    }
-    .op-ticker-track {
-      display: inline-flex;
-      white-space: nowrap;
-      animation: opTicker 30s linear infinite;
-      will-change: transform;
-    }
-    .op-ticker-content {
-      display: inline-flex;
-      align-items: center;
-      gap: 24px;
-      padding-right: 24px;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.85);
-    }
-    .op-ticker-content .dot {
-      color: #E5231B;
-      font-weight: 700;
-    }
-    @keyframes opTicker {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .op-ticker-track { animation: none; }
-    }
-
-    /* OCCUPANCY TOGGLE */
-    .eco-toggle-group {
-      display: inline-flex;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 999px;
-      padding: 4px;
-      gap: 4px;
-      margin-bottom: 24px;
-    }
-    .eco-toggle-btn {
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      color: rgba(255, 255, 255, 0.65);
-      background: transparent;
-      border: none;
-      border-radius: 999px;
-      padding: 8px 20px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .eco-toggle-btn:hover {
-      color: #FFFFFF;
-      background: rgba(255, 255, 255, 0.08);
-    }
-    .eco-toggle-btn.active {
-      color: #FFFFFF;
-      background: #E5231B;
-      box-shadow: 0 2px 10px rgba(229, 35, 27, 0.4);
-    }
-
-    /* CHOOSE YOUR TIER */
-    .tier-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      margin-top: 48px;
-    }
-    @media (max-width: 820px) {
-      .tier-grid {
-        grid-template-columns: 1fr;
-        gap: 28px;
-      }
-    }
-    .tier-card {
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-      padding: 36px 32px;
-      background: rgba(255, 255, 255, 0.02);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: border-color 0.3s ease, transform 0.2s ease;
-    }
-    .tier-card:hover {
-      border-color: rgba(255, 255, 255, 0.25);
-    }
-    .tier-card.featured {
-      border: 1px solid #E5231B;
-      background: linear-gradient(180deg, rgba(229, 35, 27, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
-      box-shadow: 0 8px 30px rgba(229, 35, 27, 0.12);
-    }
-    .tier-badge {
-      position: absolute;
-      top: -12px;
-      right: 24px;
-      background: #E5231B;
-      color: #FFFFFF;
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 4px 12px;
-      border-radius: 999px;
-    }
-    .tier-name {
-      font-family: 'Instrument Serif', serif;
-      font-size: 28px;
-      line-height: 1.2;
-      color: #FFFFFF;
-      margin-bottom: 6px;
-    }
-    .tier-keys {
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.6);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 24px;
-    }
-    .tier-cost-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-    .tier-cost-table td {
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.72);
-    }
-    .tier-cost-table td:last-child {
-      text-align: right;
-      color: #FFFFFF;
-      font-weight: 600;
-    }
-    .tier-total-row td {
-      border-bottom: none;
-      padding-top: 14px;
-      font-size: 16px;
-      color: #FFFFFF !important;
-      font-weight: 700 !important;
-    }
-    .tier-total-row td:last-child {
-      color: #E5231B !important;
-      font-size: 18px;
-    }
-    .tier-comm {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 16px;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 6px;
-      margin-top: 16px;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.85);
-    }
-    .tier-comm-val {
-      font-weight: 700;
-      color: #E5231B;
-      font-size: 15px;
-    }
-
-    /* ESTATE CARD (BELOW BOTH TIERS) */
-    .estate-tier-card {
-      margin-top: 28px;
-      border: 1px dashed rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      padding: 28px 32px;
-      background: rgba(255, 255, 255, 0.015);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    @media (max-width: 767px) {
-      .estate-tier-card {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    /* ITEM 9: SUPPORTING LINE BENEATH TIER TABLE */
-    .tier-supporting-line {
-      margin-top: 32px;
-      text-align: center;
-      color: #E5231B;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.18em;
-      font-variant: all-small-caps;
-      text-transform: uppercase;
-      font-weight: 600;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    @media (max-width: 767px) {
-      .tier-supporting-line {
-        font-size: 11px;
-        letter-spacing: 0.12em;
-        line-height: 1.6;
-        max-width: 280px;
-        text-align: center;
-      }
-    }
-
-    /* YOUR NAME ON THE DOOR */
-    .door-benefits-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 36px;
-      margin-bottom: 48px;
-    }
-    @media (max-width: 860px) {
-      .door-benefits-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    @media (max-width: 580px) {
-      .door-benefits-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .door-benefit-item {
-      padding: 18px 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.02);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.88);
-      font-weight: 500;
-    }
-    .door-benefit-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #E5231B;
-      flex-shrink: 0;
-    }
-
-    .kits-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-    }
-    @media (max-width: 820px) {
-      .kits-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .kit-card {
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-      padding: 32px;
-      background: rgba(255, 255, 255, 0.02);
-    }
-    .kit-badge {
-      display: inline-block;
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 4px;
-      margin-bottom: 12px;
-    }
-    .kit-badge-inc {
-      background: rgba(229, 35, 27, 0.15);
-      color: #E5231B;
-      border: 1px solid rgba(229, 35, 27, 0.3);
-    }
-    .kit-badge-opt {
-      background: rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-    }
-    .kit-items-list {
-      list-style: none;
-      padding: 0;
-      margin: 20px 0 24px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .kit-items-list li {
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.75);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .kit-items-list li::before {
-      content: "—";
-      color: #E5231B;
-    }
-    .kit-pricing-box {
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 16px;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.65);
-      line-height: 1.6;
-    }
-    .kit-pricing-highlight {
-      color: #FFFFFF;
-      font-weight: 600;
-    }
-  </style>
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
 </head>
-<body id="top">
+<body>
 
-  <!-- BLACK FULLSCREEN FAST LOADER -->
-  <div id="preloader">
-    <div class="preloader-track">
-      <div class="preloader-fill" id="preloader-fill"></div>
+<!-- PRELOADER -->
+<div id="pre" aria-hidden="true">
+  <div class="cols"><i></i><i></i><i></i><i></i></div>
+  <p class="lbl t-title">Red Flag Outpost</p>
+  <div class="rule"><b id="ruleFill"></b></div>
+  <div class="num t-display"><span id="count">0%</span></div>
+</div>
+
+<!-- SCENE -->
+<section id="scene" aria-label="Red Flag Outpost franchise programme">
+  <div aria-hidden="true" style="position:absolute;left:0;right:0;top:169vh;height:165vh;visibility:hidden;pointer-events:none" id="tb2"></div>
+  <div aria-hidden="true" style="position:absolute;left:0;right:0;top:338vh;height:165vh;visibility:hidden;pointer-events:none" id="tb3"></div>
+  <div aria-hidden="true" style="position:absolute;left:0;right:0;top:520vh;height:269vh;visibility:hidden;pointer-events:none" id="tbe"></div>
+  <span id="top" aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:1px"></span>
+  <span id="echo" aria-hidden="true" style="position:absolute;left:0;right:0;top:689vh;height:1px"></span>
+  <span id="details" aria-hidden="true" style="position:absolute;left:0;right:0;top:858vh;height:1px"></span>
+
+  <div id="stage">
+    <div class="layer" id="canvasWrap">
+      <img id="poster" src="https://storage.getlayers.ai/assets/house-22508188f8/scene/sequence/desktop/000.webp" alt="" fetchpriority="high">
+      <canvas id="seq" aria-hidden="true"></canvas>
+    </div>
+
+    <div class="layer" id="grid" aria-hidden="true"><div id="gridInner" style="position:absolute;inset:0"><div class="rules"><i></i><i></i><i></i><i></i></div></div></div>
+
+    <a class="alink plain t-caption" id="quoteCta" href="#apply">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8v8h8"/><path d="M12 12l4 4-4 4"/></svg>
+      <span>Apply for allocation</span>
+    </a>
+
+    <!-- hero blocks -->
+    <div class="hero" id="h0"><h1 class="sr-only">No property? No problem.</h1>
+      <div class="exit" aria-hidden="true">
+        <div class="w s-tl"><div class="eng slide t-display" data-text="No"></div></div>
+        <div class="w s-cr"><div class="eng slide t-display" data-text="property?"></div></div>
+        <div class="w s-bl"><div class="eng slide t-display" data-text="No problem."></div></div>
+      </div>
+      <p class="desc r t-body">You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.</p>
+    </div>
+
+    <div class="hero" id="h1"><h2 class="sr-only">Asset light. Zero staff.</h2>
+      <div class="exit" aria-hidden="true">
+        <div class="w s-tr"><div class="eng slide t-display" data-text="Asset"></div></div>
+        <div class="w s-cl"><div class="eng slide t-display" data-text="light"></div></div>
+        <div class="w s-br"><div class="eng slide t-display" data-text="Zero staff"></div></div>
+      </div>
+      <p class="desc l t-body">No staff to hire. No hospitality experience needed. No ops to learn. This is not a guessing game. It's a system.</p>
+    </div>
+
+    <div class="hero" id="h2"><h2 class="sr-only">Creator led marketing.</h2>
+      <div aria-hidden="true" style="position:absolute;inset:0">
+        <div class="w s-tl"><div class="eng slide t-display" data-text="Creator"></div></div>
+        <div class="w s-c"><div class="eng slide t-display" data-text="led"></div></div>
+        <div class="w s-br"><div class="eng slide t-display" data-text="Marketing"></div></div>
+      </div>
+      <p class="desc l t-body">AI-run operations, lifetime support, and creator-led marketing — the parts that usually break a franchise, handled.</p>
+    </div>
+
+    <!-- echo -->
+    <div class="layer" id="echoLayer">
+      <div class="img"><img src="https://storage.getlayers.ai/assets/house-22508188f8/scene/interior-echo.webp" alt="Sunlit open-plan living space behind floor-to-ceiling glazing"></div>
+      <article id="echoPanel" aria-labelledby="echo-title">
+        <div class="eng rise clip t-title" id="echoLead" data-lines="Illustrative yield|3-key villa" style="color:rgba(255,255,255,.95)"></div>
+        <div class="mid">
+          <h2 id="echo-title" class="t-display"><span class="sr-only">Outpost®</span>
+            <span class="eng slide" id="echoTitle" data-text="Outpost" aria-hidden="true"></span>
+            <sup aria-hidden="true">®</sup>
+          </h2>
+          <p class="t-body">₹1,62,000 gross monthly revenue at 60% occupancy. Approximately 2x the yield spread of a traditional let. Full workings below.</p>
+        </div>
+        <div class="foot">
+          <div class="icons">
+            <a href="#apply" aria-label="Apply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></a>
+            <a href="#economics" aria-label="Economics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg></a>
+            <a href="#reviews" aria-label="Stories"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg></a>
+          </div>
+          <div class="eng rise clip t-title" id="echoFoot" data-lines="Red Flag|Outpost" style="color:rgba(255,255,255,.95)"></div>
+        </div>
+      </article>
+    </div>
+
+    <!-- details -->
+    <div class="layer" id="detailsLayer">
+      <div class="img"><img src="https://storage.getlayers.ai/assets/house-22508188f8/scene/interior-details.webp" alt="Dusk-lit lounge with walnut-panelled walls"></div>
+      <div class="cross" aria-hidden="true"><i></i><i></i></div>
+      <h2 id="dTitle" class="t-title"><span>We hand you an asset</span><span>and run it for you</span></h2>
+      <dl style="display:contents">
+        <div class="stat st-tr"><dd class="v" data-v="60"><span class="sr-only">60</span><span aria-hidden="true" class="drum">0</span></dd><dt class="t-body">Percent occupancy</dt></div>
+        <div class="stat st-bl"><dd class="v" data-v="3"><span class="sr-only">3</span><span aria-hidden="true" class="drum">0</span></dd><dt class="t-body">Keys per villa</dt></div>
+        <div class="stat st-br"><dd class="v" data-v="2"><span class="sr-only">2</span><span aria-hidden="true" class="drum">0</span></dd><dt class="t-body">X yield spread</dt></div>
+      </dl>
+
+      <a id="ovTop" class="t-body" href="mailto:hello@redflaghomes.in"><span style="display:inline-block;line-height:1">✦</span> Contact</a>
+      <div class="ov" id="ovLead"><h3 class="eng rise clip t-headline" data-lines="The hunt, the flip,|the system that runs it"></h3></div>
+      <div class="ov" id="ovAside">
+        <address style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem;font-style:normal" class="t-body">
+          <span style="text-transform:uppercase">Contact</span>
+          <span>Red Flag Homes Network</span>
+          <a href="mailto:hello@redflaghomes.in" style="color:inherit">hello@redflaghomes.in</a>
+        </address>
+      </div>
+
+      <div id="star" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M0 12C6 12 12 6 12 0C12 6 18 12 24 12C18 12 12 18 12 24C12 18 6 12 0 12Z" fill="#ffffff"/><path id="starTint" d="M0 12C6 12 12 6 12 0C12 6 18 12 24 12C18 12 12 18 12 24C12 18 6 12 0 12Z" fill="#E5231B" opacity="0"/></svg>
+      </div>
+
+      <div id="showreel">
+        <video id="reel" muted loop playsinline preload="metadata" crossorigin="anonymous"
+          poster="https://storage.getlayers.ai/assets/house-22508188f8/scene/showreel-poster.webp" aria-label="Red Flag Outpost showreel">
+          <source src="https://storage.getlayers.ai/assets/house-22508188f8/scene/showreel.mp4" type="video/mp4">
+        </video>
+      </div>
     </div>
   </div>
+</section>
 
-  <!-- VIDEO BACKGROUND -->
-  <video id="scene-video" autoplay muted loop playsinline preload="auto">
-    <source src="franchiseoutpost.mp4" type="video/mp4">
-    <source src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchiseoutpost.mp4" type="video/mp4">
-  </video>
+<!-- TICKER -->
+<div id="ticker" aria-hidden="true"><div id="tickRow"></div></div>
 
-  <!-- TOP NAVBAR -->
-  <header id="scene-nav">
-    <a href="index.html" class="nav-brand" aria-label="Return to Homepage">
-      <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Logo" class="nav-brand-logo" />
-      <span>RED FLAG OUTPOST</span>
-    </a>
-    
-    <nav class="nav-links-center" aria-label="Primary Navigation">
-      <a href="index.html" class="nav-link">Main Home</a>
-      <a href="#top" class="nav-link active">Outpost</a>
-      <a href="#echo" class="nav-link">Economics</a>
-      <a href="#reviews" class="nav-link">Stories</a>
-      <a href="index.html#book" class="nav-link">Book a Stay</a>
-    </nav>
+<!-- ECONOMICS -->
+<section class="sec" id="economics">
+  <div class="wrap">
+    <p class="eyebrow">The economics</p>
+    <p class="figure" id="gross">₹1,62,000<span style="font-size:.4em;letter-spacing:0"> /mo</span></p>
+    <p class="spread">≈ 2x yield spread</p>
+    <p class="illus">Capital deployed: deposit ₹4,50,000 + franchise ₹49,999 + setup ₹1,50,000 = ₹6,49,999 · ADR ₹9,000</p>
 
-    <div class="nav-right-actions">
-      <a href="#apply" class="nav-alloc-btn">
+    <div class="occ" role="group" aria-label="Occupancy">
+      <button type="button" data-o="45">45%</button>
+      <button type="button" data-o="55">55%</button>
+      <button type="button" data-o="60" aria-pressed="true">60%</button>
+      <button type="button" data-o="65">65%</button>
+    </div>
+
+    <table class="fin">
+      <tbody>
+        <tr><td>Gross booking revenue</td><td id="r-gross">₹1,62,000</td></tr>
+        <tr><td>Less Red Flag 10.5%</td><td id="r-comm">₹17,010</td></tr>
+        <tr><td>Less cleaning &amp; maintenance</td><td id="r-clean">₹20,400</td></tr>
+        <tr class="tot"><td>= Your net payout</td><td id="r-payout">₹1,24,590</td></tr>
+        <tr><td>Less rent</td><td>₹75,000</td></tr>
+        <tr><td>Less electricity &amp; utilities</td><td>₹12,000</td></tr>
+        <tr class="tot"><td>Net monthly to you</td><td id="r-net">₹37,590</td></tr>
+        <tr class="tot"><td>Return on capital</td><td id="r-roc">69%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="caveats">
+      <p>Breakeven is around 42% occupancy.</p>
+      <p>A ten-point occupancy swing roughly doubles or halves your profit — which is why we operate the property ourselves.</p>
+      <p>No minimum guarantees. We only earn when you earn.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TIERS -->
+<section class="sec" id="tiers">
+  <div class="wrap">
+    <p class="eyebrow">Choose your tier</p>
+    <h2 class="h-sec">Two ways in. One system.</h2>
+    <div class="tiers">
+      <div class="tier">
+        <h3>Red Flag Studio</h3>
+        <dl>
+          <div class="row"><span>Property</span><b>Studio / 1BHK</b></div>
+          <div class="row"><span>Franchise fee</span><b>₹29,999</b></div>
+          <div class="row"><span>Setup &amp; procuring</span><b>₹99,000</b></div>
+          <div class="row"><span>Total programme cost</span><b>₹1,28,999</b></div>
+          <div class="row"><span>Commission</span><b>12%</b></div>
+        </dl>
+      </div>
+      <div class="tier feat">
+        <h3>Red Flag Villa</h3>
+        <dl>
+          <div class="row"><span>Property</span><b>2–4 keys</b></div>
+          <div class="row"><span>Franchise fee</span><b>₹49,999</b></div>
+          <div class="row"><span>Setup &amp; procuring</span><b>₹1,50,000</b></div>
+          <div class="row"><span>Total programme cost</span><b>₹1,99,999</b></div>
+          <div class="row"><span>Commission</span><b>10.5%</b></div>
+        </dl>
+      </div>
+    </div>
+    <p class="estate"><b style="font-weight:500;color:#fff">Red Flag Estate</b> — 5+ keys, 9% commission. By invitation, after two successful quarters. You don't apply for it. You earn it.</p>
+    <p class="note">Cleaning and maintenance — deducted from revenue, never from your pocket</p>
+  </div>
+</section>
+
+<!-- BRANDING -->
+<section class="sec" id="branding">
+  <div class="wrap">
+    <p class="eyebrow">Your name on the door</p>
+    <h2 class="h-sec">The branding isn't decoration. Here's what it earns you.</h2>
+    <div class="bene">
+      <div><b>Your name on the door</b><p>Engraved RED FLAG x [Your Property] plate. An identity, not a listing number.</p></div>
+      <div><b>A higher nightly rate</b><p>Design detail supports premium pricing. You stop being compared to the flat next door.</p></div>
+      <div><b>Free guest content</b><p>Guests photograph and post branded details unprompted. Distribution you don't pay for.</p></div>
+      <div><b>Instant credibility</b><p>Reads as a hospitality brand, not someone's spare flat. Browsers become bookers.</p></div>
+      <div><b>The collection effect</b><p>Guests who stay in one Red Flag property recognise and book others.</p></div>
+      <div><b>Exit value</b><p>A branded, operating, revenue-producing property sells for more than a furnished flat.</p></div>
+    </div>
+    <div class="kits">
+      <div>
+        <h4>Signature kit — included</h4>
+        <ul>
+          <li>Engraved co-branded door plate</li>
+          <li>Branded tissue boxes and toiletry set</li>
+          <li>Branded welcome card and house guide</li>
+          <li>Branded coasters and key tags</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Icon kit — optional</h4>
+        <ul>
+          <li>Monogram curtains and cushion covers</li>
+          <li>Branded blankets, linen and throws</li>
+          <li>Branded ceramics, glassware and tray</li>
+          <li>Branded robes, slippers and towels</li>
+          <li>Studio ₹35,000 · Villa ₹75,000 one-time</li>
+          <li>Replenishment ₹8,000 · ₹18,000 annually</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXECUTION MAP -->
+<section class="sec" id="map">
+  <div class="wrap">
+    <p class="eyebrow">The execution map</p>
+    <h2 class="h-sec">Four stages. You step back after the first.</h2>
+    <div class="step"><p class="n">01</p><div><h3>The hunt</h3><p>We don't let you sign a bad lease. Demand data from our portfolio tells us whether your property will perform — before you commit.</p><ul><li>Demand assessment</li><li>Lease negotiation support</li><li>Legal and risk review</li></ul></div></div>
+    <div class="step"><p class="n">02</p><div><h3>The flip</h3><p>Ordinary spaces become premium, photograph-ready properties in under 45 days.</p><ul><li>Interior transformation</li><li>Furnishing and styling</li><li>Signature branding kit</li><li>Smart locks and WiFi</li></ul></div></div>
+    <div class="step"><p class="n">03</p><div><h3>The drop</h3><p>Every property launches through content creators — demand and a permanent content library from week one.</p><ul><li>Creator stay campaign</li><li>Editorial shoot</li><li>Airbnb, Booking.com and direct</li><li>Direct booking setup</li></ul></div></div>
+    <div class="step"><p class="n">04</p><div><h3>The yield</h3><p>You step back. The system runs.</p><ul><li>AI dynamic pricing</li><li>24/7 guest messaging</li><li>Every clean and turnover arranged</li><li>Minor maintenance handled</li><li>Payouts 1st and 16th</li></ul></div></div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews" aria-labelledby="reviews-title">
+  <div class="head">
+    <h2 id="reviews-title"><span style="color:var(--accent)">✦</span> Client stories</h2>
+    <p aria-live="polite">01 / 01</p>
+    <div class="pg">
+      <button type="button" aria-label="Previous story" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+      <button type="button" aria-label="Next story" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    </div>
+  </div>
+  <figure>
+    <div class="port"><img src="https://storage.getlayers.ai/assets/house-22508188f8/scene/interior-echo.webp" alt="Sunlit open-plan living space behind floor-to-ceiling glazing"></div>
+    <div class="copy">
+      <span class="qm" aria-hidden="true">“</span>
+      <blockquote><div class="eng rise t-headline" id="quoteEng" data-lines="Most franchises hand you a business and leave you to run it. We hand you an asset and run it for you."></div></blockquote>
+      <figcaption><p class="nm">Red Flag Outpost</p><p class="rl">Founding Partner Programme</p></figcaption>
+    </div>
+  </figure>
+  <span id="sentinel" style="position:absolute;left:0;right:0;bottom:0;height:1px"></span>
+</section>
+
+<!-- APPLY -->
+<section class="sec" id="apply">
+  <div class="wrap">
+    <p class="eyebrow">Apply for allocation</p>
+    <h2 class="h-sec" style="color:var(--ink)">Deploy your capital.</h2>
+    <p style="color:#5c5e59;max-width:35rem;line-height:1.6">Ready to build a hospitality portfolio? Request an allocation spot with our expansion team.</p>
+    <p class="limited">Limited allocation. Applications reviewed in order received.</p>
+    <form id="applyForm">
+      <div><label for="f-name">Full name</label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
+      <div><label for="f-email">Email address</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+      <div><label for="f-phone">Contact number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
+      <div><label for="f-city">Target city</label><input id="f-city" name="city" type="text" required></div>
+      <div><label for="f-cap">Deployable capital</label>
+        <select id="f-cap" name="capital" required>
+          <option value="">Select</option>
+          <option>₹1.5 Lakh – ₹3 Lakh</option>
+          <option>₹3 Lakh – ₹8 Lakh</option>
+          <option>₹8 Lakh+</option>
+        </select>
+      </div>
+      <div><label for="f-prop">Do you already have a property in mind?</label>
+        <select id="f-prop" name="property" required><option value="">Select</option><option>Yes</option><option>No</option><option>Looking</option></select>
+      </div>
+      <div><label for="f-client">Are you an existing Red Flag client?</label>
+        <select id="f-client" name="client" required><option value="">Select</option><option>Yes</option><option>No</option></select>
+      </div>
+      <button type="submit">Request allocation</button>
+      <p id="formMsg" role="status" style="color:var(--accent);font-size:.875rem"></p>
+    </form>
+  </div>
+</section>
+
+<div id="spacer" aria-hidden="true"></div>
+
+<!-- FOOTER -->
+<footer id="foot">
+  <img src="https://storage.getlayers.ai/assets/house-22508188f8/footer/footer-bg.webp" alt="">
+  <div class="tint" aria-hidden="true"></div>
+  <div class="content">
+    <div class="cta">
+      <h2 class="eng rise clip t-headline" id="footCta" data-lines="Be part of|the revolution."></h2>
+      <a class="alink glass t-caption" href="#apply">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8v8h8"/><path d="M12 12l4 4-4 4"/></svg>
         <span>Apply for allocation</span>
       </a>
     </div>
-  </header>
+    <nav aria-label="Footer">
+      <ul>
+        <li><a class="t-lead" href="#top">Home</a></li>
+        <li><a class="t-lead" href="#echo">Outpost</a></li>
+        <li><a class="t-lead" href="#economics">Economics</a></li>
+        <li><a class="t-lead" href="#reviews">Stories</a></li>
+      </ul>
+    </nav>
+  </div>
+  <p id="wordmark"><span class="sr-only">Red Flag Outpost</span><span id="wmInner" aria-hidden="true"></span></p>
+  <p class="foot-legal">© 2026 Red Flag Homes Network. All rights reserved. A company of Red Flag World Holdings Ltd, London.</p>
+</footer>
+<span id="contact" aria-hidden="true" style="display:block;height:1px"></span>
 
-  <!-- FLOATING DOCK -->
-  <nav class="op-dock" aria-label="Red Flag Outpost">
-    <div class="op-dock-inner">
-      <a href="index.html" class="op-dock-brand" aria-label="Return to Homepage">
-        <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Logo" style="height: 20px; width: auto; display: block;" />
-        <span class="op-dock-wordmark">RED FLAG OUTPOST</span>
-      </a>
-      <div class="op-dock-links">
-        <a href="#top" class="op-dock-link active">Home</a>
-        <a href="#echo" class="op-dock-link">Outpost</a>
-        <a href="#details" class="op-dock-link">Economics</a>
-        <a href="#reviews" class="op-dock-link">Stories</a>
+<!-- DOCK -->
+<div id="dock">
+  <nav aria-label="Primary">
+    <ul id="dockMenu">
+      <li><a class="t-lead" href="#top">Home</a></li>
+      <li><a class="t-lead" href="#echo">Outpost</a></li>
+      <li><a class="t-lead" href="#economics">Economics</a></li>
+      <li><a class="t-lead" href="#tiers">Tiers</a></li>
+      <li><a class="t-lead" href="#reviews">Stories</a></li>
+    </ul>
+    <div id="dockBar">
+      <div class="dock-desk">
+        <a class="mk" href="#top" aria-label="Red Flag Outpost — back to top">
+          <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Outpost" width="28" height="28">
+          <span class="t-caption" style="font-size:.6875rem">Red Flag Outpost</span>
+        </a>
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <a id="dockApply" href="#apply">Apply</a>
+          <button id="menuBtn" type="button" aria-expanded="false" aria-controls="dockMenu" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
+        </div>
       </div>
-      <a href="#apply" class="op-dock-cta">Apply</a>
+      <div class="dock-mob" aria-label="Mobile Navigation">
+        <a class="mob-tab" href="#top" aria-label="Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Home</span>
+        </a>
+        <a class="mob-tab" href="#echo" aria-label="Outpost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v5"/></svg>
+          <span>Outpost</span>
+        </a>
+        <a class="mob-tab" href="#economics" aria-label="Yield">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+          <span>Yield</span>
+        </a>
+        <a class="mob-tab" href="#reviews" aria-label="Stories">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          <span>Stories</span>
+        </a>
+        <a class="mob-tab mob-apply" href="#apply" aria-label="Apply">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span>Apply</span>
+        </a>
+      </div>
     </div>
   </nav>
-
-  <!-- HERO PIN / SCROLL SCENE (THREE STATEMENTS) -->
-  <div id="scene-outer">
-    <div id="scene-inner">
-      <div id="scene-overlay">
-        
-        <!-- STATEMENT 1:
-             No (top-left) · property? (center-right) · No problem. (bottom-left)
-             Description (right): "You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it."
-        -->
-        <div class="scene-section visible" id="sec1">
-          <span class="hero-slot slot-top-left" id="s1-w1">No</span>
-          <span class="hero-slot slot-center-right" id="s1-w2">property?</span>
-          <span class="hero-slot slot-bottom-left" id="s1-w3">No problem.</span>
-          <div class="hero-desc desc-right" id="s1-desc">
-            You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.
-          </div>
-          <a href="#echo" class="hero-arrow-btn" aria-label="Scroll to Economics">
-            <svg class="icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
-          </a>
-        </div>
-
-        <!-- STATEMENT 2:
-             Asset (top-right) · light (center-left) · Zero staff (bottom-right)
-             Description (left): "No staff to hire. No hospitality experience needed. No ops to learn. This is not a guessing game. It's a system."
-        -->
-        <div class="scene-section" id="sec2">
-          <span class="hero-slot slot-top-right" id="s2-w1">Asset</span>
-          <span class="hero-slot slot-center-left" id="s2-w2">light</span>
-          <span class="hero-slot slot-bottom-right" id="s2-w3">Zero staff</span>
-          <div class="hero-desc desc-left" id="s2-desc">
-            No staff to hire. No hospitality experience needed. No ops to learn. This is not a guessing game. It's a system.
-          </div>
-        </div>
-
-        <!-- STATEMENT 3:
-             Creator (top-left) · led (center) · Marketing (bottom-right)
-             Description (left): "AI-run operations, lifetime support, and creator-led marketing — the parts that usually break a franchise, handled."
-        -->
-        <div class="scene-section" id="sec3">
-          <span class="hero-slot slot-top-left" id="s3-w1">Creator</span>
-          <span class="hero-slot slot-center" id="s3-w2">led</span>
-          <span class="hero-slot slot-bottom-right" id="s3-w3">Marketing</span>
-          <div class="hero-desc desc-left" id="s3-desc">
-            AI-run operations, lifetime support, and creator-led marketing — the parts that usually break a franchise, handled.
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- CONTENT SECTIONS -->
-  <div class="op-layout">
-
-    <!-- URGENCY BANNER UNDER HERO CTAS -->
-    <div class="urgency-banner-wrap" id="urgency-banner">
-      <span class="urgency-banner-text">Founding Partner allocation now open &mdash; 40% off franchise fee</span>
-    </div>
-
-    <!-- HORIZONTAL TICKER STRIP BELOW HERO -->
-    <div class="op-ticker-strip" id="hero-ticker">
-      <div class="op-ticker-track">
-        <div class="op-ticker-content">
-          <span>9&ndash;12% COMMISSION</span><span class="dot">&middot;</span>
-          <span>CLEANING HANDLED</span><span class="dot">&middot;</span>
-          <span>MAINTENANCE HANDLED</span><span class="dot">&middot;</span>
-          <span>ZERO STAFF</span><span class="dot">&middot;</span>
-          <span>CREATOR-LED MARKETING</span><span class="dot">&middot;</span>
-          <span>AI-RUN OPERATIONS</span><span class="dot">&middot;</span>
-        </div>
-        <div class="op-ticker-content" aria-hidden="true">
-          <span>9&ndash;12% COMMISSION</span><span class="dot">&middot;</span>
-          <span>CLEANING HANDLED</span><span class="dot">&middot;</span>
-          <span>MAINTENANCE HANDLED</span><span class="dot">&middot;</span>
-          <span>ZERO STAFF</span><span class="dot">&middot;</span>
-          <span>CREATOR-LED MARKETING</span><span class="dot">&middot;</span>
-          <span>AI-RUN OPERATIONS</span><span class="dot">&middot;</span>
-        </div>
-        <div class="op-ticker-content" aria-hidden="true">
-          <span>9&ndash;12% COMMISSION</span><span class="dot">&middot;</span>
-          <span>CLEANING HANDLED</span><span class="dot">&middot;</span>
-          <span>MAINTENANCE HANDLED</span><span class="dot">&middot;</span>
-          <span>ZERO STAFF</span><span class="dot">&middot;</span>
-          <span>CREATOR-LED MARKETING</span><span class="dot">&middot;</span>
-          <span>AI-RUN OPERATIONS</span><span class="dot">&middot;</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- THE ECONOMICS PANEL (ECHO® -> OUTPOST®) -->
-    <section class="op-section stagger-section op-section-first" id="echo">
-      <div class="op-container">
-        
-        <div class="echo-top-lines stagger-child">
-          <span>Illustrative yield</span>
-          <span>3-key villa</span>
-        </div>
-
-        <div class="stagger-child">
-          <h2 class="echo-title" id="echo-wordmark">
-            <span class="echo-char">O</span><span class="echo-char">u</span><span class="echo-char">t</span><span class="echo-char">p</span><span class="echo-char">o</span><span class="echo-char">s</span><span class="echo-char">t</span><sup>&reg;</sup>
-          </h2>
-        </div>
-
-        <p class="echo-desc op-body stagger-child">
-          Illustrative economics for a 3-key Villa at 60% occupancy base case. Full workings below.
-        </p>
-
-        <!-- OCCUPANCY TOGGLE -->
-        <div class="stagger-child" style="text-align: center; margin-top: 12px; margin-bottom: 24px;">
-          <div class="eco-toggle-group" role="tablist" aria-label="Occupancy scenario toggle">
-            <button type="button" class="eco-toggle-btn" data-occ="45" role="tab" aria-selected="false">45%</button>
-            <button type="button" class="eco-toggle-btn" data-occ="55" role="tab" aria-selected="false">55%</button>
-            <button type="button" class="eco-toggle-btn active" data-occ="60" role="tab" aria-selected="true">60%</button>
-            <button type="button" class="eco-toggle-btn" data-occ="65" role="tab" aria-selected="false">65%</button>
-          </div>
-        </div>
-
-        <div class="op-eco-fig stagger-child" id="eco-headline-val">₹1,62,000<span style="font-size: 0.55em; color: rgba(255,255,255,0.6);">/mo</span></div>
-        <div class="op-eco-yield stagger-child" id="eco-headline-return">69% Return on capital</div>
-        <div class="op-eco-caveat stagger-child" id="eco-headline-caption">Illustrative, 3-key Villa at 60% occupancy.</div>
-
-        <!-- CAPITAL DEPLOYED DETAILS -->
-        <div class="stagger-child" style="max-width: 680px; margin: 32px auto 20px auto; padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.7); text-align: center; line-height: 1.6;">
-          Capital deployed: deposit ₹4,50,000 + franchise ₹49,999 + setup ₹1,50,000 = <strong style="color: #FFFFFF;">₹6,49,999</strong>. ADR <strong style="color: #FFFFFF;">₹9,000</strong>.
-        </div>
-
-        <table class="op-workings stagger-child">
-          <tbody>
-            <tr>
-              <td class="op-body">Gross booking revenue</td>
-              <td class="op-body" id="val-gross">₹1,62,000</td>
-            </tr>
-            <tr>
-              <td class="op-body">Less Red Flag 10.5%</td>
-              <td class="op-body" id="val-comm">₹17,010</td>
-            </tr>
-            <tr>
-              <td class="op-body">Less cleaning &amp; maintenance</td>
-              <td class="op-body" id="val-cleaning">₹20,400</td>
-            </tr>
-            <tr style="border-top: 1px solid rgba(255,255,255,0.18); border-bottom: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.02);">
-              <td class="op-body" style="color: #FFFFFF !important; font-weight: 600;">= Your net payout</td>
-              <td class="op-body" id="val-netpayout" style="color: #E5231B !important; font-weight: 700;">₹1,24,590</td>
-            </tr>
-            <tr>
-              <td class="op-body">Less rent</td>
-              <td class="op-body">₹75,000</td>
-            </tr>
-            <tr>
-              <td class="op-body">Less electricity &amp; utilities</td>
-              <td class="op-body">₹12,000</td>
-            </tr>
-            <tr style="border-top: 2px solid rgba(255,255,255,0.25); background: rgba(229,35,27,0.06);">
-              <td class="op-body" style="color: #FFFFFF !important; font-weight: 700; font-size: 15px;">Net monthly to you</td>
-              <td class="op-body" id="val-netmonthly" style="color: #FFFFFF !important; font-weight: 700; font-size: 16px;">₹37,590</td>
-            </tr>
-            <tr>
-              <td class="op-body" style="color: rgba(255,255,255,0.85); font-weight: 600;">Return on capital</td>
-              <td class="op-body" id="val-return" style="color: #E5231B; font-weight: 700;">69%</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- THREE SPECIFIC FOOTNOTES BELOW TABLE -->
-        <div class="stagger-child" style="max-width: 680px; margin: 28px auto 0 auto; display: flex; flex-direction: column; gap: 10px; font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.6; text-align: center;">
-          <p style="margin: 0;">&bull; Breakeven is around 42% occupancy.</p>
-          <p style="margin: 0;">&bull; A ten-point occupancy swing roughly doubles or halves your profit &mdash; which is why we operate the property ourselves.</p>
-          <p style="margin: 0;">&bull; No minimum guarantees. We only earn when you earn.</p>
-        </div>
-
-        <div class="echo-bottom-lines stagger-child">
-          <span>Red Flag</span>
-          <span>Outpost</span>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- CHOOSE YOUR TIER SECTION -->
-    <section class="op-section stagger-section" id="tiers">
-      <div class="op-container">
-        <span class="op-eyebrow stagger-child">SCALE &amp; PRICING</span>
-        <h2 class="op-h2 stagger-child" style="margin-bottom: 16px;">
-          Choose Your Tier
-        </h2>
-        <p class="op-body stagger-child" style="max-width: 720px;">
-          Every tier includes our full management stack: creator launch, AI dynamic pricing, guest care, and hands-off turnovers. Select the footprint matching your capital and property size.
-        </p>
-
-        <div class="tier-grid stagger-child">
-          <!-- TIER 1: RED FLAG STUDIO -->
-          <div class="tier-card">
-            <div>
-              <h3 class="tier-name">Red Flag Studio</h3>
-              <div class="tier-keys">Studio / 1BHK &middot; Single Key</div>
-              
-              <table class="tier-cost-table">
-                <tbody>
-                  <tr>
-                    <td>Franchise Fee</td>
-                    <td>₹29,999</td>
-                  </tr>
-                  <tr>
-                    <td>Setup &amp; Staging</td>
-                    <td>₹99,000</td>
-                  </tr>
-                  <tr class="tier-total-row">
-                    <td>Total Commitment</td>
-                    <td>₹1,28,999</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div>
-              <div class="tier-comm">
-                <span>Management Commission</span>
-                <span class="tier-comm-val">12%</span>
-              </div>
-              <a href="#apply" class="op-btn" style="width: 100%; text-align: center; margin-top: 20px; box-sizing: border-box;">
-                Apply for Studio
-              </a>
-            </div>
-          </div>
-
-          <!-- TIER 2: RED FLAG VILLA (FEATURED) -->
-          <div class="tier-card featured">
-            <span class="tier-badge">Popular Allocation</span>
-            <div>
-              <h3 class="tier-name">Red Flag Villa</h3>
-              <div class="tier-keys">2–4 Keys &middot; Private Villa</div>
-              
-              <table class="tier-cost-table">
-                <tbody>
-                  <tr>
-                    <td>Franchise Fee</td>
-                    <td>₹49,999</td>
-                  </tr>
-                  <tr>
-                    <td>Setup &amp; Staging</td>
-                    <td>₹1,50,000</td>
-                  </tr>
-                  <tr class="tier-total-row">
-                    <td>Total Commitment</td>
-                    <td>₹1,99,999</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div>
-              <div class="tier-comm" style="background: rgba(229,35,27,0.1); border: 1px solid rgba(229,35,27,0.2);">
-                <span>Management Commission</span>
-                <span class="tier-comm-val">10.5%</span>
-              </div>
-              <a href="#apply" class="op-btn op-btn-primary" style="width: 100%; text-align: center; margin-top: 20px; box-sizing: border-box;">
-                Apply for Villa
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- RED FLAG ESTATE TRACK (BELOW BOTH) -->
-        <div class="estate-tier-card stagger-child">
-          <div style="max-width: 640px;">
-            <div style="font-family: 'Instrument Serif', serif; font-size: 22px; color: #FFFFFF; margin-bottom: 6px;">
-              Red Flag Estate &mdash; 5+ Keys, 9% Commission
-            </div>
-            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.6;">
-              By invitation, after two successful quarters. You don't apply for it. You earn it.
-            </p>
-          </div>
-          <div style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #E5231B; border: 1px solid rgba(229,35,27,0.3); padding: 8px 18px; border-radius: 999px;">
-            By Invitation Only
-          </div>
-        </div>
-
-        <!-- ITEM 9: SUPPORTING LINE BENEATH TIER TABLE -->
-        <div class="tier-supporting-line stagger-child">
-          CLEANING AND MAINTENANCE &mdash; DEDUCTED FROM REVENUE, NEVER FROM YOUR POCKET
-        </div>
-
-      </div>
-    </section>
-
-    <!-- YOUR NAME ON THE DOOR (BRANDING SECTION) -->
-    <section class="op-section stagger-section" id="brand-identity">
-      <div class="op-container">
-        <span class="op-eyebrow stagger-child">BRAND &amp; DISTINCTION</span>
-        <h2 class="op-h2 stagger-child" style="margin-bottom: 16px;">
-          Your Name on the Door
-        </h2>
-        <p class="op-body stagger-child" style="max-width: 760px;">
-          When your property joins the Red Flag collection, it leaves commodity status forever. Guests don't book generic rooms; they book an established design standard.
-        </p>
-
-        <!-- SIX BENEFIT ROWS -->
-        <div class="door-benefits-grid stagger-child">
-          <div class="door-benefit-item">
-            <span class="door-benefit-dot"></span>
-            <span>Engraved RED FLAG &times; [Your Property] plate</span>
-          </div>
-          <div class="door-benefit-item">
-            <span class="door-benefit-dot"></span>
-            <span>Higher nightly rate</span>
-          </div>
-          <div class="door-benefit-item">
-            <span class="door-benefit-dot"></span>
-            <span>Free guest content</span>
-          </div>
-          <div class="door-benefit-item">
-            <span class="door-benefit-dot"></span>
-            <span>Instant credibility</span>
-          </div>
-          <div class="door-benefit-item">
-            <span class="door-benefit-dot"></span>
-            <span>The collection effect</span>
-          </div>
-          <div class="door-benefit-item">
-            <span class="door-benefit-dot"></span>
-            <span>Exit value</span>
-          </div>
-        </div>
-
-        <!-- SIGNATURE KIT VS ICON KIT -->
-        <div class="kits-grid stagger-child">
-          <!-- SIGNATURE KIT -->
-          <div class="kit-card">
-            <span class="kit-badge kit-badge-inc">Signature Kit &mdash; Included</span>
-            <h3 style="font-family: 'Instrument Serif', serif; font-size: 26px; color: #FFFFFF; margin-bottom: 8px;">
-              Essential Brand Foundation
-            </h3>
-            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6;">
-              Standard with every Studio and Villa onboarding. Installed before your creator launch.
-            </p>
-
-            <ul class="kit-items-list">
-              <li>Exterior architectural door plate</li>
-              <li>Branded tissue and guest toiletries</li>
-              <li>Welcome card and curated house guide</li>
-              <li>Signature coasters and weighted key tags</li>
-            </ul>
-
-            <div class="kit-pricing-box">
-              <span class="kit-pricing-highlight">Included with setup</span> &middot; No recurring replenishment fee for foundational hardware.
-            </div>
-          </div>
-
-          <!-- ICON KIT -->
-          <div class="kit-card">
-            <span class="kit-badge kit-badge-opt">Icon Kit &mdash; Optional</span>
-            <h3 style="font-family: 'Instrument Serif', serif; font-size: 26px; color: #FFFFFF; margin-bottom: 8px;">
-              Complete Aesthetic Immersion
-            </h3>
-            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6;">
-              Custom-milled textile and tabletop package for flagship spaces seeking highest yield ADR.
-            </p>
-
-            <ul class="kit-items-list">
-              <li>Monogram curtains and tailored cushions</li>
-              <li>Heavyweight blankets and 400-thread linen</li>
-              <li>Handmade ceramics and bespoke glassware</li>
-              <li>Signature waffle robes and plush slippers</li>
-            </ul>
-
-            <div class="kit-pricing-box">
-              <div>One-time: <span class="kit-pricing-highlight">Studio ₹35,000</span> / <span class="kit-pricing-highlight">Villa ₹75,000</span></div>
-              <div style="margin-top: 4px;">Replenishment: <span class="kit-pricing-highlight">₹8,000</span> / <span class="kit-pricing-highlight">₹18,000</span> annually</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- DETAILS (THREE STAT COUNTERS) -->
-    <section class="op-section stagger-section" id="details">
-      <div class="op-container">
-        <span class="op-eyebrow stagger-child">DETAILS</span>
-        <h2 class="op-h2 stagger-child" style="margin-bottom: 48px;">
-          We hand you an asset<br>and run it for you
-        </h2>
-
-        <div class="stat-counters-grid stagger-child">
-          <div class="stat-card">
-            <div class="stat-number-row">
-              <span class="stat-counter" data-target="60">0</span>
-              <span class="stat-unit">%</span>
-            </div>
-            <div class="stat-label">Percent occupancy</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number-row">
-              <span class="stat-counter" data-target="3">0</span>
-            </div>
-            <div class="stat-label">Keys per villa</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number-row">
-              <span class="stat-counter" data-target="2">0</span>
-              <span class="stat-unit">X</span>
-            </div>
-            <div class="stat-label">X yield spread</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ZOOM OVERLAYS / SYSTEM -->
-    <section class="op-section stagger-section" id="system">
-      <div class="op-container">
-        <span class="op-eyebrow stagger-child">THE SYSTEM</span>
-        <h3 class="op-h2 stagger-child" style="margin-bottom: 24px;">
-          The hunt, the flip,<br>the system that runs it
-        </h3>
-        <p class="op-body stagger-child" style="margin-bottom: 80px; max-width: 800px;">
-          No staff to hire. No hospitality experience needed. No ops to learn. This is not a guessing game. It's a system. Here is exactly how your capital becomes a high-yield asset.
-        </p>
-
-        <div style="position: relative;">
-          <div class="op-step-connector"></div>
-          
-          <div class="op-step stagger-child">
-            <div class="op-step-num">01</div>
-            <div class="op-step-content">
-              <h3 class="op-h3" style="margin-bottom: 16px;">THE HUNT</h3>
-              <p class="op-body" style="margin-bottom: 16px;">We don't let you sign a bad lease. Using demand data from our managed portfolio, we assess your property &mdash; or help you find one in a high-demand, low-supply pocket.</p>
-              <ul class="op-body" style="padding-left: 20px;">
-                <li>Demand assessment</li>
-                <li>Lease negotiation support</li>
-                <li>Legal and risk review</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="op-step stagger-child">
-            <div class="op-step-num">02</div>
-            <div class="op-step-content">
-              <h3 class="op-h3" style="margin-bottom: 16px;">THE FLIP</h3>
-              <p class="op-body" style="margin-bottom: 16px;">Ordinary spaces become premium in under 45 days.</p>
-              <ul class="op-body" style="padding-left: 20px;">
-                <li>Interior transformation</li>
-                <li>Furnishing and styling</li>
-                <li>Signature branding kit</li>
-                <li>Smart locks and WiFi</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="op-step stagger-child">
-            <div class="op-step-num">03</div>
-            <div class="op-step-content">
-              <h3 class="op-h3" style="margin-bottom: 16px;">THE DROP</h3>
-              <p class="op-body" style="margin-bottom: 16px;">We don't quietly list you and hope. Every property launches through content creators &mdash; building demand and a permanent content library from week one.</p>
-              <ul class="op-body" style="padding-left: 20px;">
-                <li>Creator stay campaign</li>
-                <li>Editorial shoot</li>
-                <li>Airbnb, Booking.com and direct</li>
-                <li>Direct booking setup</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="op-step stagger-child">
-            <div class="op-step-num">04</div>
-            <div class="op-step-content">
-              <h3 class="op-h3" style="margin-bottom: 16px;">THE YIELD</h3>
-              <p class="op-body" style="margin-bottom: 16px;">You step back. The system runs.</p>
-              <ul class="op-body" style="padding-left: 20px;">
-                <li>AI dynamic pricing</li>
-                <li>24/7 guest messaging</li>
-                <li>Every clean and turnover arranged</li>
-                <li>Minor maintenance handled</li>
-                <li>Payouts 1st and 16th</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Address Block & Contact link -->
-        <div class="stagger-child" style="margin-top: 80px; padding: 32px; border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; background: rgba(255,255,255,0.02);">
-          <div>
-            <div style="font-family: 'Instrument Serif', serif; font-size: 24px; color: #FFFFFF; margin-bottom: 6px;">Red Flag World Holdings Ltd</div>
-            <a href="mailto:hello@redflaghomes.in" style="color: rgba(255,255,255,0.7); text-decoration: none; font-size: 15px; transition: color 0.2s;" onmouseover="this.style.color='#E5231B'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">hello@redflaghomes.in</a>
-          </div>
-          <div>
-            <a href="mailto:hello@redflaghomes.in" class="op-btn">Contact</a>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- CLIENT STORIES (REVIEWS) -->
-    <section class="op-section stagger-section" id="reviews">
-      <div class="op-container">
-        <span class="op-eyebrow stagger-child">PARTNER STORIES</span>
-        
-        <div class="story-layout stagger-child">
-          <div class="story-img-wrap">
-            <img src="https://storage.getlayers.ai/assets/wanderlust-555800a518/Block 3/pexels-arthousestudio-4344885.jpg" alt="Red Flag Outpost Villa Interior" class="story-interior-img" />
-          </div>
-          <div class="story-text-wrap">
-            <blockquote style="font-family: 'Instrument Serif', serif; font-size: clamp(24px, 3.2vw, 36px); line-height: 1.35; color: rgba(255,255,255,0.95); margin-bottom: 32px; font-weight: 300;">
-              &ldquo;Most franchises hand you a business and leave you to run it. We hand you an asset and run it for you.&rdquo;
-            </blockquote>
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-              <div>
-                <div style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #FFFFFF; margin-bottom: 4px;">Red Flag Outpost</div>
-                <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5);">Founding Partner Programme</div>
-              </div>
-              <div style="font-family: 'Michroma', sans-serif; font-size: 12px; letter-spacing: 0.15em; color: #E5231B;">01 / 01</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- REVEAL FOOTER WITH ANIMATED STAR -->
-    <footer id="reveal-footer" class="op-reveal-footer">
-      <div class="op-container">
-        
-        <!-- Rotating Star Canvas -->
-        <div style="display: flex; justify-content: center; margin-bottom: 48px;">
-          <canvas id="star-canvas" width="120" height="120" style="width: 72px; height: 72px;"></canvas>
-        </div>
-
-        <div style="text-align: center; margin-bottom: 64px;">
-          <h2 style="font-family: 'Instrument Serif', serif; font-size: clamp(36px, 5.5vw, 68px); line-height: 1.1; margin-bottom: 32px; font-weight: 300;">
-            Be part of<br>the revolution.
-          </h2>
-          <a href="#apply" class="op-btn" style="background: #E5231B; border-color: #E5231B; color: #FFFFFF; font-size: 14px; padding: 14px 36px; border-radius: 999px;">
-            Apply for allocation
-          </a>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px;">
-          <div style="font-family: 'Michroma', sans-serif; font-size: 13px; letter-spacing: 0.15em; color: #FFFFFF;">
-            Red Flag Outpost
-          </div>
-          <div style="display: flex; gap: 24px; flex-wrap: wrap;">
-            <a href="#top" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px;">Home</a>
-            <a href="#echo" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px;">Outpost</a>
-            <a href="#details" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px;">Economics</a>
-            <a href="#reviews" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px;">Stories</a>
-          </div>
-        </div>
-      </div>
-      <span id="contact"></span>
-    </footer>
-
-    <!-- APPLY FORM (SAND SURFACE) -->
-    <section id="apply" class="sand-surface">
-      <div style="max-width: 560px; margin: 0 auto;">
-        <span style="font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #E5231B; display: block; margin-bottom: 16px; font-weight: 600;">
-          ALLOCATION
-        </span>
-        <h2 style="font-family: 'Instrument Serif', serif; font-size: 40px; line-height: 1.15; color: #0C0C0C; margin-bottom: 8px; font-weight: 400;">
-          Deploy Your Capital
-        </h2>
-        <p style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #E5231B; margin-bottom: 16px;">
-          Limited allocation. Applications reviewed in order received.
-        </p>
-        <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.6; color: rgba(12, 12, 12, 0.7); margin-bottom: 48px;">
-          Ready to build a hospitality asset? Request an allocation spot with our expansion team.
-        </p>
-
-        <form id="apply-form" style="display: flex; flex-direction: column; gap: 28px;">
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label for="app-name" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
-              Full Name
-            </label>
-            <input type="text" id="app-name" required class="sand-input" placeholder="Your name" />
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label for="app-email" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
-              Email Address
-            </label>
-            <input type="email" id="app-email" required class="sand-input" placeholder="you@example.com" />
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label for="app-tel" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
-              Contact Number
-            </label>
-            <input type="tel" id="app-tel" required class="sand-input" placeholder="+91 00000 00000" />
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label for="app-city" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
-              Target City
-            </label>
-            <input type="text" id="app-city" required class="sand-input" placeholder="e.g. Goa, Rishikesh, Alibaug" />
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label for="app-capital" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
-              Deployable Capital
-            </label>
-            <select id="app-capital" required class="sand-select">
-              <option value="" disabled selected>Select deployable capital...</option>
-              <option value="₹1.5–3 Lakh">₹1.5–3 Lakh</option>
-              <option value="₹3–8 Lakh">₹3–8 Lakh</option>
-              <option value="₹8 Lakh+">₹8 Lakh+</option>
-            </select>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label for="app-property" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
-              Do you already have a property in mind?
-            </label>
-            <select id="app-property" required class="sand-select">
-              <option value="" disabled selected>Select an option...</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-              <option value="Looking">Looking</option>
-            </select>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label for="app-existing-client" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
-              Are you an existing Red Flag client?
-            </label>
-            <select id="app-existing-client" required class="sand-select">
-              <option value="" disabled selected>Select an option...</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </select>
-          </div>
-
-          <div style="margin-top: 12px;">
-            <button type="submit" id="apply-submit-btn" style="height: 52px; padding: 0 40px; background: #E5231B; color: #FFFFFF; border: none; border-radius: 999px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, transform 0.2s;">
-              Request allocation
-            </button>
-          </div>
-        </form>
-      </div>
-    </section>
-
-  </div>
-
-  <script>
-    // FAST LOADER & BACKGROUND VIDEO AUTOPLAY
-    (function() {
-      const preloader = document.getElementById('preloader');
-      const fill = document.getElementById('preloader-fill');
-      const bgVideos = Array.from(document.querySelectorAll('video'));
-      let isFinished = false;
-      let loadedCount = 0;
-      const totalVideos = bgVideos.length;
-
-      function finishLoader() {
-        if (isFinished) return;
-        isFinished = true;
-        clearTimeout(hardCapTimer);
-        clearInterval(progressTimer);
-
-        // Call play() on all background videos, catching rejection silently (iOS Low Power Mode safe)
-        bgVideos.forEach(v => {
-          try {
-            const p = v.play();
-            if (p !== undefined && typeof p.catch === 'function') {
-              p.catch(() => {});
-            }
-          } catch (e) {}
-        });
-
-        if (fill) fill.style.width = '100%';
-
-        if (preloader) {
-          setTimeout(() => {
-            preloader.classList.add('loaded');
-            setTimeout(() => {
-              if (preloader.parentNode) preloader.remove();
-            }, 450);
-          }, 80);
-        }
-      }
-
-      // Hard-cap the wait at 4 seconds
-      const hardCapTimer = setTimeout(finishLoader, 4000);
-
-      // Smooth progress indicator
-      let pVal = 10;
-      const progressTimer = setInterval(() => {
-        if (pVal < 90) {
-          pVal += (90 - pVal) * 0.15;
-          if (fill) fill.style.width = pVal + '%';
-        }
-      }, 70);
-
-      function videoReady() {
-        loadedCount++;
-        if (fill && totalVideos > 0) {
-          const ratio = Math.max(pVal, (loadedCount / totalVideos) * 95);
-          fill.style.width = ratio + '%';
-        }
-        if (loadedCount >= totalVideos) {
-          finishLoader();
-        }
-      }
-
-      if (totalVideos === 0) {
-        finishLoader();
-      } else {
-        bgVideos.forEach(v => {
-          if (v.readyState >= 4) {
-            videoReady();
-          } else {
-            let done = false;
-            const onReady = () => {
-              if (done) return;
-              done = true;
-              v.removeEventListener('canplaythrough', onReady);
-              v.removeEventListener('canplay', onReady);
-              v.removeEventListener('loadeddata', onReady);
-              videoReady();
-            };
-            v.addEventListener('canplaythrough', onReady, { once: true });
-            v.addEventListener('canplay', onReady, { once: true });
-            v.addEventListener('loadeddata', onReady, { once: true });
-          }
-        });
-      }
-    })();
-
-    // SPRING TIMELINE ENGINE & HERO SLOTS MOTION
-    (function() {
-      const container = document.getElementById('scene-outer');
-      const video = document.getElementById('scene-video');
-      const sec1 = document.getElementById('sec1');
-      const sec2 = document.getElementById('sec2');
-      const sec3 = document.getElementById('sec3');
-
-      // Statement 1 elements
-      const s1w1 = document.getElementById('s1-w1');
-      const s1w2 = document.getElementById('s1-w2');
-      const s1w3 = document.getElementById('s1-w3');
-      const s1desc = document.getElementById('s1-desc');
-
-      // Statement 2 elements
-      const s2w1 = document.getElementById('s2-w1');
-      const s2w2 = document.getElementById('s2-w2');
-      const s2w3 = document.getElementById('s2-w3');
-      const s2desc = document.getElementById('s2-desc');
-
-      // Statement 3 elements
-      const s3w1 = document.getElementById('s3-w1');
-      const s3w2 = document.getElementById('s3-w2');
-      const s3w3 = document.getElementById('s3-w3');
-      const s3desc = document.getElementById('s3-desc');
-
-      let targetP = 0;
-      let currentP = 0;
-      let rafId = null;
-
-      function updateTarget() {
-        if (!container) return;
-        const rect = container.getBoundingClientRect();
-        const total = container.offsetHeight - window.innerHeight;
-        const current = -rect.top;
-        targetP = Math.max(0, Math.min(1, current / total));
-      }
-
-      function springTick() {
-        // Spring physics damping: current += (target - current) * stiffness
-        currentP += (targetP - currentP) * 0.12;
-        const p = currentP;
-
-        // Fades for the 3 statements
-        let s1 = p < 0.22 ? 1 : Math.max(0, 1 - (p - 0.22) / 0.10);
-        let s2 = p < 0.32 ? 0 : p < 0.42 ? (p - 0.32) / 0.10 : p < 0.58 ? 1 : Math.max(0, 1 - (p - 0.58) / 0.10);
-        let s3 = p < 0.68 ? 0 : p < 0.78 ? (p - 0.68) / 0.10 : 1;
-
-        if (sec1) {
-          sec1.style.opacity = s1;
-          sec1.classList.toggle('visible', s1 > 0.1);
-        }
-        if (sec2) {
-          sec2.style.opacity = s2;
-          sec2.classList.toggle('visible', s2 > 0.1);
-        }
-        if (sec3) {
-          sec3.style.opacity = s3;
-          sec3.classList.toggle('visible', s3 > 0.1);
-        }
-
-        // Slot parallax motion on desktop
-        if (window.innerWidth >= 768) {
-          if (s1w1) s1w1.style.transform = 'translateY(' + (-p * 60) + 'px)';
-          if (s1w2) s1w2.style.transform = 'translateY(' + (p * 40) + 'px)';
-          if (s1w3) s1w3.style.transform = 'translateY(' + (-p * 30) + 'px)';
-          if (s1desc) s1desc.style.transform = 'translateY(' + (-p * 20) + 'px)';
-
-          const p2 = p - 0.45;
-          if (s2w1) s2w1.style.transform = 'translateY(' + (p2 * 50) + 'px)';
-          if (s2w2) s2w2.style.transform = 'translateY(' + (-p2 * 40) + 'px)';
-          if (s2w3) s2w3.style.transform = 'translateY(' + (p2 * 30) + 'px)';
-          if (s2desc) s2desc.style.transform = 'translateY(' + (p2 * 20) + 'px)';
-
-          const p3 = p - 0.8;
-          if (s3w1) s3w1.style.transform = 'translateY(' + (p3 * 40) + 'px)';
-          if (s3w2) s3w2.style.transform = 'translate(-50%, ' + (p3 * 30) + 'px)';
-          if (s3w3) s3w3.style.transform = 'translateY(' + (-p3 * 50) + 'px)';
-          if (s3desc) s3desc.style.transform = 'translateY(' + (p3 * 20) + 'px)';
-        }
-
-        // canvasOpacity(p) fade for video background into content
-        const postHeroOffset = window.scrollY - (container ? container.offsetHeight - window.innerHeight : 0);
-        if (postHeroOffset > 0) {
-          const fadeProgress = Math.min(1, postHeroOffset / (window.innerHeight * 0.8));
-          if (video) video.style.opacity = Math.max(0, 1 - fadeProgress);
-        } else {
-          if (video) video.style.opacity = 1;
-        }
-
-        requestAnimationFrame(springTick);
-      }
-
-      window.addEventListener('scroll', updateTarget, { passive: true });
-      window.addEventListener('resize', updateTarget);
-      updateTarget();
-      requestAnimationFrame(springTick);
-    })();
-
-    // SCROLL REVEAL OBSERVER & STAT COUNTERS
-    (function() {
-      const sections = document.querySelectorAll('.stagger-section');
-      const echoChars = document.querySelectorAll('.echo-char');
-      let statsAnimated = false;
-
-      function animateStats() {
-        if (statsAnimated) return;
-        statsAnimated = true;
-        document.querySelectorAll('.stat-counter').forEach(el => {
-          const target = parseInt(el.getAttribute('data-target') || '0', 10);
-          let current = 0;
-          const step = Math.ceil(target / 40);
-          const interval = setInterval(() => {
-            current += step;
-            if (current >= target) {
-              current = target;
-              clearInterval(interval);
-            }
-            el.textContent = current;
-          }, 35);
-        });
-      }
-
-      function revealEchoChars() {
-        echoChars.forEach((ch, idx) => {
-          setTimeout(() => {
-            ch.classList.add('is-visible');
-          }, idx * 70);
-        });
-      }
-
-      if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-revealed');
-              entry.target.querySelectorAll('.stagger-child').forEach((child, i) => {
-                setTimeout(() => {
-                  child.classList.add('is-revealed');
-                }, i * 100);
-              });
-
-              if (entry.target.id === 'echo') {
-                revealEchoChars();
-              }
-              if (entry.target.id === 'details') {
-                animateStats();
-              }
-            }
-          });
-        }, { threshold: 0.15 });
-
-        sections.forEach(sec => observer.observe(sec));
-      } else {
-        sections.forEach(sec => {
-          sec.classList.add('is-revealed');
-          sec.querySelectorAll('.stagger-child').forEach(child => child.classList.add('is-revealed'));
-        });
-        revealEchoChars();
-        animateStats();
-      }
-
-      // Safety timeout: reveal after 3s so content cannot remain stranded
-      setTimeout(() => {
-        sections.forEach(sec => {
-          sec.classList.add('is-revealed');
-          sec.querySelectorAll('.stagger-child').forEach(child => child.classList.add('is-revealed'));
-        });
-        revealEchoChars();
-        animateStats();
-      }, 3000);
-    })();
-
-    // ROTATING STAR CANVAS (INVERSE ACCENT & BRAND RED #E5231B)
-    (function() {
-      const canvas = document.getElementById('star-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      let angle = 0;
-
-      function drawStar(cx, cy, spikes, outerRadius, innerRadius) {
-        let rot = Math.PI / 2 * 3;
-        let x = cx;
-        let y = cy;
-        let step = Math.PI / spikes;
-
-        ctx.beginPath();
-        ctx.moveTo(cx, cy - outerRadius);
-        for (let i = 0; i < spikes; i++) {
-          x = cx + Math.cos(rot) * outerRadius;
-          y = cy + Math.sin(rot) * outerRadius;
-          ctx.lineTo(x, y);
-          rot += step;
-
-          x = cx + Math.cos(rot) * innerRadius;
-          y = cy + Math.sin(rot) * innerRadius;
-          ctx.lineTo(x, y);
-          rot += step;
-        }
-        ctx.lineTo(cx, cy - outerRadius);
-        ctx.closePath();
-        ctx.fillStyle = '#E5231B'; // brand red
-        ctx.fill();
-      }
-
-      function render() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        angle += 0.015;
-        ctx.rotate(angle);
-        drawStar(0, 0, 5, 32, 15);
-        ctx.restore();
-        requestAnimationFrame(render);
-      }
-      render();
-    })();
-
-    // DOCK ACTIVE INDICATOR
-    (function() {
-      const links = document.querySelectorAll('.op-dock-link');
-      const sections = ['top', 'echo', 'details', 'reviews', 'apply'];
-
-      window.addEventListener('scroll', () => {
-        let currentSection = 'top';
-        const scrollY = window.scrollY;
-
-        sections.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) {
-            const top = el.offsetTop - 300;
-            if (scrollY >= top) {
-              currentSection = id;
-            }
-          }
-        });
-
-        links.forEach(l => {
-          const href = l.getAttribute('href');
-          if (href === '#' + currentSection) {
-            l.classList.add('active');
-          } else {
-            l.classList.remove('active');
-          }
-        });
-      }, { passive: true });
-    })();
-
-    // OCCUPANCY TOGGLE ENGINE
-    (function() {
-      const toggleBtns = document.querySelectorAll('.eco-toggle-btn');
-      const valGross = document.getElementById('val-gross');
-      const valComm = document.getElementById('val-comm');
-      const valCleaning = document.getElementById('val-cleaning');
-      const valNetpayout = document.getElementById('val-netpayout');
-      const valNetmonthly = document.getElementById('val-netmonthly');
-      const valReturn = document.getElementById('val-return');
-      const headlineVal = document.getElementById('eco-headline-val');
-      const headlineReturn = document.getElementById('eco-headline-return');
-      const headlineCaption = document.getElementById('eco-headline-caption');
-
-      const data = {
-        '45': {
-          gross: '₹1,21,500',
-          comm: '₹12,758',
-          cleaning: '₹16,500',
-          netpayout: '₹92,242',
-          netmonthly: '₹5,242',
-          returnRate: '10%',
-          caption: 'Illustrative, 3-key Villa at 45% occupancy.'
-        },
-        '55': {
-          gross: '₹1,48,500',
-          comm: '₹15,593',
-          cleaning: '₹18,500',
-          netpayout: '₹1,14,407',
-          netmonthly: '₹27,407',
-          returnRate: '51%',
-          caption: 'Illustrative, 3-key Villa at 55% occupancy.'
-        },
-        '60': {
-          gross: '₹1,62,000',
-          comm: '₹17,010',
-          cleaning: '₹20,400',
-          netpayout: '₹1,24,590',
-          netmonthly: '₹37,590',
-          returnRate: '69%',
-          caption: 'Illustrative, 3-key Villa at 60% occupancy.'
-        },
-        '65': {
-          gross: '₹1,75,500',
-          comm: '₹18,428',
-          cleaning: '₹22,300',
-          netpayout: '₹1,34,772',
-          netmonthly: '₹47,772',
-          returnRate: '88%',
-          caption: 'Illustrative, 3-key Villa at 65% occupancy.'
-        }
-      };
-
-      toggleBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          const occ = this.getAttribute('data-occ');
-          if (!data[occ]) return;
-
-          toggleBtns.forEach(b => {
-            b.classList.remove('active');
-            b.setAttribute('aria-selected', 'false');
-          });
-          this.classList.add('active');
-          this.setAttribute('aria-selected', 'true');
-
-          const d = data[occ];
-          if (valGross) valGross.textContent = d.gross;
-          if (valComm) valComm.textContent = d.comm;
-          if (valCleaning) valCleaning.textContent = d.cleaning;
-          if (valNetpayout) valNetpayout.textContent = d.netpayout;
-          if (valNetmonthly) valNetmonthly.textContent = d.netmonthly;
-          if (valReturn) valReturn.textContent = d.returnRate;
-
-          if (headlineVal) headlineVal.innerHTML = d.gross + '<span style="font-size: 0.55em; color: rgba(255,255,255,0.6);">/mo</span>';
-          if (headlineReturn) headlineReturn.textContent = d.returnRate + ' Return on capital';
-          if (headlineCaption) headlineCaption.textContent = d.caption;
-        });
-      });
-    })();
-
-    // APPLY FORM SUBMIT (WHATSAPP + NOTIFICATION)
-    (function() {
-      const form = document.getElementById('apply-form');
-      if (!form) return;
-
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const name = document.getElementById('app-name').value;
-        const email = document.getElementById('app-email').value;
-        const tel = document.getElementById('app-tel').value;
-        const city = document.getElementById('app-city').value;
-        const cap = document.getElementById('app-capital').value;
-        const prop = document.getElementById('app-property').value;
-        const existing = document.getElementById('app-existing-client').value;
-
-        const text = "RED FLAG OUTPOST - ALLOCATION REQUEST\n" +
-                     "Name: " + name + "\n" +
-                     "Email: " + email + "\n" +
-                     "Contact: " + tel + "\n" +
-                     "Target City: " + city + "\n" +
-                     "Deployable Capital: " + cap + "\n" +
-                     "Property in Mind: " + prop + "\n" +
-                     "Existing Red Flag Client: " + existing;
-
-        const waUrl = "https://wa.me/918881306632?text=" + encodeURIComponent(text);
-        window.open(waUrl, '_blank');
-
-        const btn = document.getElementById('apply-submit-btn');
-        if (btn) {
-          btn.textContent = 'Allocation Requested';
-          btn.style.background = '#111111';
-        }
-      });
-    })();
-  </script>
+</div>
+
+<div id="badge" aria-hidden="true"><b>Play</b></div>
+
+<script type="module">
+import Lenis from "lenis";
+
+/* ---------- root font size above 1440 ---------- */
+const FONT_BASE=16,BASE_W=1440,COEF=.6666;
+function setRoot(){
+  const w=window.innerWidth;
+  const size=FONT_BASE-(FONT_BASE*(((BASE_W-w)/BASE_W)*100*COEF))/100;
+  if(size>16)document.documentElement.style.fontSize=size+"px";
+  else document.documentElement.style.removeProperty("font-size");
+}
+setRoot();addEventListener("resize",setRoot);
+
+/* ---------- lenis + ticker ---------- */
+const lenis=new Lenis({smoothWheel:true,anchors:true});
+const subs=[];
+function frame(t){lenis.raf(t);for(const f of subs){try{f(t)}catch(e){console.error(e)}}requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+document.documentElement.classList.add("locked");lenis.stop();
+scrollTo(0,0);
+
+/* ---------- maths ---------- */
+const clamp01=v=>Math.min(1,Math.max(0,v));
+const span=(p,[a,b])=>clamp01((p-a)/(b-a));
+const easeInOutSine=t=>(1-Math.cos(t*Math.PI))/2;
+const easeOutSine=t=>Math.sin(t*Math.PI/2);
+const easeOutQuint=t=>1-Math.pow(1-t,5);
+const easeOutQuart=t=>1-Math.pow(1-t,4);
+
+const PHASE={sequence:[0,.4],heroOneExit:[.08,.13],heroTwoEnter:[.13,.18],heroTwoExit:[.21,.26],
+  heroThreeEnter:[.26,.31],echo:[.4,.53],details:[.53,.66],star:[.66,.74],showreelReveal:[.74,.79],showreelZoom:[.79,1]};
+
+function progressOf(el,startPose,endPose){
+  const bb=el.getBoundingClientRect(),ch=innerHeight;
+  const poses={top_top:bb.top,center_top:bb.top+bb.height/2,bottom_top:bb.bottom,
+    top_bottom:bb.top-ch,center_bottom:bb.top+bb.height/2-ch,bottom_bottom:bb.bottom-ch,
+    top_center:bb.top-ch/2,center_center:bb.top+bb.height/2-ch/2,bottom_center:bb.bottom-ch/2};
+  const s=poses[startPose],e=poses[endPose],len=Math.abs(s-e);
+  if(!len)return 0;
+  return Math.min(Math.max(0,1-(s+len)/len),1);
+}
+
+/* spring follower */
+function spring(tension,friction){
+  let pos=0,vel=0,to=0;
+  return {set:v=>to=v,get:()=>pos,step(dt){
+    const steps=Math.min(64,dt);
+    for(let i=0;i<steps;i++){
+      vel+=((-tension*1e-6*(pos-to))+(-friction*.001*vel));pos+=vel;
+    }
+    return pos;
+  }};
+}
+
+/* ---------- letter engine ---------- */
+function build(el,text,stagger){
+  el.innerHTML="";let i=0;
+  const words=text.split(" ");
+  words.forEach((w,wi)=>{
+    const ws=document.createElement("span");ws.className="wd";
+    for(const ch of w){
+      const ls=document.createElement("span");ls.className="lt";ls.textContent=ch;
+      ls.style.transitionDelay=(i*stagger)+"ms";ws.appendChild(ls);i++;
+    }
+    el.appendChild(ws);
+  });
+  return el.querySelectorAll(".lt");
+}
+function setOn(letters,on){letters.forEach(l=>l.classList.toggle("on",on))}
+
+const engines=[];
+document.querySelectorAll(".eng[data-text]").forEach(el=>{
+  const stg=el.closest("#h0")?750/el.dataset.text.replace(/\s/g,"").length:18;
+  engines.push({el,letters:build(el,el.dataset.text,stg)});
+});
+const lineEngines=[];
+document.querySelectorAll(".eng[data-lines]").forEach(el=>{
+  el.style.flexDirection="column";el.style.alignItems="flex-start";
+  const lines=el.dataset.lines.split("|");let idx=0;const all=[];
+  el.innerHTML="";
+  lines.forEach(line=>{
+    const row=document.createElement("span");row.style.display="flex";row.style.flexWrap="wrap";row.style.columnGap=".28em";
+    line.split(" ").forEach(w=>{
+      const ws=document.createElement("span");ws.className="wd";
+      for(const ch of w){const ls=document.createElement("span");ls.className="lt";ls.textContent=ch;ls.style.transitionDelay=(idx*22)+"ms";ws.appendChild(ls);idx++;all.push(ls)}
+      row.appendChild(ws);
+    });
+    el.appendChild(row);
+  });
+  lineEngines.push({el,letters:all,on:false});
+});
+function toggleLine(id,on){
+  const e=lineEngines.find(x=>x.el.id===id||x.el.closest("#"+id));
+  if(e&&e.on!==on){e.on=on;setOn(e.letters,on)}
+}
+
+/* ---------- sequence canvas ---------- */
+const TIER=(innerWidth<1024||matchMedia("(hover:none) and (pointer:coarse)").matches)
+  ?{name:"mobile",count:105,w:1280,h:720}:{name:"desktop",count:210,w:1920,h:1080};
+const BASE="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset";
+const canvas=document.getElementById("seq");canvas.width=TIER.w;canvas.height=TIER.h;
+const ctx=canvas.getContext("2d");
+const frames=new Array(TIER.count).fill(null);
+let settled=0,painted=-1,loadedRatio=0;
+function nearest(i){for(let s=0;s<TIER.count;s++){const im=frames[i-s]??frames[i+s];if(im)return im}return null}
+function draw(force){
+  const i=Math.min(TIER.count-1,Math.floor(span(P.get(),PHASE.sequence)*TIER.count));
+  if(!force&&i===painted)return;
+  const im=nearest(i);if(!im)return;
+  ctx.drawImage(im,0,0,TIER.w,TIER.h);painted=i;
+}
+async function loadFrames(){
+  let cursor=0;
+  const pump=async()=>{
+    while(true){
+      const i=cursor++;if(i>=TIER.count)return;
+      const img=new Image();img.decoding="async";img.crossOrigin="anonymous";
+      img.src=BASE+TIER.name+"/"+String(i).padStart(3,"0")+".webp";
+      let ok=img;try{await img.decode()}catch{ok=null}
+      frames[i]=ok;settled++;loadedRatio=settled/TIER.count;
+      if(ok)draw(true);
+    }
+  };
+  await Promise.all(Array.from({length:6},pump));
+}
+loadFrames();
+
+/* ---------- preloader ---------- */
+const pre=document.getElementById("pre"),countEl=document.getElementById("count"),ruleFill=document.getElementById("ruleFill");
+const numWrap=document.querySelector("#pre .num");
+let clockStart=performance.now(),exiting=false;
+function preStep(t){
+  if(exiting)return;
+  const clock=easeOutQuart(clamp01((t-clockStart)/2800));
+  const v=Math.min(clock,loadedRatio);
+  const pct=Math.round(v*100);
+  countEl.textContent=pct+"%";
+  countEl.style.left=pct+"%";countEl.style.transform="translateX(-"+pct+"%)";
+  ruleFill.style.transform="scaleX("+v+")";
+  if(clock>=1&&loadedRatio>=1){
+    exiting=true;pre.classList.add("out");
+    document.documentElement.classList.remove("locked");lenis.start();
+    setTimeout(()=>{engines.filter(e=>e.el.closest("#h0")).forEach(e=>setOn(e.letters,true));
+      document.getElementById("grid").classList.add("on")},1200);
+    setTimeout(()=>pre.remove(),1600);
+  }
+}
+subs.push(preStep);
+numWrap.style.position="absolute";countEl.style.position="absolute";countEl.style.bottom="0";
+
+/* fail-safe: never stick */
+setTimeout(()=>{if(!exiting){loadedRatio=1;clockStart=0}},8000);
+
+/* ---------- scene driving ---------- */
+const scene=document.getElementById("scene");
+const P=spring(90,26);
+let last=performance.now(),flags={};
+const el={
+  canvasWrap:document.getElementById("canvasWrap"),
+  gridInner:document.getElementById("gridInner"),
+  h:[document.getElementById("h0"),document.getElementById("h1"),document.getElementById("h2")],
+  echo:document.getElementById("echoLayer"),echoImg:document.querySelector("#echoLayer .img"),
+  det:document.getElementById("detailsLayer"),detImg:document.querySelector("#detailsLayer .img"),
+  star:document.getElementById("star"),starTint:document.getElementById("starTint"),
+  reel:document.getElementById("showreel"),video:document.getElementById("reel"),
+  ovLead:document.getElementById("ovLead"),ovAside:document.getElementById("ovAside"),ovTop:document.getElementById("ovTop")
+};
+const HERO_GONE=[PHASE.heroOneExit[1],PHASE.heroTwoExit[1],PHASE.echo[1]];
+const EXIT_SHIFT=2.5,EXIT_BLUR=.75;
+
+function sceneStep(t){
+  const dt=t-last;last=t;
+  P.set(progressOf(scene,"top_top","bottom_bottom"));
+  const p=P.step(dt);
+
+  el.canvasWrap.style.opacity=1-span(p,PHASE.echo);
+  el.gridInner.style.opacity=1-span(p,PHASE.sequence);
+  el.gridInner.style.visibility=(1-span(p,PHASE.sequence))>0?"visible":"hidden";
+
+  el.h.forEach((h,i)=>{h.style.visibility=p<HERO_GONE[i]?"visible":"hidden"});
+  const ex=(node,range)=>{
+    const e=easeInOutSine(span(p,range));
+    node.style.opacity=1-e;
+    node.style.transform="translate3d("+(-EXIT_SHIFT*e)+"rem,0,0)";
+    node.style.filter=e>0?"blur("+(EXIT_BLUR*e)+"rem)":"none";
+  };
+  ex(el.h[0].querySelector(".exit"),PHASE.heroOneExit);
+  ex(el.h[1].querySelector(".exit"),PHASE.heroTwoExit);
+  el.h[2].style.opacity=1-span(p,PHASE.echo);
+  el.h[0].querySelector(".desc").style.opacity=1-span(p,PHASE.heroOneExit);
+  el.h[1].querySelector(".desc").style.opacity=span(p,PHASE.heroTwoEnter)*(1-span(p,PHASE.heroTwoExit));
+  el.h[2].querySelector(".desc").style.opacity=span(p,PHASE.heroThreeEnter);
+
+  el.echo.style.transform="translate3d(0,"+((1-span(p,PHASE.echo))*100)+"%,0)";
+  el.echoImg.style.transform="scale("+(1.1-.1*span(p,PHASE.echo))+")";
+
+  el.det.style.clipPath="inset("+((1-span(p,PHASE.details))*100)+"% 0 0 0)";
+  el.detImg.style.transform="scale("+(1.1-.1*span(p,PHASE.details))+")";
+
+  el.star.style.transform="scale("+(.04+Math.pow(span(p,PHASE.star),5)*16)+")";
+  el.starTint.setAttribute("opacity",span(p,PHASE.star));
+
+  const rev=span(p,PHASE.showreelReveal),zm=easeInOutSine(span(p,PHASE.showreelZoom));
+  el.reel.style.clipPath="inset("+((1-rev)*100)+"% 0 0 0)";
+  el.reel.style.transform="translate(-50%,calc(-50% + "+((1-rev)*10)+"%)) scale("+(1+zm*.8)+")";
+  [el.ovLead,el.ovAside,el.ovTop].forEach(n=>{n.style.opacity=rev;n.style.visibility=rev>0?"visible":"hidden"});
+  el.ovLead.style.transform="translate3d("+((1-zm)*7.5)+"rem,-50%,0)";
+  el.ovAside.style.transform="translate3d("+(-(1-zm)*7.5)+"rem,-50%,0)";
+
+  const f={canvas:p<PHASE.echo[1],echoLead:p>=PHASE.echo[0],echoFoot:span(p,PHASE.echo)>=.9,
+    details:p>=PHASE.details[0],showreel:p>=PHASE.star[0],zoom:p>=PHASE.showreelReveal[0]};
+  if(f.echoLead!==flags.echoLead)toggleLine("echoLead",f.echoLead);
+  if(f.echoFoot!==flags.echoFoot)toggleLine("echoFoot",f.echoFoot);
+  if(f.zoom!==flags.zoom)toggleLine("ovLead",f.zoom);
+  if(f.details!==flags.details)runStats(f.details);
+  if(f.showreel!==flags.showreel){f.showreel?el.video.play().catch(()=>{}):el.video.pause()}
+  flags=f;
+
+  /* echo title letters by scroll progress */
+  const ep=progressOf(document.getElementById("tbe"),"top_top","bottom_bottom");
+  const et=engines.find(e=>e.el.id==="echoTitle");
+  if(et)et.letters.forEach((l,i)=>l.classList.toggle("on",ep>i/et.letters.length));
+  const b2=progressOf(document.getElementById("tb2"),"top_top","bottom_bottom");
+  engines.filter(e=>e.el.closest("#h1")).forEach(e=>e.letters.forEach((l,i)=>l.classList.toggle("on",b2>i/e.letters.length)));
+  const b3=progressOf(document.getElementById("tb3"),"top_top","bottom_bottom");
+  engines.filter(e=>e.el.closest("#h2")).forEach(e=>e.letters.forEach((l,i)=>l.classList.toggle("on",b3>i/e.letters.length)));
+
+  if(f.canvas&&!document.hidden)draw();
+}
+subs.push(sceneStep);
+engines.filter(e=>e.el.id==="echoTitle").forEach(e=>e.letters.forEach(l=>l.style.transitionDuration=".5s"));
+
+/* ---------- stat drums ---------- */
+let statStart=null,statsOn=false;
+function runStats(on){statsOn=on;statStart=on?performance.now():null;
+  if(!on)document.querySelectorAll(".stat .drum").forEach(d=>{d.textContent="0";d.style.filter="none";d.style.transform="none"})}
+subs.push(t=>{
+  if(!statsOn||statStart===null)return;
+  const k=easeOutQuint(clamp01((t-statStart)/2200));
+  document.querySelectorAll(".stat .v").forEach(v=>{
+    const target=+v.dataset.v,n=target*k,rest=1-k;
+    const d=v.querySelector(".drum");
+    d.textContent=Math.floor(n);
+    d.style.filter="blur("+(rest*.5)+"rem)";
+    d.style.transform="translate3d(0,"+(rest*1.25)+"rem,0)";
+  });
+});
+
+/* ---------- play badge ---------- */
+const badge=document.getElementById("badge");
+let bx=0,by=0,bo=0,bs=.7,tx=0,ty=0,to=0,ts=.7;
+el.video.addEventListener("mouseenter",e=>{bx=tx=e.clientX;by=ty=e.clientY;to=1;ts=1});
+el.video.addEventListener("mousemove",e=>{tx=e.clientX;ty=e.clientY});
+el.video.addEventListener("mouseleave",()=>{to=0;ts=.7});
+subs.push(()=>{
+  bx+=(tx-bx)*.2;by+=(ty-by)*.2;bo+=(to-bo)*.15;bs+=(ts-bs)*.15;
+  badge.style.transform="translate3d("+bx+"px,"+by+"px,0)";
+  badge.style.opacity=bo;badge.querySelector("b").style.scale=bs;
+});
+
+/* ---------- footer reveal ---------- */
+const spacer=document.getElementById("spacer"),foot=document.getElementById("foot");
+const F=spring(140,30);let fLast=performance.now(),ctaOn=false;
+const wmInner=document.getElementById("wmInner");
+const WM="Red Flag Outpost";
+WM.split(" ").forEach((w,wi,arr)=>{
+  const ws=document.createElement("span");ws.className="wd";
+  [...w].forEach((ch,i)=>{const s=document.createElement("span");s.style.display="inline-block";s.dataset.i=i;s.textContent=ch;ws.appendChild(s)});
+  wmInner.appendChild(ws);
+  if(wi<arr.length-1)wmInner.appendChild(document.createTextNode(" "));
+});
+const wmLetters=[...wmInner.querySelectorAll("span[data-i]")];
+function wmShift(f,i){
+  const even=(i+1)%2===0;
+  const start=even?0+i*.02:.12,end=even?.48+i*.02:.72;
+  const settle=easeOutSine(clamp01((f-start)/(end-start)));
+  return (1-settle)*(even?5.625:8.75);
+}
+subs.push(t=>{
+  if(innerWidth<768){foot.style.visibility="visible";return}
+  const dt=t-fLast;fLast=t;
+  const raw=progressOf(spacer,"top_bottom","bottom_bottom");
+  F.set(raw);const f=F.step(dt);
+  foot.style.visibility=raw>0?"visible":"hidden";
+  const on=raw>=.2;if(on!==ctaOn){ctaOn=on;toggleLine("footCta",on)}
+  wmLetters.forEach(l=>{l.style.transform="translate3d(0,"+wmShift(f,+l.dataset.i)+"rem,0)"});
+});
+if(innerWidth<768)toggleLine("footCta",true);
+
+/* ---------- quote in view ---------- */
+new IntersectionObserver(es=>es.forEach(e=>toggleLine("quoteEng",e.isIntersecting)),{rootMargin:"0px 0px -15% 0px"})
+  .observe(document.getElementById("quoteEng"));
+
+/* ---------- dock ---------- */
+const dock=document.getElementById("dock"),menu=document.getElementById("dockMenu"),menuBtn=document.getElementById("menuBtn");
+new IntersectionObserver(es=>es.forEach(e=>{
+  dock.classList.toggle("hide",e.boundingClientRect.top<innerHeight);
+}),{threshold:0}).observe(document.getElementById("sentinel"));
+menuBtn?.addEventListener("click",()=>{
+  const open=menu.classList.toggle("open");
+  menuBtn.setAttribute("aria-expanded",String(open));
+  menuBtn.setAttribute("aria-label",open?"Close menu":"Open menu");
+});
+menu?.addEventListener("click",e=>{if(e.target.tagName==="A"){menu.classList.remove("open");menuBtn.setAttribute("aria-expanded","false")}});
+addEventListener("keydown",e=>{if(e.key==="Escape"){menu?.classList.remove("open");menuBtn?.setAttribute("aria-expanded","false")}});
+
+/* ---------- ticker ---------- */
+const TICK=["9–12% commission","Cleaning handled","Maintenance handled","Zero staff","Creator-led marketing","AI-run operations"];
+const row=document.getElementById("tickRow");
+for(let r=0;r<2;r++)TICK.forEach(x=>{const s=document.createElement("span");s.textContent=x+" ·";row.appendChild(s)});
+
+/* ---------- economics toggle ---------- */
+const DATA={
+  45:{gross:121500,comm:12758,clean:16500,payout:92242,net:5242,roc:"10%"},
+  55:{gross:148500,comm:15593,clean:18500,payout:114407,net:27407,roc:"51%"},
+  60:{gross:162000,comm:17010,clean:20400,payout:124590,net:37590,roc:"69%"},
+  65:{gross:175500,comm:18428,clean:22300,payout:134772,net:47772,roc:"88%"}
+};
+const inr=n=>"₹"+n.toLocaleString("en-IN");
+function setOcc(o){
+  const d=DATA[o];
+  document.getElementById("gross").innerHTML=inr(d.gross)+'<span style="font-size:.4em;letter-spacing:0"> /mo</span>';
+  document.getElementById("r-gross").textContent=inr(d.gross);
+  document.getElementById("r-comm").textContent=inr(d.comm);
+  document.getElementById("r-clean").textContent=inr(d.clean);
+  document.getElementById("r-payout").textContent=inr(d.payout);
+  document.getElementById("r-net").textContent=inr(d.net);
+  document.getElementById("r-roc").textContent=d.roc;
+  document.querySelectorAll(".occ button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.o===String(o))));
+  document.querySelector(".illus").textContent="Illustrative, 3-key Villa at "+o+"% occupancy · ADR ₹9,000 · capital deployed ₹6,49,999";
+}
+document.querySelectorAll(".occ button").forEach(b=>b.addEventListener("click",()=>setOcc(b.dataset.o)));
+setOcc(60);
+
+/* ---------- form ---------- */
+document.getElementById("applyForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  document.getElementById("formMsg").textContent="Thank you. Our expansion team will be in touch within two working days.";
+  e.target.reset();
+});
+</script>
 </body>
 </html>

@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Registered user profile information and session metadata",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "lastLoginAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "AllocationApplication": {
+      "title": "Allocation Application",
+      "description": "Franchise partner allocation applications",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "phone": { "type": "string" },
+        "tier": { "type": "string" },
+        "location": { "type": "string" },
+        "capital": { "type": "string" },
+        "notes": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "userEmail", "tier"]
+    },
+    "BookingInquiry": {
+      "title": "Booking Inquiry",
+      "description": "Stay booking requests and inquiries",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "destination": { "type": "string" },
+        "guests": { "type": "string" },
+        "dates": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "userEmail"]
+    }
+  },
+  "firestore": {
+    "users": {
+      "path": "users/{userId}",
+      "schema": "UserProfile",
+      "description": "User profile documents keyed by Firebase Auth UID"
+    },
+    "applications": {
+      "path": "applications/{applicationId}",
+      "schema": "AllocationApplication",
+      "description": "Franchise allocation applications"
+    },
+    "inquiries": {
+      "path": "inquiries/{inquiryId}",
+      "schema": "BookingInquiry",
+      "description": "Booking requests and reservations"
+    }
+  }
+}
