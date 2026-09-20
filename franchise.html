@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script type="importmap">
 { "imports": { 
@@ -182,8 +182,46 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 .alink.plain:hover{opacity:.8;transform:translateY(2px)}
 .alink.glass{border-radius:.25rem;border:1px solid rgba(255,255,255,.08);background:rgba(10,11,9,.75);padding:.875rem 1.75rem;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
 .alink.glass:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.22);background:rgba(18,19,17,.95)}
-#quoteCta{position:absolute;right:2.5rem;top:2.5rem;z-index:10}
-@media(max-width:767.98px){#quoteCta{right:1.5rem;top:1.5rem}}
+#quoteCta{position:absolute;right:2.5rem;top:2.5rem;z-index:10;height:2.25rem;display:inline-flex;align-items:center}
+@media(max-width:767.98px){#quoteCta{right:1.5rem;top:1.5rem;height:2.25rem}}
+
+/* ---------- Hero Mark & Headline Architecture ---------- */
+.hero-logo{position:absolute;left:2.5rem;top:2.5rem;width:2.25rem;height:2.25rem;display:inline-flex;align-items:center;justify-content:center;z-index:20;opacity:.9;transition:opacity 350ms var(--ease-glide)}
+.hero-logo:hover{opacity:1}
+.hero-logo img{width:100%;height:100%;object-fit:contain;display:block}
+@media(max-width:767.98px){.hero-logo{left:1.5rem;top:1.5rem}}
+
+.hero-scrim{position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.55),transparent 60%);pointer-events:none;z-index:1}
+.hero-anchor{position:absolute;left:2.5rem;top:50%;transform:translateY(-50%);z-index:2;pointer-events:none;width:max-content;max-width:calc(100vw - 5rem)}
+@media(max-width:767.98px){.hero-anchor{left:1.5rem;max-width:calc(100vw - 3rem)}}
+
+#h0 .hero-col,
+#h0 .exit{position:relative!important;inset:auto!important;width:max-content;max-width:100%;display:flex;flex-direction:column;align-items:flex-start;text-align:left;pointer-events:auto}
+.hero-eyebrow{font-family:"Instrument Sans",system-ui,sans-serif;font-size:.6875rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.7);margin:0 0 1.25rem 0;opacity:0;transform:translateY(0.4em);filter:blur(8px);will-change:transform,opacity,filter}
+
+.hero-headline{font-family:"Instrument Serif",Georgia,"Times New Roman",serif;font-weight:400;font-style:normal;line-height:.95;letter-spacing:-.035em;font-size:2.75rem;max-width:14ch;text-align:left;margin:0;display:flex;flex-direction:column;align-items:flex-start}
+@media(min-width:640px){.hero-headline{font-size:5rem}}
+@media(min-width:1024px){.hero-headline{font-size:7rem}}
+
+.hero-line{display:block;white-space:nowrap}
+.h-char{display:inline-block;opacity:0;transform:translateY(0.4em);filter:blur(8px);will-change:transform,opacity,filter}
+.h-space{display:inline-block}
+
+#h0 .hero-desc{position:static;bottom:auto;left:auto;right:auto;width:auto;font-family:"Instrument Sans",system-ui,sans-serif;color:rgba(255,255,255,.75);max-width:34ch;text-align:left;margin-top:1.75rem;line-height:1.55;font-size:1rem}
+@media(max-width:767.98px){#h0 .hero-desc{margin-top:1.25rem;font-size:.9375rem}}
+.hero-desc-inner{display:block;opacity:0;transform:translateY(0.4em);filter:blur(8px);will-change:transform,opacity,filter}
+
+@keyframes heroRise{
+  0%{opacity:0;transform:translateY(0.4em);filter:blur(8px)}
+  100%{opacity:1;transform:translateY(0);filter:blur(0)}
+}
+.hero-in .hero-eyebrow{animation:heroRise 900ms cubic-bezier(.16,1,.3,1) 0ms forwards}
+.hero-in .h-char{animation:heroRise 900ms cubic-bezier(.16,1,.3,1) calc(200ms + var(--i) * 35ms) forwards}
+.hero-in .hero-desc-inner{animation:heroRise 900ms cubic-bezier(.16,1,.3,1) 600ms forwards}
+
+@media(prefers-reduced-motion:reduce){
+  .hero-eyebrow,.h-char,.hero-desc-inner{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}
+}
 
 /* ---------- ticker ---------- */
 #ticker{position:relative;z-index:50;background:var(--black);border-block:1px solid rgba(255,255,255,.12);overflow:hidden;padding:1rem 0}
@@ -205,9 +243,16 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 @media(min-width:768px){.figure{font-size:3.25rem}}
 .spread{color:var(--accent);text-align:center;margin-top:1.25rem;font-size:1.25rem}
 .illus{text-align:center;color:rgba(255,255,255,.55);font-size:.8125rem;margin-top:3rem}
-.occ{display:flex;justify-content:center;gap:.5rem;margin:3rem 0 2rem;flex-wrap:wrap}
-.occ button{border:1px solid rgba(255,255,255,.2);padding:.5rem 1.25rem;font-size:.8125rem;letter-spacing:.1em;transition:all .3s var(--ease-glide)}
-.occ button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+.fx{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2.5rem 0 1rem;flex-wrap:wrap}
+.fx__label{font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.fx__set{display:flex;gap:.5rem;flex-wrap:wrap}
+.fx__set button{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);padding:.5rem 1.25rem;font-size:.8125rem;letter-spacing:.1em;cursor:pointer;transition:all .3s var(--ease-glide)}
+.fx__set button:hover{border-color:rgba(255,255,255,.5);color:#fff}
+.fx__set button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.occ{display:flex;justify-content:center;gap:.5rem;margin:1rem 0 2rem;flex-wrap:wrap}
+.occ button{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);padding:.5rem 1.25rem;font-size:.8125rem;letter-spacing:.1em;cursor:pointer;transition:all .3s var(--ease-glide)}
+.occ button:hover{border-color:rgba(255,255,255,.5);color:#fff}
+.occ button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 
 /* Projected 6-Month Occupancy Trend D3 Chart */
 .occupancy-chart-wrap{
@@ -1014,19 +1059,38 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 
     <div class="layer" id="grid" aria-hidden="true"><div id="gridInner" style="position:absolute;inset:0"><div class="rules"><i></i><i></i><i></i><i></i></div></div></div>
 
+    <!-- logo -->
+    <a href="index.html" class="hero-logo" id="heroLogo" aria-label="Red Flag Homes Network — home">
+      <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/logo.png" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png';" alt="Red Flag mark">
+    </a>
+
     <a class="alink plain t-caption" id="quoteCta" href="#apply">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8v8h8"/><path d="M12 12l4 4-4 4"/></svg>
       <span>Apply for allocation</span>
     </a>
 
     <!-- hero blocks -->
-    <div class="hero" id="h0"><h1 class="sr-only">No property? No problem.</h1>
-      <div class="exit" aria-hidden="true">
-        <div class="w s-tl"><div class="eng slide t-display" data-text="No"></div></div>
-        <div class="w s-cr"><div class="eng slide t-display" data-text="property?"></div></div>
-        <div class="w s-bl"><div class="eng slide t-display" data-text="No problem."></div></div>
+    <div class="hero" id="h0">
+      <div class="hero-scrim" aria-hidden="true"></div>
+      <div class="hero-anchor">
+        <div class="exit hero-col" id="heroCol">
+          <p class="hero-eyebrow">Red Flag Outpost</p>
+          <h1 class="hero-headline" aria-label="No property? No problem.">
+            <span class="hero-line" aria-hidden="true">
+              <span class="h-char" style="--i:0">N</span><span class="h-char" style="--i:1">o</span>
+            </span>
+            <span class="hero-line" aria-hidden="true">
+              <span class="h-char" style="--i:2">p</span><span class="h-char" style="--i:3">r</span><span class="h-char" style="--i:4">o</span><span class="h-char" style="--i:5">p</span><span class="h-char" style="--i:6">e</span><span class="h-char" style="--i:7">r</span><span class="h-char" style="--i:8">t</span><span class="h-char" style="--i:9">y</span><span class="h-char" style="--i:10">?</span>
+            </span>
+            <span class="hero-line" aria-hidden="true">
+              <span class="h-char" style="--i:11">N</span><span class="h-char" style="--i:12">o</span><span class="h-space">&nbsp;</span><span class="h-char" style="--i:13">p</span><span class="h-char" style="--i:14">r</span><span class="h-char" style="--i:15">o</span><span class="h-char" style="--i:16">b</span><span class="h-char" style="--i:17">l</span><span class="h-char" style="--i:18">e</span><span class="h-char" style="--i:19">m</span><span class="h-char" style="--i:20">.</span>
+            </span>
+          </h1>
+          <div class="desc hero-desc">
+            <span class="hero-desc-inner">You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.</span>
+          </div>
+        </div>
       </div>
-      <p class="desc r t-body">You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.</p>
     </div>
 
     <div class="hero" id="h1"><h2 class="sr-only">Asset light. Zero staff.</h2>
@@ -1116,11 +1180,16 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
     <p class="spread">≈ 2x yield spread</p>
     <p class="illus">Capital deployed: deposit ₹4,50,000 + franchise ₹49,999 + setup ₹1,50,000 = ₹6,49,999 · ADR ₹9,000</p>
 
-    <div class="occ" role="group" aria-label="Occupancy">
-      <button type="button" data-o="45">45%</button>
-      <button type="button" data-o="55">55%</button>
+    <div class="fx" role="group" aria-label="Market and currency">
+      <span class="fx__label">Market</span>
+      <div class="fx__set" id="fxSet"></div>
+    </div>
+
+    <div class="occ" role="group" aria-label="Occupancy percentage">
+      <button type="button" data-o="45" aria-pressed="false">45%</button>
+      <button type="button" data-o="55" aria-pressed="false">55%</button>
       <button type="button" data-o="60" aria-pressed="true">60%</button>
-      <button type="button" data-o="65">65%</button>
+      <button type="button" data-o="65" aria-pressed="false">65%</button>
     </div>
 
     <!-- Projected 6-Month Occupancy Trend (D3.js Bar Chart) -->
@@ -1145,8 +1214,8 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
         <tr><td>Less Red Flag 10.5%</td><td id="r-comm">₹17,010</td></tr>
         <tr><td>Less cleaning &amp; maintenance</td><td id="r-clean">₹20,400</td></tr>
         <tr class="tot"><td>= Your net payout</td><td id="r-payout">₹1,24,590</td></tr>
-        <tr><td>Less rent</td><td>₹75,000</td></tr>
-        <tr><td>Less electricity &amp; utilities</td><td>₹12,000</td></tr>
+        <tr><td>Less rent</td><td id="r-rent">₹75,000</td></tr>
+        <tr><td>Less electricity &amp; utilities</td><td id="r-util">₹12,000</td></tr>
         <tr class="tot"><td>Net monthly to you</td><td id="r-net">₹37,590</td></tr>
         <tr class="tot"><td>Return on capital</td><td id="r-roc">69%</td></tr>
       </tbody>
@@ -1160,37 +1229,220 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   </div>
 </section>
 
-<!-- TIERS -->
+<!-- ============================================================
+     TIERS — replace the whole existing <section class="sec" id="tiers"> … </section>
+     with everything below. Self-contained: markup, style and script.
+     ============================================================ -->
+
 <section class="sec" id="tiers">
   <div class="wrap">
     <p class="eyebrow">Choose your tier</p>
     <h2 class="h-sec">Two ways in. One system.</h2>
-    <div class="tiers">
-      <div class="tier">
-        <h3>Red Flag Studio</h3>
-        <dl>
-          <div class="row"><span>Property</span><b>Studio / 1BHK</b></div>
-          <div class="row"><span>Franchise fee</span><b>₹29,999</b></div>
-          <div class="row"><span>Setup &amp; procuring</span><b>₹99,000</b></div>
-          <div class="row"><span>Total programme cost</span><b>₹1,28,999</b></div>
-          <div class="row"><span>Commission</span><b>12%</b></div>
-        </dl>
-      </div>
-      <div class="tier feat">
-        <h3>Red Flag Villa</h3>
-        <dl>
-          <div class="row"><span>Property</span><b>2–4 keys</b></div>
-          <div class="row"><span>Franchise fee</span><b>₹49,999</b></div>
-          <div class="row"><span>Setup &amp; procuring</span><b>₹1,50,000</b></div>
-          <div class="row"><span>Total programme cost</span><b>₹1,99,999</b></div>
-          <div class="row"><span>Commission</span><b>10.5%</b></div>
-        </dl>
-      </div>
+  </div>
+
+  <div class="deck-stage" id="deckStage">
+    <div class="deck-halo" aria-hidden="true"></div>
+
+    <div class="deck" id="deck">
+
+      <article class="tcard" data-i="0">
+        <div class="tcard__in">
+          <header>
+            <span class="tcard__kind">Entry</span>
+            <h3>Red Flag Studio</h3>
+            <p class="tcard__sub">Studio or 1BHK &middot; single key</p>
+          </header>
+          <dl>
+            <div><dt>Franchise fee</dt><dd>&#8377;29,999</dd></div>
+            <div><dt>Setup &amp; procuring</dt><dd>&#8377;99,000</dd></div>
+            <div class="is-total"><dt>Total programme cost</dt><dd>&#8377;1,28,999</dd></div>
+          </dl>
+          <div class="tcard__rate"><b>12%</b><span>management commission</span></div>
+          <a class="tcard__cta" href="#apply">Apply for Studio</a>
+        </div>
+      </article>
+
+      <article class="tcard is-feat" data-i="1">
+        <div class="tcard__in">
+          <span class="tcard__flag">Most allocated</span>
+          <header>
+            <span class="tcard__kind">Core</span>
+            <h3>Red Flag Villa</h3>
+            <p class="tcard__sub">Villa or apartment &middot; 2&ndash;4 keys</p>
+          </header>
+          <dl>
+            <div><dt>Franchise fee</dt><dd>&#8377;49,999</dd></div>
+            <div><dt>Setup &amp; procuring</dt><dd>&#8377;1,50,000</dd></div>
+            <div class="is-total"><dt>Total programme cost</dt><dd>&#8377;1,99,999</dd></div>
+          </dl>
+          <div class="tcard__rate"><b>10.5%</b><span>management commission</span></div>
+          <a class="tcard__cta -solid" href="#apply">Apply for Villa</a>
+        </div>
+      </article>
+
+      <article class="tcard is-locked" data-i="2">
+        <div class="tcard__in">
+          <span class="tcard__flag -quiet">By invitation</span>
+          <header>
+            <span class="tcard__kind">Invitation</span>
+            <h3>Red Flag Estate</h3>
+            <p class="tcard__sub">5+ keys &middot; after two successful quarters</p>
+          </header>
+          <dl>
+            <div><dt>Franchise fee</dt><dd>&mdash;</dd></div>
+            <div><dt>Setup &amp; procuring</dt><dd>&mdash;</dd></div>
+            <div class="is-total"><dt>Total programme cost</dt><dd>On invitation</dd></div>
+          </dl>
+          <div class="tcard__rate"><b>9%</b><span>management commission</span></div>
+          <p class="tcard__note">You don&rsquo;t apply for it. You earn it.</p>
+        </div>
+      </article>
+
     </div>
-    <p class="estate"><b style="font-weight:500;color:#fff">Red Flag Estate</b> — 5+ keys, 9% commission. By invitation, after two successful quarters. You don't apply for it. You earn it.</p>
-    <p class="note">Cleaning and maintenance — deducted from revenue, never from your pocket</p>
+
+    <div class="deck-nav" role="group" aria-label="Tiers">
+      <button type="button" id="deckPrev" aria-label="Previous tier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="deck-dots" id="deckDots"></div>
+      <button type="button" id="deckNext" aria-label="Next tier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <p class="note">Cleaning and maintenance &mdash; deducted from revenue, never from your pocket</p>
   </div>
 </section>
+
+<style>
+.deck-stage{position:relative;margin-top:3rem;display:flex;flex-direction:column;align-items:center;
+  perspective:1800px;perspective-origin:50% 45%;touch-action:pan-y;user-select:none}
+.deck-halo{position:absolute;top:44%;left:50%;translate:-50% -50%;width:min(70vw,40rem);aspect-ratio:1;
+  pointer-events:none;background:radial-gradient(closest-side,rgba(229,35,27,.5),transparent 70%);opacity:.2;filter:blur(40px)}
+.deck{position:relative;width:100%;height:30rem;transform-style:preserve-3d}
+.tcard{position:absolute;top:0;left:50%;width:20rem;height:28.5rem;margin-left:-10rem;
+  transform-style:preserve-3d;cursor:pointer;
+  transition:transform .65s cubic-bezier(.22,.61,.36,1),opacity .65s cubic-bezier(.22,.61,.36,1),filter .65s}
+.tcard__in{position:absolute;inset:0;display:flex;flex-direction:column;
+  border:1px solid rgba(255,255,255,.1);border-radius:1.25rem;
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  padding:2rem 1.75rem;overflow:hidden;transition:border-color .5s,box-shadow .5s}
+.tcard.is-active .tcard__in{border-color:rgba(255,255,255,.22);box-shadow:0 2rem 4rem rgba(0,0,0,.55)}
+.tcard.is-feat.is-active .tcard__in{border-color:var(--accent);box-shadow:0 2rem 5rem rgba(229,35,27,.28)}
+.tcard:not(.is-active){filter:saturate(.5)}
+.tcard__flag{position:absolute;right:1.5rem;top:1.5rem;font-size:.5625rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:.3rem .7rem}
+.tcard__flag.-quiet{color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.22)}
+.tcard__kind{display:block;font-size:.5625rem;letter-spacing:.24em;text-transform:uppercase;
+  color:rgba(255,255,255,.4);margin-bottom:.875rem}
+.tcard h3{font-size:1.375rem;font-weight:400;letter-spacing:-.01em;line-height:1.2}
+.tcard__sub{margin-top:.5rem;font-size:.8125rem;line-height:1.5;color:rgba(255,255,255,.5)}
+.tcard dl{margin:1.75rem 0 0;display:flex;flex-direction:column}
+.tcard dl>div{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
+  padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.tcard dt{font-size:.8125rem;color:rgba(255,255,255,.55)}
+.tcard dd{font-size:.9375rem;font-variant-numeric:tabular-nums}
+.tcard dl>div.is-total{border-bottom:none;padding-top:1rem}
+.tcard dl>div.is-total dt{color:rgba(255,255,255,.8)}
+.tcard dl>div.is-total dd{font-size:1.125rem}
+.tcard__rate{margin-top:auto;padding-top:1.5rem;display:flex;align-items:baseline;gap:.625rem}
+.tcard__rate b{font-size:2.25rem;font-weight:400;letter-spacing:-.03em;line-height:1}
+.tcard.is-feat .tcard__rate b{color:var(--accent)}
+.tcard__rate span{font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.tcard__cta{margin-top:1.5rem;display:block;text-align:center;border:1px solid rgba(255,255,255,.25);
+  border-radius:999px;padding:.75rem 1rem;font-size:.6875rem;letter-spacing:.16em;text-transform:uppercase;
+  transition:background-color .35s,border-color .35s,color .35s}
+.tcard__cta:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5)}
+.tcard__cta.-solid{background:var(--accent);border-color:var(--accent)}
+.tcard__cta.-solid:hover{opacity:.9}
+.tcard__note{margin-top:1.5rem;font-size:.8125rem;line-height:1.5;color:rgba(255,255,255,.45)}
+.deck-nav{display:flex;align-items:center;gap:1.25rem;margin-top:1rem}
+.deck-nav button{width:2.75rem;height:2.75rem;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.18);border-radius:999px;transition:border-color .35s,background-color .35s}
+.deck-nav button:hover{border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.06)}
+.deck-nav svg{width:1.125rem;height:1.125rem}
+.deck-dots{display:flex;gap:.5rem}
+.deck-dots button{width:.5rem;height:.5rem;padding:0;border-radius:999px;border:none;
+  background:rgba(255,255,255,.25);transition:background-color .35s,width .35s}
+.deck-dots button[aria-current="true"]{background:var(--accent);width:1.5rem}
+@media(max-width:767.98px){
+  .deck{height:31rem}
+  .tcard{width:17.5rem;margin-left:-8.75rem;height:29.5rem}
+  .deck-stage{margin-top:2rem}
+}
+@media (prefers-reduced-motion:reduce){.tcard{transition:none}}
+</style>
+
+<script>
+(function(){
+  var deck=document.getElementById("deck");
+  if(!deck)return;
+  var cards=[].slice.call(deck.querySelectorAll(".tcard"));
+  var dots=document.getElementById("deckDots");
+  var stage=document.getElementById("deckStage");
+  var active=1;
+
+  cards.forEach(function(c,i){
+    var b=document.createElement("button");
+    b.type="button";
+    b.setAttribute("aria-label",c.querySelector("h3").textContent);
+    b.addEventListener("click",function(){go(i)});
+    dots.appendChild(b);
+    c.addEventListener("click",function(e){
+      if(i!==active && !e.target.closest("a"))go(i);
+    });
+  });
+
+  function layout(){
+    var gapX=window.innerWidth>=768?21:15;
+    cards.forEach(function(c,i){
+      var d=i-active, ad=Math.abs(d);
+      var x=d*gapX, rotY=d*-22, z=ad*-9, sc=ad?0.86:1;
+      c.style.transform="translate3d("+x+"rem,"+(ad?0.75:0)+"rem,"+z+"rem) rotateY("+rotY+"deg) scale("+sc+")";
+      c.style.opacity=ad>1?0:(ad?0.55:1);
+      c.style.zIndex=String(10-ad);
+      c.style.pointerEvents=ad>1?"none":"auto";
+      c.classList.toggle("is-active",!ad);
+      c.setAttribute("aria-hidden",ad>1?"true":"false");
+    });
+    [].slice.call(dots.children).forEach(function(b,i){
+      b.setAttribute("aria-current",String(i===active));
+    });
+  }
+  function go(i){
+    active=Math.max(0,Math.min(cards.length-1,i));
+    layout();
+  }
+
+  document.getElementById("deckPrev").addEventListener("click",function(){go(active-1)});
+  document.getElementById("deckNext").addEventListener("click",function(){go(active+1)});
+
+  var sx=null;
+  stage.addEventListener("touchstart",function(e){sx=e.touches[0].clientX},{passive:true});
+  stage.addEventListener("touchend",function(e){
+    if(sx===null)return;
+    var dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>40)go(active+(dx<0?1:-1));
+    sx=null;
+  },{passive:true});
+
+  var onScreen=false;
+  new IntersectionObserver(function(es){
+    es.forEach(function(e){onScreen=e.isIntersecting});
+  },{threshold:.3}).observe(stage);
+  addEventListener("keydown",function(e){
+    if(!onScreen)return;
+    if(e.key==="ArrowLeft")go(active-1);
+    if(e.key==="ArrowRight")go(active+1);
+  });
+
+  addEventListener("resize",layout);
+  layout();
+})();
+</script>
 
 <!-- BRANDING -->
 <section class="sec" id="branding">
@@ -1502,6 +1754,19 @@ async function loadFrames(){
 }
 loadFrames();
 
+function triggerHeroAnim(){
+  const h0=document.getElementById("h0");
+  if(h0&&!h0.classList.contains("hero-in")){
+    h0.classList.add("hero-in");
+  }
+}
+if(document.readyState==="complete"||document.readyState==="interactive"){
+  setTimeout(triggerHeroAnim,1000);
+} else {
+  window.addEventListener("DOMContentLoaded",()=>{setTimeout(triggerHeroAnim,1000)});
+}
+window.addEventListener("load",()=>{setTimeout(triggerHeroAnim,600)});
+
 /* ---------- preloader ---------- */
 const pre=document.getElementById("pre"),countEl=document.getElementById("count"),ruleFill=document.getElementById("ruleFill");
 const numWrap=document.querySelector("#pre .num");
@@ -1517,7 +1782,10 @@ function preStep(t){
   if(clock>=1&&loadedRatio>=1){
     exiting=true;pre.classList.add("out");
     document.documentElement.classList.remove("locked");lenis.start();
-    setTimeout(()=>{engines.filter(e=>e.el.closest("#h0")).forEach(e=>setOn(e.letters,true));
+    triggerHeroAnim();
+    setTimeout(()=>{
+      triggerHeroAnim();
+      engines.filter(e=>e.el.closest("#h0")).forEach(e=>setOn(e.letters,true));
       document.getElementById("grid").classList.add("on")},1200);
     setTimeout(()=>pre.remove(),1600);
   }
@@ -1990,6 +2258,10 @@ function updateOccupancyChart(tier){
 }
 
 function setOcc(o){
+  if(typeof window.recalcEconomics === "function"){
+    window.recalcEconomics(o);
+    return;
+  }
   const d=DATA[o];
   document.getElementById("gross").innerHTML=inr(d.gross)+'<span style="font-size:.4em;letter-spacing:0"> /mo</span>';
   document.getElementById("r-gross").textContent=inr(d.gross);
@@ -2382,5 +2654,231 @@ if (applyFormEl) {
     </button>
   </form>
 </div>
+<style>
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: calc(100px - 14px);
+  height: 50px;
+  border-radius: 50px;
+  background: 
+   radial-gradient(farthest-side,#0000 calc(100% - 15px),#ccc calc(100% - 14px) 99%,#0000) left,
+   radial-gradient(farthest-side,#0000 calc(100% - 15px),#ccc calc(100% - 14px) 99%,#0000) right;
+  background-size: calc(50% + 7px) 100%;
+  background-repeat: no-repeat;
+  position: relative;
+  animation: l10-0 1s infinite linear;
+}
+.loader:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto; 
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f03355;
+  transform-origin: -14px 50%;
+  animation: l10-1 0.5s infinite linear;
+}
+@keyframes l10-0 { 
+    0%,49.99% { transform:scaleX(1)}
+    50%,100% { transform:scaleX(-1)} 
+}
+@keyframes l10-1 { 
+    100% { transform:rotate(1turn)} 
+}
+</style>
+<script>
+/* ---------- Currency & Market Economics Switcher ---------- */
+const MARKETS = {
+  INR: {
+    name: "India",
+    code: "INR",
+    symbol: "₹",
+    locale: "en-IN",
+    feeMult: 1.0,
+    adr: 9000,
+    rent: 75000,
+    util: 12000,
+    deposit: 450000,
+    franchise: { studio: 29999, villa: 49999 },
+    setup: { studio: 99000, villa: 150000 }
+  },
+  GBP: {
+    name: "UK",
+    code: "GBP",
+    symbol: "£",
+    locale: "en-GB",
+    feeMult: 1.8,
+    adr: 240,
+    rent: 2200,
+    util: 340,
+    deposit: 13200,
+    franchise: { studio: 2600, villa: 4400 },
+    setup: { studio: 8700, villa: 13200 }
+  },
+  AED: {
+    name: "UAE",
+    code: "AED",
+    symbol: "AED ",
+    locale: "en-AE",
+    feeMult: 1.6,
+    adr: 1100,
+    rent: 11000,
+    util: 1700,
+    deposit: 66000,
+    franchise: { studio: 11800, villa: 19700 },
+    setup: { studio: 39000, villa: 59000 }
+  },
+  USD: {
+    name: "US",
+    code: "USD",
+    symbol: "$",
+    locale: "en-US",
+    feeMult: 2.0,
+    adr: 320,
+    rent: 2900,
+    util: 450,
+    deposit: 17400,
+    franchise: { studio: 3800, villa: 6400 },
+    setup: { studio: 12600, villa: 19100 }
+  }
+};
+
+const INDIA_CLEANING = {
+  45: 16500,
+  55: 18500,
+  60: 20400,
+  65: 22300
+};
+
+let currentMarketKey = "INR";
+let currentOcc = 60;
+
+function formatMarketMoney(n, market) {
+  return market.symbol + Math.round(n).toLocaleString(market.locale);
+}
+
+function recalcEconomics(newOcc, newMarketKey) {
+  if (newOcc !== undefined && newOcc !== null) {
+    currentOcc = Number(newOcc) || 60;
+  }
+  if (newMarketKey && MARKETS[newMarketKey]) {
+    currentMarketKey = newMarketKey;
+  }
+
+  const m = MARKETS[currentMarketKey];
+  if (!m) return;
+
+  const occ = currentOcc;
+  const gross = m.adr * 30 * (occ / 100);
+  const comm = gross * 0.105;
+  const clean = currentMarketKey === "INR"
+    ? (INDIA_CLEANING[occ] !== undefined ? INDIA_CLEANING[occ] : gross * 0.126)
+    : gross * 0.126;
+  const payout = gross - comm - clean;
+  const net = payout - m.rent - m.util;
+  const capital = m.deposit + m.franchise.villa + m.setup.villa;
+  const roc = (net * 12) / capital;
+
+  // 1. #gross (with the " /mo" suffix)
+  const grossEl = document.getElementById("gross");
+  if (grossEl) {
+    grossEl.innerHTML = formatMarketMoney(gross, m) + '<span style="font-size:.4em;letter-spacing:0"> /mo</span>';
+  }
+
+  // 2. Breakdown table cells
+  const setCell = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+  setCell("r-gross", formatMarketMoney(gross, m));
+  setCell("r-comm", formatMarketMoney(comm, m));
+  setCell("r-clean", formatMarketMoney(clean, m));
+  setCell("r-payout", formatMarketMoney(payout, m));
+  setCell("r-rent", formatMarketMoney(m.rent, m));
+  setCell("r-util", formatMarketMoney(m.util, m));
+  setCell("r-net", formatMarketMoney(net, m));
+  setCell("r-roc", Math.round(roc * 100) + "%");
+
+  // 3. .illus assumptions line
+  const illusEl = document.querySelector(".illus");
+  if (illusEl) {
+    illusEl.textContent = `Capital deployed: deposit ${formatMarketMoney(m.deposit, m)} + franchise ${formatMarketMoney(m.franchise.villa, m)} + setup ${formatMarketMoney(m.setup.villa, m)} = ${formatMarketMoney(capital, m)} · ADR ${formatMarketMoney(m.adr, m)}`;
+  }
+
+  // 4. #echoPanel .mid p sentence
+  const echoPEl = document.querySelector("#echoPanel .mid p");
+  if (echoPEl) {
+    echoPEl.textContent = `${formatMarketMoney(gross, m)} gross monthly revenue at ${occ}% occupancy. Approximately 2x the yield spread of a traditional let. Full workings below.`;
+  }
+
+  // 5. The three <dd> cells on each of the first two #deck .tcard cards (franchise fee, setup, total)
+  const cards = document.querySelectorAll("#deck .tcard");
+  if (cards.length >= 2) {
+    // Card 0: Studio
+    const studioDds = cards[0].querySelectorAll("dd");
+    if (studioDds.length >= 3) {
+      studioDds[0].textContent = formatMarketMoney(m.franchise.studio, m);
+      studioDds[1].textContent = formatMarketMoney(m.setup.studio, m);
+      studioDds[2].textContent = formatMarketMoney(m.franchise.studio + m.setup.studio, m);
+    }
+    // Card 1: Villa
+    const villaDds = cards[1].querySelectorAll("dd");
+    if (villaDds.length >= 3) {
+      villaDds[0].textContent = formatMarketMoney(m.franchise.villa, m);
+      villaDds[1].textContent = formatMarketMoney(m.setup.villa, m);
+      villaDds[2].textContent = formatMarketMoney(m.franchise.villa + m.setup.villa, m);
+    }
+  }
+
+  // Update aria-pressed on occupancy buttons
+  document.querySelectorAll(".occ button").forEach(b => {
+    b.setAttribute("aria-pressed", String(Number(b.dataset.o) === occ));
+  });
+
+  // Update aria-pressed on currency buttons
+  const fxSetEl = document.getElementById("fxSet");
+  if (fxSetEl) {
+    fxSetEl.querySelectorAll("button").forEach(b => {
+      b.setAttribute("aria-pressed", String(b.dataset.currency === currentMarketKey));
+    });
+  }
+
+  // Update D3 chart if available
+  if (typeof updateOccupancyChart === "function") {
+    updateOccupancyChart(occ);
+  }
+}
+
+window.recalcEconomics = recalcEconomics;
+
+// Build buttons in #fxSet
+const fxContainer = document.getElementById("fxSet");
+if (fxContainer) {
+  fxContainer.innerHTML = "";
+  Object.keys(MARKETS).forEach(code => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = code;
+    btn.dataset.currency = code;
+    btn.setAttribute("aria-pressed", code === currentMarketKey ? "true" : "false");
+    btn.addEventListener("click", () => {
+      recalcEconomics(currentOcc, code);
+    });
+    fxContainer.appendChild(btn);
+  });
+}
+
+// Attach listeners to .occ occupancy buttons
+document.querySelectorAll(".occ button").forEach(b => {
+  b.addEventListener("click", () => {
+    recalcEconomics(b.dataset.o, currentMarketKey);
+  });
+});
+
+// Run initial calculation
+recalcEconomics(60, "INR");
+</script>
 </body>
 </html>

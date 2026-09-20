@@ -347,8 +347,8 @@
     #b4-header { padding: 4rem 1.5rem; text-align: center; }
     #b4-panels { display: flex; width: 100vw; height: 75vh; }
     .b4-panel { flex: 1; position: relative; overflow: hidden; cursor: pointer; border-left: 1px solid var(--scrim-scene); transition: flex 0.6s cubic-bezier(0.2, 0, 0, 1); }
-    .b4-panel-img-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
-    .b4-panel-img { position: absolute; height: 100%; width: calc(100% + 101px); left: -50.5px; object-fit: cover; }
+    .b4-panel-img-wrap { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
+    .b4-panel-img { position: absolute; height: 120%; width: calc(100% + 101px); left: -50.5px; top: -10%; object-fit: cover; will-change: transform; }
     .b4-panel-scrim { position: absolute; inset: 0; background: linear-gradient(to top, var(--scrim-panel), transparent); pointer-events: none; opacity: 1; transition: opacity 0.6s; }
     .b4-panel-content { position: absolute; bottom: 2rem; left: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; opacity: 0; transform: translateY(1rem); transition: all 0.6s; color: var(--foreground-accent-strong); }
     .b4-panel.active { flex: 2.5; }
@@ -1779,13 +1779,13 @@
       }
       .b4-panel-img {
         position: absolute !important;
-        inset: 0 !important;
+        inset: auto !important;
         width: 100% !important;
-        height: 100% !important;
+        height: 130% !important;
         left: 0 !important;
-        top: 0 !important;
+        top: -15% !important;
         object-fit: cover !important;
-        transform: none !important;
+        will-change: transform !important;
       }
       .b4-panel-scrim {
         display: none !important;
@@ -3340,12 +3340,36 @@
     });
   });
 
+  // Block 4 Subtle Parallax
+  const b4Imgs = Array.from(document.querySelectorAll('.b4-panel-img'));
+  const b4Wrap = document.getElementById('block4');
+  function tickB4() {
+    if (isReduced || !b4Wrap || !b4Imgs.length) return;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const blockRect = b4Wrap.getBoundingClientRect();
+    if (blockRect.bottom < -100 || blockRect.top > vh + 100) return;
+
+    const isMobile = window.innerWidth <= 1024;
+    for (let i = 0; i < b4Imgs.length; i++) {
+      const img = b4Imgs[i];
+      const panel = img.closest('.b4-panel') || img.parentElement;
+      const targetRect = panel.getBoundingClientRect();
+      const centerY = targetRect.top + targetRect.height / 2;
+      const progress = (centerY - vh / 2) / (vh / 2);
+      const clamped = Math.max(-1.4, Math.min(1.4, progress));
+      const maxShift = isMobile ? 18 : 36;
+      const translateY = -clamped * maxShift;
+      img.style.transform = `translate3d(0, ${translateY.toFixed(2)}px, 0)`;
+    }
+  }
+
   let lastT = performance.now();
   function masterTick(t) {
     let dt = (t - lastT) / 1000;
     if(dt > 0.1) dt = 0.016;
     lastT = t;
     tickB3();
+    tickB4();
     
     requestAnimationFrame(masterTick);
   }
