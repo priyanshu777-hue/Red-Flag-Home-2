@@ -103,6 +103,143 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@500&family=Michroma&display=swap" rel="stylesheet">
   <style>
+    /* --- shared background across Signature + How We Host --- */
+#b3-bg-img { display: none !important; }
+
+#block3,
+#block4 {
+  background-image: url('https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/how-we-host.jpg') !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+}
+
+/* readability scrim over block 3 */
+#b3-scrim {
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 5, 5, 0.55) 0%,
+    rgba(10, 5, 5, 0.35) 40%,
+    rgba(10, 5, 5, 0.75) 100%
+  ) !important;
+  z-index: 2 !important;
+}
+
+/* block 4 sits over the same image, darkened so the header reads */
+#block4 { position: relative; }
+#block4::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 5, 5, 0.75) 0%,
+    rgba(10, 5, 5, 0.6) 45%,
+    rgba(10, 5, 5, 0.92) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+#b4-header,
+#b4-panels { position: relative; z-index: 1; }
+
+/* the panels blend into the background rather than sitting on it */
+.b4-panel {
+  border: 1px solid rgba(242, 228, 225, 0.08);
+  border-left: none;
+}
+.b4-panel .b4-panel-scrim {
+  background: linear-gradient(
+    to top,
+    rgba(10, 5, 5, 0.9) 0%,
+    rgba(10, 5, 5, 0.25) 60%,
+    transparent 100%
+  ) !important;
+}
+
+/* iOS ignores fixed attachment — fall back cleanly */
+@media (max-width: 1024px) {
+  #block3,
+  #block4 { background-attachment: scroll !important; }
+}
+    /* --- menu as a side panel --- */
+.rf-menu-overlay {
+  display: block !important;
+  padding: 0 !important;
+  background: rgba(6, 5, 5, 0.55) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+.rf-menu-content {
+  position: fixed !important;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: min(360px, 88vw);
+  max-width: none !important;
+  padding: 6rem 2.25rem 2.25rem;
+  box-sizing: border-box;
+  background: rgba(12, 10, 11, 0.98);
+  border-left: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: -2rem 0 4rem rgba(0, 0, 0, 0.55);
+  transform: translateX(100%);
+  transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rf-menu-overlay.is-open .rf-menu-content {
+  transform: translateX(0);
+}
+.rf-menu-links {
+  gap: 0 !important;
+}
+.rf-menu-overlay-link {
+  font-size: 1.25rem !important;
+  width: 100%;
+  padding: 1.1rem 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  letter-spacing: 0.01em;
+}
+.rf-menu-overlay-link:last-child {
+  border-bottom: none;
+}
+.rf-menu-overlay-link:hover {
+  transform: translateX(6px) !important;
+}
+.rf-menu-close-btn {
+  top: 1.5rem !important;
+  right: 1.5rem !important;
+  width: 38px !important;
+  height: 38px !important;
+}
+  header#rf-nav-pill {
+  left: auto !important;
+  right: 1.5rem !important;
+  width: fit-content !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+.rf-nav-logo {
+  position: fixed !important;
+  left: 2rem !important;
+  top: 1.5rem !important;
+  z-index: 1001 !important;
+}
+.rf-nav-center {
+  position: static !important;
+  transform: none !important;
+  margin-right: 0.75rem !important;
+}
+@media (max-width: 768px) {
+  .rf-nav-logo {
+    left: 1.25rem !important;
+    top: 1.25rem !important;
+  }
+  header#rf-nav-pill {
+    right: 1rem !important;
+  }
+}
+</style>
+<style>
     :root {
       --raw-color-white: #ffffff;
       --raw-color-neutral-100: #ededed;
@@ -1459,14 +1596,15 @@
       padding: 0 1.5rem;
       z-index: 1000;
       box-sizing: border-box;
-      margin: 0 auto;
-      max-width: 1400px;
       user-select: none;
       pointer-events: auto;
     }
 
     /* Left: Logo */
-    .rf-nav-logo {
+    .rf-nav-logo {      position: fixed;
+      left: 2rem;
+      top: 1.75rem;
+      z-index: 201;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1487,9 +1625,9 @@
 
     /* Centre: Partner · Explore · Menu */
     .rf-nav-center {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+      position: static;
+      transform: none;
+      margin-right: 0.75rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1783,12 +1921,15 @@
 
     @media (max-width: 768px) {
       #rf-nav-pill {
-        top: 1rem;
-        left: 1rem;
-        right: 1rem;
-        padding: 0 1.25rem;
-        height: 3.25rem;
-        max-width: calc(100vw - 2rem);
+      top: 1.5rem;
+      left: auto;
+      right: 1.5rem;
+      width: fit-content;
+      height: 3rem;
+      }
+            .rf-nav-logo {
+        left: 1.25rem;
+        top: 1.5rem;
       }
       .rf-nav-desk-only {
         display: none !important;
@@ -2771,11 +2912,12 @@
   </div>
 
   <!-- FLOATING PILL NAVBAR -->
-  <header id="rf-nav-pill" class="rf-nav-pill" aria-label="Primary Navigation">
-    <!-- Left: Logo linking to / -->
-    <a href="/" id="rf-nav-logo" class="rf-nav-logo" aria-label="Red Flag Homes Network — Home" title="Red Flag Homes Network">
+  <a href="/" id="rf-nav-logo" class="rf-nav-logo" aria-label="Red Flag Homes Network — Home" title="Red Flag Homes Network">
       <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Logo" />
     </a>
+  <header id="rf-nav-pill" class="rf-nav-pill" aria-label="Primary Navigation">
+    <!-- Left: Logo linking to / -->
+    
 
     <!-- Centre: Partner · Explore · Menu -->
     <nav class="rf-nav-center" aria-label="Center Navigation">
@@ -2821,9 +2963,7 @@
         <a href="/" class="rf-menu-overlay-link" style="--stagger-i: 0">Home</a>
         <a href="#franchise" class="rf-menu-overlay-link" style="--stagger-i: 1">Partner</a>
         <a href="#journal" class="rf-menu-overlay-link" style="--stagger-i: 2">Explore</a>
-        <a href="#cities" class="rf-menu-overlay-link" style="--stagger-i: 3">Cities</a>
-        <a href="franchise.html" class="rf-menu-overlay-link" style="--stagger-i: 4">Outpost</a>
-        <a href="#contact" class="rf-menu-overlay-link" style="--stagger-i: 5">Contact</a>
+        <a href="#contact" class="rf-menu-overlay-link" style="--stagger-i: 3">Contact</a>
       </nav>
     </div>
   </div>
