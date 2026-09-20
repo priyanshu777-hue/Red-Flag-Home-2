@@ -289,6 +289,12 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
   color:rgba(255,255,255,0.6);
   line-height:1.4;
 }
+.occupancy-chart-note{
+  font-size:11px;
+  color:rgba(255,255,255,0.5);
+  line-height:1.4;
+  margin-top:.35rem;
+}
 .occupancy-chart-legend{
   display:flex;
   align-items:center;
@@ -1198,6 +1204,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
         <div>
           <h3 class="occupancy-chart-title">Projected 6-Month Occupancy Trend</h3>
           <p class="occupancy-chart-subtitle">Ramp-up trajectory from launch to mature portfolio run-rate</p>
+          <p class="occupancy-chart-note">Illustrative ramp based on managed portfolio averages. Your property's performance will differ.</p>
         </div>
         <div class="occupancy-chart-legend">
           <span class="legend-item"><span class="legend-swatch-above"></span> Profitable (&gt;42%)</span>
@@ -1224,7 +1231,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
     <div class="caveats">
       <p>Breakeven is around 42% occupancy.</p>
       <p>A ten-point occupancy swing roughly doubles or halves your profit — which is why we operate the property ourselves.</p>
-      <p>No minimum guarantees. We only earn when you earn.</p>
+      <p>Performance-linked. We earn when you earn.</p>
     </div>
   </div>
 </section>
@@ -1530,9 +1537,9 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
       <div><label for="f-cap">Deployable capital</label>
         <select id="f-cap" name="capital" required>
           <option value="">Select</option>
-          <option>₹1.5 Lakh – ₹3 Lakh</option>
-          <option>₹3 Lakh – ₹8 Lakh</option>
-          <option>₹8 Lakh+</option>
+          <option data-band="low" value="₹1.5 Lakh – ₹3 Lakh">₹1.5 Lakh – ₹3 Lakh</option>
+          <option data-band="mid" value="₹3 Lakh – ₹8 Lakh">₹3 Lakh – ₹8 Lakh</option>
+          <option data-band="high" value="₹8 Lakh+">₹8 Lakh+</option>
         </select>
       </div>
       <div><label for="f-prop">Do you already have a property in mind?</label>
@@ -2088,12 +2095,18 @@ function initOccupancyChart(){
     .attr("y1", breakevenY)
     .attr("y2", breakevenY);
 
+  const getActiveM = () => (window.getActiveMarket && window.getActiveMarket()) || { symbol: "₹", locale: "en-IN", adr: 9000 };
+  const fmtMoney = (val, m) => (window.formatMarketMoney ? window.formatMarketMoney(val, m) : ("₹" + Math.round(val).toLocaleString("en-IN")));
+
+  const activeM = getActiveM();
+  const beGross = Math.round(activeM.adr * 30 * (BREAKEVEN_OCC / 100));
+
   beGroup.append("text")
     .attr("class", "d3-breakeven-badge")
     .attr("x", width - margin.right)
     .attr("y", breakevenY - 6)
     .attr("text-anchor", "end")
-    .text("42% Breakeven");
+    .text(`42% Breakeven (${fmtMoney(beGross, activeM)})`);
 
   // X Axis
   const xAxis = d3.axisBottom(xScale).tickSize(0).tickPadding(10);
@@ -2156,34 +2169,36 @@ function initOccupancyChart(){
       .transition().duration(150)
       .attr("opacity", 1);
 
-    const isProfitable = d.occ >= BREAKEVEN_OCC;
-    const estRev = Math.round(ADR * 30 * (d.occ / 100));
-    const variance = d.occ - BREAKEVEN_OCC;
+    const datum = this.__data__ || d;
+    const isProfitable = datum.occ >= BREAKEVEN_OCC;
+    const currentM = getActiveM();
+    const estRev = Math.round(currentM.adr * 30 * (datum.occ / 100));
+    const variance = datum.occ - BREAKEVEN_OCC;
 
     tooltip.innerHTML = `
       <div class="d3-tooltip-month">
-        <span>${d.month} · ${d.stage}</span>
+        <span>${datum.month} · ${datum.stage}</span>
         <span class="d3-tooltip-status ${isProfitable ? 'profitable' : 'ramp'}">${isProfitable ? 'Profitable' : 'Ramp Phase'}</span>
       </div>
       <div class="d3-tooltip-row">
         <span>Projected Occupancy:</span>
-        <b>${d.occ}%</b>
+        <b>${datum.occ}%</b>
       </div>
       <div class="d3-tooltip-row">
         <span>Est. Monthly Gross:</span>
-        <b>${inr(estRev)}</b>
+        <b>${fmtMoney(estRev, currentM)}</b>
       </div>
       <div class="d3-tooltip-row">
         <span>Vs Breakeven:</span>
         <b style="color:${isProfitable ? '#4ade80' : '#fbbf24'}">${variance >= 0 ? '+' + variance + '%' : variance + '%'}</b>
       </div>
       <div class="d3-tooltip-row" style="margin-top:5px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px;color:rgba(255,255,255,0.6);font-size:11px;">
-        <span>${d.note}</span>
+        <span>${datum.note}</span>
       </div>
     `;
 
-    const barX = xScale(isMobile ? d.short : d.month) + xScale.bandwidth() / 2;
-    const barY = yScale(d.occ);
+    const barX = xScale(isMobile ? datum.short : datum.month) + xScale.bandwidth() / 2;
+    const barY = yScale(datum.occ);
 
     tooltip.style.left = barX + "px";
     tooltip.style.top = barY + "px";
@@ -2218,6 +2233,12 @@ function updateOccupancyChart(tier){
     initOccupancyChart();
     return;
   }
+
+  const getActiveM = () => (window.getActiveMarket && window.getActiveMarket()) || { symbol: "₹", locale: "en-IN", adr: 9000 };
+  const fmtMoney = (val, m) => (window.formatMarketMoney ? window.formatMarketMoney(val, m) : ("₹" + Math.round(val).toLocaleString("en-IN")));
+  const activeM = getActiveM();
+  const beGross = Math.round(activeM.adr * 30 * (BREAKEVEN_OCC / 100));
+  svg.select(".d3-breakeven-badge").text(`42% Breakeven (${fmtMoney(beGross, activeM)})`);
 
   const rect = container.getBoundingClientRect();
   const width = Math.max(280, rect.width || container.clientWidth || 600);
@@ -2256,6 +2277,7 @@ function updateOccupancyChart(tier){
     .attr("y", d => yScale(d.occ) - 7)
     .text(d => d.occ + "%");
 }
+window.updateOccupancyChart = updateOccupancyChart;
 
 function setOcc(o){
   if(typeof window.recalcEconomics === "function"){
@@ -2745,12 +2767,37 @@ const MARKETS = {
   }
 };
 
+const CAPITAL_BANDS = {
+  INR: {
+    low: "₹1.5 Lakh – ₹3 Lakh",
+    mid: "₹3 Lakh – ₹8 Lakh",
+    high: "₹8 Lakh+"
+  },
+  GBP: {
+    low: "£15,000 – £30,000",
+    mid: "£30,000 – £80,000",
+    high: "£80,000+"
+  },
+  AED: {
+    low: "AED 70,000 – AED 140,000",
+    mid: "AED 140,000 – AED 370,000",
+    high: "AED 370,000+"
+  },
+  USD: {
+    low: "$20,000 – $40,000",
+    mid: "$40,000 – $105,000",
+    high: "$105,000+"
+  }
+};
+
 const INDIA_CLEANING = {
   45: 16500,
   55: 18500,
   60: 20400,
   65: 22300
 };
+
+const BREAKEVEN_OCC = 42;
 
 let currentMarketKey = "INR";
 let currentOcc = 60;
@@ -2759,12 +2806,86 @@ function formatMarketMoney(n, market) {
   return market.symbol + Math.round(n).toLocaleString(market.locale);
 }
 
-function recalcEconomics(newOcc, newMarketKey) {
+function updateCapitalDropdown(marketKey) {
+  const select = document.getElementById("f-cap");
+  if (!select) return;
+
+  const currentOption = select.options[select.selectedIndex];
+  const currentBand = currentOption ? currentOption.getAttribute("data-band") : null;
+  const bands = CAPITAL_BANDS[marketKey] || CAPITAL_BANDS.INR;
+
+  const lowOpt = select.querySelector('option[data-band="low"]');
+  const midOpt = select.querySelector('option[data-band="mid"]');
+  const highOpt = select.querySelector('option[data-band="high"]');
+
+  if (lowOpt && midOpt && highOpt) {
+    lowOpt.textContent = bands.low;
+    lowOpt.value = bands.low;
+    midOpt.textContent = bands.mid;
+    midOpt.value = bands.mid;
+    highOpt.textContent = bands.high;
+    highOpt.value = bands.high;
+  } else {
+    select.innerHTML = `
+      <option value="">Select</option>
+      <option data-band="low" value="${bands.low}">${bands.low}</option>
+      <option data-band="mid" value="${bands.mid}">${bands.mid}</option>
+      <option data-band="high" value="${bands.high}">${bands.high}</option>
+    `;
+  }
+
+  if (currentBand) {
+    const matched = select.querySelector(`option[data-band="${currentBand}"]`);
+    if (matched) {
+      matched.selected = true;
+    }
+  }
+}
+
+function updateChartBreakeven(m) {
+  const beGross = Math.round(m.adr * 30 * (BREAKEVEN_OCC / 100));
+  const beFmt = formatMarketMoney(beGross, m);
+  const badge = document.querySelector(".d3-breakeven-badge");
+  if (badge) {
+    badge.textContent = `42% Breakeven (${beFmt})`;
+  }
+}
+
+const ISO_TO_CURRENCY = {
+  IN: "INR",
+  GB: "GBP",
+  AE: "AED",
+  US: "USD"
+};
+
+const CURRENCY_TO_ISO = {
+  INR: "IN",
+  GBP: "GB",
+  AED: "AE",
+  USD: "US"
+};
+
+function getStoredMarketCurrency() {
+  try {
+    const stored = localStorage.getItem("rf_market");
+    if (stored) {
+      const mapped = ISO_TO_CURRENCY[stored.toUpperCase()] || (MARKETS[stored.toUpperCase()] ? stored.toUpperCase() : null);
+      if (mapped) return mapped;
+    }
+  } catch (e) {}
+  return "INR";
+}
+
+function render(newOcc, newMarketKey) {
   if (newOcc !== undefined && newOcc !== null) {
     currentOcc = Number(newOcc) || 60;
   }
   if (newMarketKey && MARKETS[newMarketKey]) {
     currentMarketKey = newMarketKey;
+    try {
+      const iso = CURRENCY_TO_ISO[currentMarketKey] || "IN";
+      localStorage.setItem("rf_market", iso);
+    } catch (e) {}
   }
 
   const m = MARKETS[currentMarketKey];
@@ -2832,6 +2953,12 @@ function recalcEconomics(newOcc, newMarketKey) {
     }
   }
 
+  // 6. Deployable capital dropdown in apply form
+  updateCapitalDropdown(currentMarketKey);
+
+  // 7. Projected 6-month occupancy chart breakeven annotation
+  updateChartBreakeven(m);
+
   // Update aria-pressed on occupancy buttons
   document.querySelectorAll(".occ button").forEach(b => {
     b.setAttribute("aria-pressed", String(Number(b.dataset.o) === occ));
@@ -2851,7 +2978,10 @@ function recalcEconomics(newOcc, newMarketKey) {
   }
 }
 
-window.recalcEconomics = recalcEconomics;
+window.render = render;
+window.recalcEconomics = render;
+window.getActiveMarket = () => MARKETS[currentMarketKey];
+window.formatMarketMoney = formatMarketMoney;
 
 // Build buttons in #fxSet
 const fxContainer = document.getElementById("fxSet");
@@ -2864,7 +2994,7 @@ if (fxContainer) {
     btn.dataset.currency = code;
     btn.setAttribute("aria-pressed", code === currentMarketKey ? "true" : "false");
     btn.addEventListener("click", () => {
-      recalcEconomics(currentOcc, code);
+      render(currentOcc, code);
     });
     fxContainer.appendChild(btn);
   });
@@ -2873,12 +3003,23 @@ if (fxContainer) {
 // Attach listeners to .occ occupancy buttons
 document.querySelectorAll(".occ button").forEach(b => {
   b.addEventListener("click", () => {
-    recalcEconomics(b.dataset.o, currentMarketKey);
+    render(b.dataset.o, currentMarketKey);
   });
 });
 
-// Run initial calculation
-recalcEconomics(60, "INR");
+// Listen for market changes from other tabs or nav
+window.addEventListener("storage", (e) => {
+  if (e.key === "rf_market" && e.newValue) {
+    const cur = ISO_TO_CURRENCY[e.newValue.toUpperCase()] || (MARKETS[e.newValue.toUpperCase()] ? e.newValue.toUpperCase() : null);
+    if (cur && cur !== currentMarketKey) {
+      render(currentOcc, cur);
+    }
+  }
+});
+
+// Run initial calculation and render using stored market (defaults to INR)
+const initialMarket = getStoredMarketCurrency();
+render(60, initialMarket);
 </script>
 </body>
 </html>
