@@ -172,16 +172,13 @@
       background: var(--raw-color-velvet-700);
     }
     .rail-btn:hover { background: var(--raw-color-velvet-500); }
-    
-    #mobile-menu {
-      position: fixed; inset: 0; background: var(--background); color: var(--foreground);
-      z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transform: translateX(100%); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* PREVENT IOS PLAY BUTTON OVERLAY & HIDE WEBKIT MEDIA CONTROLS */
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-start-playback-button {
+      display: none !important;
+      -webkit-appearance: none;
     }
-    #mobile-menu.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
-    #mobile-menu-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: inherit; cursor: pointer; padding: 0.5rem; }
-    #mobile-menu a { font-size: 2rem; text-decoration: none; color: inherit; margin: 1rem 0; font-family: var(--font-display); text-transform: uppercase; transition: opacity 0.2s ease; }
-    #mobile-menu a:hover { opacity: 0.6; }
 
     #explore-btn { right: 1.5rem; top: 5rem; width: 11.3125rem; text-align: right; }
     
@@ -1816,6 +1813,13 @@
   </style>
 </head>
 <body>
+  <!-- BLACK FULLSCREEN FAST LOADER -->
+  <div id="page-loader" style="position: fixed; inset: 0; z-index: 999999; background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto; transition: opacity 400ms ease, visibility 400ms ease;">
+    <div style="width: 140px; height: 2px; background: rgba(255, 255, 255, 0.12); border-radius: 2px; overflow: hidden; position: relative;">
+      <div id="loader-progress-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #E5231B; transition: width 0.15s ease-out;"></div>
+    </div>
+  </div>
+
     <a href="franchise.html" id="site-logo" aria-label="Red Flag Outpost" title="Red Flag Outpost">
       <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag Logo" />
     </a>
@@ -1823,7 +1827,7 @@
 <div id="vignette"></div>
 
 <section id="hero">
-  <video autoplay muted loop playsinline  id="vid-base" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/hero.mp4" muted playsinline  loop></video>
+  <video autoplay muted loop playsinline preload="auto" id="vid-base" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/hero.mp4"></video>
   <div id="hero-grain"></div>
   <div id="hero-veil"></div>
 
@@ -1833,19 +1837,8 @@
     </header>
     
     <div id="right-rail" class="chrome hero-group" data-group="nav">
-      <button class="rail-btn" id="mobile-menu-btn">Menu</button>
-      <a href="franchise.html" class="rail-btn" style="border-top: 1px solid rgba(0,0,0,0.1);">Partner</a>
+      <a href="franchise.html" class="rail-btn">Partner</a>
       <a href="#journal" class="rail-btn" style="border-top: 1px solid rgba(0,0,0,0.1);">Explore</a>
-    </div>
-
-    <div id="mobile-menu">
-      <button id="mobile-menu-close" aria-label="Close menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-      <a href="#book">Book Now</a>
-      <a href="franchise.html">Partner With Us</a>
-      <a href="#journal">Explore</a>
-      <a href="#contact">Contact</a>
     </div>
 
     <div id="titles" class="hero-group" data-group="titles">
@@ -1865,7 +1858,7 @@
 </section>
 
 <section id="book" class="section-container">
-  <video autoplay muted loop playsinline  id="book-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/pool.mp4"  muted loop playsinline></video>
+  <video autoplay muted loop playsinline preload="auto" id="book-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/pool.mp4"></video>
   <div id="book-overlay"></div>
   <div id="book-container">
         <div class="aurora-headline-wrapper">
@@ -1995,7 +1988,7 @@
 </section>
 
 <section id="franchise" class="section-container">
-  <video autoplay muted loop playsinline  id="franchise-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/host.mp4"  muted loop playsinline></video>
+  <video autoplay muted loop playsinline preload="auto" id="franchise-video" src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/host.mp4"></video>
   <div id="franchise-overlay"></div>
   <div class="franchise-container">
         <div class="aurora-headline-wrapper">
@@ -2184,7 +2177,7 @@
     <!-- BRAND — union cell, origin (0, 0) -->
     <section class="ft-card ft-card--union ft-brand">
       <span class="ft-asset" aria-hidden="true">
-        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="auto"></video>
       </span>
       <div class="ft-mark">RED FLAG HOMES NETWORK</div>
       <nav class="ft-nav">
@@ -2211,7 +2204,7 @@
     <!-- STAT — union cell, origin (col + gap, r1 + gap) -->
     <section class="ft-card ft-card--union ft-stat" id="footer-stats">
       <span class="ft-asset" aria-hidden="true">
-        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="auto"></video>
       </span>
       <div class="ft-stat-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; width: 100%; height: 100%; align-content: center; padding: 1rem;">
         <div class="ft-stat-item" style="text-align: center;">
@@ -2244,7 +2237,7 @@
     <!-- FOLLOW — union cell, origin (2 col + 2 gap, 0) -->
     <section class="ft-card ft-card--union ft-follow">
       <span class="ft-asset" aria-hidden="true">
-        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="auto"></video>
       </span>
       <div class="ft-tag"><span>FOLLOW</span></div>
       <div class="ft-chips">
@@ -2258,7 +2251,7 @@
     <!-- CONTACT — union cell -->
     <section class="ft-card ft-card--union ft-contact">
       <span class="ft-asset" aria-hidden="true">
-        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        <video data-asset-slot src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/bonfire.mp4" autoplay muted loop playsinline preload="auto"></video>
       </span>
       <div class="ft-tag"><span>CONTACT</span></div>
       <div class="ft-contact-row">
@@ -2327,17 +2320,96 @@
   function startHero() {
     heroStartedAt = performance.now();
     heroActive = true;
-    const playPromise = vidBase.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.warn("Video playback interrupted or paused by browser:", error);
-      });
-    }
     requestAnimationFrame(tickHero);
   }
 
-  lenis.start();
-  startHero();
+  // FAST LOADER & BACKGROUND VIDEO AUTOPLAY
+  (function() {
+    const pageLoader = document.getElementById('page-loader');
+    const loaderBar = document.getElementById('loader-progress-bar');
+    const bgVideos = Array.from(document.querySelectorAll('video'));
+    let isReady = false;
+    let loadedCount = 0;
+    const totalVideos = bgVideos.length;
+
+    function finishPageLoader() {
+      if (isReady) return;
+      isReady = true;
+      clearTimeout(hardCapTimer);
+      clearInterval(progressTimer);
+
+      // Call play() on all background videos silently catching errors (iOS Low Power Mode safe)
+      bgVideos.forEach(v => {
+        try {
+          const p = v.play();
+          if (p !== undefined && typeof p.catch === 'function') {
+            p.catch(() => {});
+          }
+        } catch (e) {}
+      });
+
+      if (loaderBar) loaderBar.style.width = '100%';
+
+      if (pageLoader) {
+        setTimeout(() => {
+          pageLoader.style.opacity = '0';
+          pageLoader.style.pointerEvents = 'none';
+          setTimeout(() => {
+            if (pageLoader.parentNode) pageLoader.remove();
+          }, 450);
+        }, 80);
+      }
+
+      lenis.start();
+      startHero();
+    }
+
+    // Hard-cap the wait at 4 seconds
+    const hardCapTimer = setTimeout(finishPageLoader, 4000);
+
+    // Smooth progress indicator
+    let pVal = 10;
+    const progressTimer = setInterval(() => {
+      if (pVal < 90) {
+        pVal += (90 - pVal) * 0.15;
+        if (loaderBar) loaderBar.style.width = pVal + '%';
+      }
+    }, 70);
+
+    function onVideoReady() {
+      loadedCount++;
+      if (loaderBar && totalVideos > 0) {
+        const ratio = Math.max(pVal, (loadedCount / totalVideos) * 95);
+        loaderBar.style.width = ratio + '%';
+      }
+      if (loadedCount >= totalVideos) {
+        finishPageLoader();
+      }
+    }
+
+    if (totalVideos === 0) {
+      finishPageLoader();
+    } else {
+      bgVideos.forEach(v => {
+        if (v.readyState >= 4) {
+          onVideoReady();
+        } else {
+          let done = false;
+          const handler = () => {
+            if (done) return;
+            done = true;
+            v.removeEventListener('canplaythrough', handler);
+            v.removeEventListener('canplay', handler);
+            v.removeEventListener('loadeddata', handler);
+            onVideoReady();
+          };
+          v.addEventListener('canplaythrough', handler, { once: true });
+          v.addEventListener('canplay', handler, { once: true });
+          v.addEventListener('loadeddata', handler, { once: true });
+        }
+      });
+    }
+  })();
 
   // Pointer
   let mx = window.innerWidth / 2;
@@ -2348,21 +2420,6 @@
   
   const UI_ORDER = ["titles","wordmark","nav","explore"];
   function smooth(t) { let x = Math.min(1, Math.max(0, t)); return x * x * (3 - 2 * x); }
-  
-  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-  const mobileMenuClose = document.getElementById('mobile-menu-close');
-  const mobileMenu = document.getElementById('mobile-menu');
-  
-  if(mobileMenuBtn && mobileMenu && mobileMenuClose) {
-    mobileMenuBtn.addEventListener('click', () => {
-      mobileMenu.classList.add('active');
-      lenis.stop();
-    });
-    mobileMenuClose.addEventListener('click', () => {
-      mobileMenu.classList.remove('active');
-      lenis.start();
-    });
-  }
 
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -2371,10 +2428,6 @@
       const targetElement = document.querySelector(targetId);
       if (targetElement) {
         e.preventDefault();
-        if (mobileMenu && mobileMenu.classList.contains('active')) {
-          mobileMenu.classList.remove('active');
-          lenis.start();
-        }
         lenis.scrollTo(targetElement);
       }
     });

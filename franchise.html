@@ -40,36 +40,29 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* PRELOADER CURTAIN */
+    /* FAST FULL-SCREEN LOADER */
     #preloader {
       position: fixed;
       inset: 0;
-      background: #06080B;
+      background: #000000;
       color: #E8E4DF;
-      z-index: 10000;
+      z-index: 999999;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: transform 0.85s cubic-bezier(0.85, 0, 0.15, 1);
+      transition: opacity 400ms ease, visibility 400ms ease;
       pointer-events: auto;
     }
     #preloader.loaded {
-      transform: translateY(-100%);
+      opacity: 0;
+      visibility: hidden;
       pointer-events: none;
     }
-    .preloader-label {
-      font-family: 'Michroma', sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: #FFFFFF;
-      margin-bottom: 24px;
-    }
     .preloader-track {
-      width: 200px;
+      width: 140px;
       height: 2px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.12);
       border-radius: 2px;
       overflow: hidden;
       position: relative;
@@ -81,14 +74,14 @@
       bottom: 0;
       width: 0%;
       background: #E5231B;
-      transition: width 0.3s ease;
+      transition: width 0.15s ease-out;
     }
-    .preloader-pct {
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.5);
-      margin-top: 12px;
-      letter-spacing: 0.1em;
+
+    /* PREVENT IOS PLAY BUTTON OVERLAY & HIDE WEBKIT MEDIA CONTROLS */
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-start-playback-button {
+      display: none !important;
+      -webkit-appearance: none;
     }
 
     /* VIDEO BACKGROUND */
@@ -110,7 +103,7 @@
       top: 0;
       left: 0;
       width: 100%;
-      z-index: 500;
+      z-index: 1000;
       pointer-events: auto;
       display: flex;
       align-items: center;
@@ -198,74 +191,6 @@
       background: #E5231B;
       border-color: #E5231B;
     }
-    .hamburger {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 6px;
-      color: #FFFFFF;
-      text-decoration: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    @media (min-width: 1024px) {
-      .hamburger { display: none; }
-    }
-    .hamburger-bar {
-      height: 2px;
-      width: 24px;
-      background: #FFFFFF;
-    }
-    .hamburger-bar:nth-child(3) { width: 16px; }
-
-    /* MOBILE MENU OVERLAY */
-    #mobile-menu-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      background: #06080B;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 400ms ease;
-      display: flex;
-      flex-direction: column;
-      padding: 40px 32px;
-    }
-    #mobile-menu-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .menu-close {
-      align-self: flex-end;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      color: #FFFFFF;
-      cursor: pointer;
-    }
-    .menu-links-list {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 24px;
-    }
-    .menu-link-item {
-      font-family: 'Instrument Serif', serif;
-      font-size: 36px;
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
-    .menu-link-item:hover, .menu-link-item.active { color: #FFFFFF; }
 
     /* FLOATING DOCK */
     .op-dock {
@@ -440,39 +365,59 @@
       border-color: #E5231B;
     }
 
-    /* Mobile Hero Fallback / Stack */
+    /* Mobile Layout & Hero Stacking (Clearing Fixed Header) */
     @media (max-width: 767px) {
+      #scene-nav {
+        padding: 14px 20px !important;
+        background: rgba(6, 8, 11, 0.92) !important;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .nav-alloc-btn {
+        padding: 6px 14px;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+      }
       #scene-inner {
         height: 100svh !important;
       }
       .scene-section {
         display: flex !important;
         flex-direction: column !important;
-        justify-content: center !important;
+        justify-content: flex-start !important;
         align-items: flex-start !important;
-        padding: 24px !important;
+        padding: 110px 24px 32px !important;
         box-sizing: border-box !important;
       }
       .hero-slot {
         position: static !important;
-        font-size: 40px !important;
+        font-size: 38px !important;
         line-height: 1.15 !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 4px !important;
         transform: none !important;
       }
       .hero-desc {
         position: static !important;
-        margin-top: 16px !important;
+        margin-top: 14px !important;
         max-width: 100% !important;
         font-size: 14px !important;
-        letter-spacing: 0.04em !important;
+        letter-spacing: 0.02em !important;
+        line-height: 1.6 !important;
         color: rgba(255, 255, 255, 0.85) !important;
         transform: none !important;
       }
       .hero-arrow-btn {
         position: static !important;
-        margin-top: 28px !important;
+        margin-top: 24px !important;
         transform: none !important;
+      }
+      .op-dock-links {
+        display: none !important;
+      }
+      .op-dock-inner {
+        gap: 12px;
+        padding: 6px 12px 6px 14px;
       }
     }
 
@@ -855,17 +800,372 @@
       stroke-linejoin: round;
       fill: none;
     }
+
+    /* URGENCY BANNER (POST-HERO) */
+    .urgency-banner-wrap {
+      width: 100%;
+      background: rgba(229, 35, 27, 0.08);
+      border-bottom: 1px solid rgba(229, 35, 27, 0.22);
+      padding: 14px 20px;
+      text-align: center;
+      position: relative;
+      z-index: 20;
+    }
+    .urgency-banner-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-variant: all-small-caps;
+      color: #E5231B;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    /* HORIZONTAL TICKER STRIP */
+    .op-ticker-strip {
+      width: 100%;
+      overflow: hidden;
+      background: #06080B;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 0;
+      position: relative;
+      z-index: 15;
+      white-space: nowrap;
+    }
+    .op-ticker-track {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: opTicker 30s linear infinite;
+      will-change: transform;
+    }
+    .op-ticker-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 24px;
+      padding-right: 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .op-ticker-content .dot {
+      color: #E5231B;
+      font-weight: 700;
+    }
+    @keyframes opTicker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .op-ticker-track { animation: none; }
+    }
+
+    /* OCCUPANCY TOGGLE */
+    .eco-toggle-group {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .eco-toggle-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.65);
+      background: transparent;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .eco-toggle-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .eco-toggle-btn.active {
+      color: #FFFFFF;
+      background: #E5231B;
+      box-shadow: 0 2px 10px rgba(229, 35, 27, 0.4);
+    }
+
+    /* CHOOSE YOUR TIER */
+    .tier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 48px;
+    }
+    @media (max-width: 820px) {
+      .tier-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+    }
+    .tier-card {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 36px 32px;
+      background: rgba(255, 255, 255, 0.02);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.3s ease, transform 0.2s ease;
+    }
+    .tier-card:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .tier-card.featured {
+      border: 1px solid #E5231B;
+      background: linear-gradient(180deg, rgba(229, 35, 27, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+      box-shadow: 0 8px 30px rgba(229, 35, 27, 0.12);
+    }
+    .tier-badge {
+      position: absolute;
+      top: -12px;
+      right: 24px;
+      background: #E5231B;
+      color: #FFFFFF;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    .tier-name {
+      font-family: 'Instrument Serif', serif;
+      font-size: 28px;
+      line-height: 1.2;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+    .tier-keys {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 24px;
+    }
+    .tier-cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    .tier-cost-table td {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+    .tier-cost-table td:last-child {
+      text-align: right;
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+    .tier-total-row td {
+      border-bottom: none;
+      padding-top: 14px;
+      font-size: 16px;
+      color: #FFFFFF !important;
+      font-weight: 700 !important;
+    }
+    .tier-total-row td:last-child {
+      color: #E5231B !important;
+      font-size: 18px;
+    }
+    .tier-comm {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      margin-top: 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .tier-comm-val {
+      font-weight: 700;
+      color: #E5231B;
+      font-size: 15px;
+    }
+
+    /* ESTATE CARD (BELOW BOTH TIERS) */
+    .estate-tier-card {
+      margin-top: 28px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 28px 32px;
+      background: rgba(255, 255, 255, 0.015);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    @media (max-width: 767px) {
+      .estate-tier-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* ITEM 9: SUPPORTING LINE BENEATH TIER TABLE */
+    .tier-supporting-line {
+      margin-top: 32px;
+      text-align: center;
+      color: #E5231B;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      font-variant: all-small-caps;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media (max-width: 767px) {
+      .tier-supporting-line {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        line-height: 1.6;
+        max-width: 280px;
+        text-align: center;
+      }
+    }
+
+    /* YOUR NAME ON THE DOOR */
+    .door-benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 36px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 860px) {
+      .door-benefits-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 580px) {
+      .door-benefits-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .door-benefit-item {
+      padding: 18px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.02);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.88);
+      font-weight: 500;
+    }
+    .door-benefit-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #E5231B;
+      flex-shrink: 0;
+    }
+
+    .kits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    @media (max-width: 820px) {
+      .kits-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .kit-card {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 32px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .kit-badge {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .kit-badge-inc {
+      background: rgba(229, 35, 27, 0.15);
+      color: #E5231B;
+      border: 1px solid rgba(229, 35, 27, 0.3);
+    }
+    .kit-badge-opt {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+    .kit-items-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .kit-items-list li {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.75);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .kit-items-list li::before {
+      content: "—";
+      color: #E5231B;
+    }
+    .kit-pricing-box {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.6;
+    }
+    .kit-pricing-highlight {
+      color: #FFFFFF;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body id="top">
 
-  <!-- PRELOADER CURTAIN -->
+  <!-- BLACK FULLSCREEN FAST LOADER -->
   <div id="preloader">
-    <div class="preloader-label">Red Flag Outpost</div>
     <div class="preloader-track">
       <div class="preloader-fill" id="preloader-fill"></div>
     </div>
-    <div class="preloader-pct" id="preloader-counter">0%</div>
   </div>
 
   <!-- VIDEO BACKGROUND -->
@@ -893,28 +1193,8 @@
       <a href="#apply" class="nav-alloc-btn">
         <span>Apply for allocation</span>
       </a>
-      <button class="hamburger" id="nav-hamburger" aria-label="Open Menu">
-        <div class="hamburger-bar"></div>
-        <div class="hamburger-bar"></div>
-        <div class="hamburger-bar"></div>
-      </button>
     </div>
   </header>
-
-  <!-- MOBILE MENU -->
-  <div id="mobile-menu-overlay">
-    <button class="menu-close" id="menu-close" aria-label="Close Menu">
-      <svg class="icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-    </button>
-    <div class="menu-links-list">
-      <a href="index.html" class="menu-link-item">Home Page</a>
-      <a href="#top" class="menu-link-item active">Red Flag Outpost</a>
-      <a href="#echo" class="menu-link-item">Outpost Yield</a>
-      <a href="#details" class="menu-link-item">Economics</a>
-      <a href="#reviews" class="menu-link-item">Client Stories</a>
-      <a href="#apply" class="menu-link-item" style="color: #E5231B;">Apply for Allocation</a>
-    </div>
-  </div>
 
   <!-- FLOATING DOCK -->
   <nav class="op-dock" aria-label="Red Flag Outpost">
@@ -987,6 +1267,41 @@
   <!-- CONTENT SECTIONS -->
   <div class="op-layout">
 
+    <!-- URGENCY BANNER UNDER HERO CTAS -->
+    <div class="urgency-banner-wrap" id="urgency-banner">
+      <span class="urgency-banner-text">Founding Partner allocation now open &mdash; 40% off franchise fee</span>
+    </div>
+
+    <!-- HORIZONTAL TICKER STRIP BELOW HERO -->
+    <div class="op-ticker-strip" id="hero-ticker">
+      <div class="op-ticker-track">
+        <div class="op-ticker-content">
+          <span>9&ndash;12% COMMISSION</span><span class="dot">&middot;</span>
+          <span>CLEANING HANDLED</span><span class="dot">&middot;</span>
+          <span>MAINTENANCE HANDLED</span><span class="dot">&middot;</span>
+          <span>ZERO STAFF</span><span class="dot">&middot;</span>
+          <span>CREATOR-LED MARKETING</span><span class="dot">&middot;</span>
+          <span>AI-RUN OPERATIONS</span><span class="dot">&middot;</span>
+        </div>
+        <div class="op-ticker-content" aria-hidden="true">
+          <span>9&ndash;12% COMMISSION</span><span class="dot">&middot;</span>
+          <span>CLEANING HANDLED</span><span class="dot">&middot;</span>
+          <span>MAINTENANCE HANDLED</span><span class="dot">&middot;</span>
+          <span>ZERO STAFF</span><span class="dot">&middot;</span>
+          <span>CREATOR-LED MARKETING</span><span class="dot">&middot;</span>
+          <span>AI-RUN OPERATIONS</span><span class="dot">&middot;</span>
+        </div>
+        <div class="op-ticker-content" aria-hidden="true">
+          <span>9&ndash;12% COMMISSION</span><span class="dot">&middot;</span>
+          <span>CLEANING HANDLED</span><span class="dot">&middot;</span>
+          <span>MAINTENANCE HANDLED</span><span class="dot">&middot;</span>
+          <span>ZERO STAFF</span><span class="dot">&middot;</span>
+          <span>CREATOR-LED MARKETING</span><span class="dot">&middot;</span>
+          <span>AI-RUN OPERATIONS</span><span class="dot">&middot;</span>
+        </div>
+      </div>
+    </div>
+
     <!-- THE ECONOMICS PANEL (ECHO® -> OUTPOST®) -->
     <section class="op-section stagger-section op-section-first" id="echo">
       <div class="op-container">
@@ -1003,41 +1318,272 @@
         </div>
 
         <p class="echo-desc op-body stagger-child">
-          ₹75,000 – ₹1,48,500 per month at 55% occupancy. Approximately 2x the yield spread of a traditional let. Full workings below.
+          Illustrative economics for a 3-key Villa at 60% occupancy base case. Full workings below.
         </p>
 
-        <div class="op-eco-fig stagger-child">₹75,000 &ndash; ₹1,48,500</div>
-        <div class="op-eco-yield stagger-child">≈ 2x yield spread</div>
-        <div class="op-eco-caveat stagger-child">Illustrative, 3-key Villa at 55% occupancy</div>
+        <!-- OCCUPANCY TOGGLE -->
+        <div class="stagger-child" style="text-align: center; margin-top: 12px; margin-bottom: 24px;">
+          <div class="eco-toggle-group" role="tablist" aria-label="Occupancy scenario toggle">
+            <button type="button" class="eco-toggle-btn" data-occ="45" role="tab" aria-selected="false">45%</button>
+            <button type="button" class="eco-toggle-btn" data-occ="55" role="tab" aria-selected="false">55%</button>
+            <button type="button" class="eco-toggle-btn active" data-occ="60" role="tab" aria-selected="true">60%</button>
+            <button type="button" class="eco-toggle-btn" data-occ="65" role="tab" aria-selected="false">65%</button>
+          </div>
+        </div>
+
+        <div class="op-eco-fig stagger-child" id="eco-headline-val">₹1,62,000<span style="font-size: 0.55em; color: rgba(255,255,255,0.6);">/mo</span></div>
+        <div class="op-eco-yield stagger-child" id="eco-headline-return">69% Return on capital</div>
+        <div class="op-eco-caveat stagger-child" id="eco-headline-caption">Illustrative, 3-key Villa at 60% occupancy.</div>
+
+        <!-- CAPITAL DEPLOYED DETAILS -->
+        <div class="stagger-child" style="max-width: 680px; margin: 32px auto 20px auto; padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.7); text-align: center; line-height: 1.6;">
+          Capital deployed: deposit ₹4,50,000 + franchise ₹49,999 + setup ₹1,50,000 = <strong style="color: #FFFFFF;">₹6,49,999</strong>. ADR <strong style="color: #FFFFFF;">₹9,000</strong>.
+        </div>
 
         <table class="op-workings stagger-child">
           <tbody>
             <tr>
-              <td class="op-body">Gross monthly revenue</td>
-              <td class="op-body">₹1,48,500</td>
+              <td class="op-body">Gross booking revenue</td>
+              <td class="op-body" id="val-gross">₹1,62,000</td>
             </tr>
             <tr>
-              <td class="op-body">Less Red Flag 13.5%</td>
-              <td class="op-body">₹20,048</td>
+              <td class="op-body">Less Red Flag 10.5%</td>
+              <td class="op-body" id="val-comm">₹17,010</td>
+            </tr>
+            <tr>
+              <td class="op-body">Less cleaning &amp; maintenance</td>
+              <td class="op-body" id="val-cleaning">₹20,400</td>
+            </tr>
+            <tr style="border-top: 1px solid rgba(255,255,255,0.18); border-bottom: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.02);">
+              <td class="op-body" style="color: #FFFFFF !important; font-weight: 600;">= Your net payout</td>
+              <td class="op-body" id="val-netpayout" style="color: #E5231B !important; font-weight: 700;">₹1,24,590</td>
             </tr>
             <tr>
               <td class="op-body">Less rent</td>
               <td class="op-body">₹75,000</td>
             </tr>
             <tr>
-              <td class="op-body">Less operating</td>
-              <td class="op-body">₹30,000</td>
+              <td class="op-body">Less electricity &amp; utilities</td>
+              <td class="op-body">₹12,000</td>
+            </tr>
+            <tr style="border-top: 2px solid rgba(255,255,255,0.25); background: rgba(229,35,27,0.06);">
+              <td class="op-body" style="color: #FFFFFF !important; font-weight: 700; font-size: 15px;">Net monthly to you</td>
+              <td class="op-body" id="val-netmonthly" style="color: #FFFFFF !important; font-weight: 700; font-size: 16px;">₹37,590</td>
             </tr>
             <tr>
-              <td class="op-body" style="color: rgba(255,255,255,0.95) !important; font-weight: 500;">Net monthly to you</td>
-              <td class="op-body" style="color: rgba(255,255,255,0.95) !important; font-weight: 500;">₹23,452</td>
+              <td class="op-body" style="color: rgba(255,255,255,0.85); font-weight: 600;">Return on capital</td>
+              <td class="op-body" id="val-return" style="color: #E5231B; font-weight: 700;">69%</td>
             </tr>
           </tbody>
         </table>
 
+        <!-- THREE SPECIFIC FOOTNOTES BELOW TABLE -->
+        <div class="stagger-child" style="max-width: 680px; margin: 28px auto 0 auto; display: flex; flex-direction: column; gap: 10px; font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.6; text-align: center;">
+          <p style="margin: 0;">&bull; Breakeven is around 42% occupancy.</p>
+          <p style="margin: 0;">&bull; A ten-point occupancy swing roughly doubles or halves your profit &mdash; which is why we operate the property ourselves.</p>
+          <p style="margin: 0;">&bull; No minimum guarantees. We only earn when you earn.</p>
+        </div>
+
         <div class="echo-bottom-lines stagger-child">
           <span>Red Flag</span>
           <span>Outpost</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CHOOSE YOUR TIER SECTION -->
+    <section class="op-section stagger-section" id="tiers">
+      <div class="op-container">
+        <span class="op-eyebrow stagger-child">SCALE &amp; PRICING</span>
+        <h2 class="op-h2 stagger-child" style="margin-bottom: 16px;">
+          Choose Your Tier
+        </h2>
+        <p class="op-body stagger-child" style="max-width: 720px;">
+          Every tier includes our full management stack: creator launch, AI dynamic pricing, guest care, and hands-off turnovers. Select the footprint matching your capital and property size.
+        </p>
+
+        <div class="tier-grid stagger-child">
+          <!-- TIER 1: RED FLAG STUDIO -->
+          <div class="tier-card">
+            <div>
+              <h3 class="tier-name">Red Flag Studio</h3>
+              <div class="tier-keys">Studio / 1BHK &middot; Single Key</div>
+              
+              <table class="tier-cost-table">
+                <tbody>
+                  <tr>
+                    <td>Franchise Fee</td>
+                    <td>₹29,999</td>
+                  </tr>
+                  <tr>
+                    <td>Setup &amp; Staging</td>
+                    <td>₹99,000</td>
+                  </tr>
+                  <tr class="tier-total-row">
+                    <td>Total Commitment</td>
+                    <td>₹1,28,999</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div>
+              <div class="tier-comm">
+                <span>Management Commission</span>
+                <span class="tier-comm-val">12%</span>
+              </div>
+              <a href="#apply" class="op-btn" style="width: 100%; text-align: center; margin-top: 20px; box-sizing: border-box;">
+                Apply for Studio
+              </a>
+            </div>
+          </div>
+
+          <!-- TIER 2: RED FLAG VILLA (FEATURED) -->
+          <div class="tier-card featured">
+            <span class="tier-badge">Popular Allocation</span>
+            <div>
+              <h3 class="tier-name">Red Flag Villa</h3>
+              <div class="tier-keys">2–4 Keys &middot; Private Villa</div>
+              
+              <table class="tier-cost-table">
+                <tbody>
+                  <tr>
+                    <td>Franchise Fee</td>
+                    <td>₹49,999</td>
+                  </tr>
+                  <tr>
+                    <td>Setup &amp; Staging</td>
+                    <td>₹1,50,000</td>
+                  </tr>
+                  <tr class="tier-total-row">
+                    <td>Total Commitment</td>
+                    <td>₹1,99,999</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div>
+              <div class="tier-comm" style="background: rgba(229,35,27,0.1); border: 1px solid rgba(229,35,27,0.2);">
+                <span>Management Commission</span>
+                <span class="tier-comm-val">10.5%</span>
+              </div>
+              <a href="#apply" class="op-btn op-btn-primary" style="width: 100%; text-align: center; margin-top: 20px; box-sizing: border-box;">
+                Apply for Villa
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- RED FLAG ESTATE TRACK (BELOW BOTH) -->
+        <div class="estate-tier-card stagger-child">
+          <div style="max-width: 640px;">
+            <div style="font-family: 'Instrument Serif', serif; font-size: 22px; color: #FFFFFF; margin-bottom: 6px;">
+              Red Flag Estate &mdash; 5+ Keys, 9% Commission
+            </div>
+            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.6;">
+              By invitation, after two successful quarters. You don't apply for it. You earn it.
+            </p>
+          </div>
+          <div style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #E5231B; border: 1px solid rgba(229,35,27,0.3); padding: 8px 18px; border-radius: 999px;">
+            By Invitation Only
+          </div>
+        </div>
+
+        <!-- ITEM 9: SUPPORTING LINE BENEATH TIER TABLE -->
+        <div class="tier-supporting-line stagger-child">
+          CLEANING AND MAINTENANCE &mdash; DEDUCTED FROM REVENUE, NEVER FROM YOUR POCKET
+        </div>
+
+      </div>
+    </section>
+
+    <!-- YOUR NAME ON THE DOOR (BRANDING SECTION) -->
+    <section class="op-section stagger-section" id="brand-identity">
+      <div class="op-container">
+        <span class="op-eyebrow stagger-child">BRAND &amp; DISTINCTION</span>
+        <h2 class="op-h2 stagger-child" style="margin-bottom: 16px;">
+          Your Name on the Door
+        </h2>
+        <p class="op-body stagger-child" style="max-width: 760px;">
+          When your property joins the Red Flag collection, it leaves commodity status forever. Guests don't book generic rooms; they book an established design standard.
+        </p>
+
+        <!-- SIX BENEFIT ROWS -->
+        <div class="door-benefits-grid stagger-child">
+          <div class="door-benefit-item">
+            <span class="door-benefit-dot"></span>
+            <span>Engraved RED FLAG &times; [Your Property] plate</span>
+          </div>
+          <div class="door-benefit-item">
+            <span class="door-benefit-dot"></span>
+            <span>Higher nightly rate</span>
+          </div>
+          <div class="door-benefit-item">
+            <span class="door-benefit-dot"></span>
+            <span>Free guest content</span>
+          </div>
+          <div class="door-benefit-item">
+            <span class="door-benefit-dot"></span>
+            <span>Instant credibility</span>
+          </div>
+          <div class="door-benefit-item">
+            <span class="door-benefit-dot"></span>
+            <span>The collection effect</span>
+          </div>
+          <div class="door-benefit-item">
+            <span class="door-benefit-dot"></span>
+            <span>Exit value</span>
+          </div>
+        </div>
+
+        <!-- SIGNATURE KIT VS ICON KIT -->
+        <div class="kits-grid stagger-child">
+          <!-- SIGNATURE KIT -->
+          <div class="kit-card">
+            <span class="kit-badge kit-badge-inc">Signature Kit &mdash; Included</span>
+            <h3 style="font-family: 'Instrument Serif', serif; font-size: 26px; color: #FFFFFF; margin-bottom: 8px;">
+              Essential Brand Foundation
+            </h3>
+            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6;">
+              Standard with every Studio and Villa onboarding. Installed before your creator launch.
+            </p>
+
+            <ul class="kit-items-list">
+              <li>Exterior architectural door plate</li>
+              <li>Branded tissue and guest toiletries</li>
+              <li>Welcome card and curated house guide</li>
+              <li>Signature coasters and weighted key tags</li>
+            </ul>
+
+            <div class="kit-pricing-box">
+              <span class="kit-pricing-highlight">Included with setup</span> &middot; No recurring replenishment fee for foundational hardware.
+            </div>
+          </div>
+
+          <!-- ICON KIT -->
+          <div class="kit-card">
+            <span class="kit-badge kit-badge-opt">Icon Kit &mdash; Optional</span>
+            <h3 style="font-family: 'Instrument Serif', serif; font-size: 26px; color: #FFFFFF; margin-bottom: 8px;">
+              Complete Aesthetic Immersion
+            </h3>
+            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6;">
+              Custom-milled textile and tabletop package for flagship spaces seeking highest yield ADR.
+            </p>
+
+            <ul class="kit-items-list">
+              <li>Monogram curtains and tailored cushions</li>
+              <li>Heavyweight blankets and 400-thread linen</li>
+              <li>Handmade ceramics and bespoke glassware</li>
+              <li>Signature waffle robes and plush slippers</li>
+            </ul>
+
+            <div class="kit-pricing-box">
+              <div>One-time: <span class="kit-pricing-highlight">Studio ₹35,000</span> / <span class="kit-pricing-highlight">Villa ₹75,000</span></div>
+              <div style="margin-top: 4px;">Replenishment: <span class="kit-pricing-highlight">₹8,000</span> / <span class="kit-pricing-highlight">₹18,000</span> annually</div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -1054,7 +1600,7 @@
         <div class="stat-counters-grid stagger-child">
           <div class="stat-card">
             <div class="stat-number-row">
-              <span class="stat-counter" data-target="55">0</span>
+              <span class="stat-counter" data-target="60">0</span>
               <span class="stat-unit">%</span>
             </div>
             <div class="stat-label">Percent occupancy</div>
@@ -1094,11 +1640,11 @@
             <div class="op-step-num">01</div>
             <div class="op-step-content">
               <h3 class="op-h3" style="margin-bottom: 16px;">THE HUNT</h3>
-              <p class="op-body" style="margin-bottom: 16px;">We don't let you sign a bad lease. Using demand data from our managed portfolio, we assess your property — or help you find one in a high-demand, low-supply pocket.</p>
+              <p class="op-body" style="margin-bottom: 16px;">We don't let you sign a bad lease. Using demand data from our managed portfolio, we assess your property &mdash; or help you find one in a high-demand, low-supply pocket.</p>
               <ul class="op-body" style="padding-left: 20px;">
-                <li>Demand &amp; occupancy-potential assessment</li>
+                <li>Demand assessment</li>
                 <li>Lease negotiation support</li>
-                <li>Legal and risk review before you commit</li>
+                <li>Legal and risk review</li>
               </ul>
             </div>
           </div>
@@ -1107,11 +1653,12 @@
             <div class="op-step-num">02</div>
             <div class="op-step-content">
               <h3 class="op-h3" style="margin-bottom: 16px;">THE FLIP</h3>
-              <p class="op-body" style="margin-bottom: 16px;">Keys secured, our build team moves in. Ordinary spaces become premium, photograph-ready properties in under 45 days.</p>
+              <p class="op-body" style="margin-bottom: 16px;">Ordinary spaces become premium in under 45 days.</p>
               <ul class="op-body" style="padding-left: 20px;">
-                <li>Signature interior transformation</li>
-                <li>Furnishing, styling and decor procurement</li>
-                <li>Smart locks, keyless entry, high-speed WiFi</li>
+                <li>Interior transformation</li>
+                <li>Furnishing and styling</li>
+                <li>Signature branding kit</li>
+                <li>Smart locks and WiFi</li>
               </ul>
             </div>
           </div>
@@ -1120,10 +1667,11 @@
             <div class="op-step-num">03</div>
             <div class="op-step-content">
               <h3 class="op-h3" style="margin-bottom: 16px;">THE DROP</h3>
-              <p class="op-body" style="margin-bottom: 16px;">We don't quietly list you and hope. Every property launches through content creators — building demand and a permanent content library from week one.</p>
+              <p class="op-body" style="margin-bottom: 16px;">We don't quietly list you and hope. Every property launches through content creators &mdash; building demand and a permanent content library from week one.</p>
               <ul class="op-body" style="padding-left: 20px;">
                 <li>Creator stay campaign</li>
-                <li>Professional editorial shoot</li>
+                <li>Editorial shoot</li>
+                <li>Airbnb, Booking.com and direct</li>
                 <li>Direct booking setup</li>
               </ul>
             </div>
@@ -1135,10 +1683,11 @@
               <h3 class="op-h3" style="margin-bottom: 16px;">THE YIELD</h3>
               <p class="op-body" style="margin-bottom: 16px;">You step back. The system runs.</p>
               <ul class="op-body" style="padding-left: 20px;">
-                <li>AI dynamic pricing, adjusting daily</li>
-                <li>24/7 automated guest messaging</li>
-                <li>Review and reputation management</li>
-                <li>Payouts twice monthly</li>
+                <li>AI dynamic pricing</li>
+                <li>24/7 guest messaging</li>
+                <li>Every clean and turnover arranged</li>
+                <li>Minor maintenance handled</li>
+                <li>Payouts 1st and 16th</li>
               </ul>
             </div>
           </div>
@@ -1222,9 +1771,12 @@
         <span style="font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #E5231B; display: block; margin-bottom: 16px; font-weight: 600;">
           ALLOCATION
         </span>
-        <h2 style="font-family: 'Instrument Serif', serif; font-size: 40px; line-height: 1.15; color: #0C0C0C; margin-bottom: 12px; font-weight: 400;">
+        <h2 style="font-family: 'Instrument Serif', serif; font-size: 40px; line-height: 1.15; color: #0C0C0C; margin-bottom: 8px; font-weight: 400;">
           Deploy Your Capital
         </h2>
+        <p style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #E5231B; margin-bottom: 16px;">
+          Limited allocation. Applications reviewed in order received.
+        </p>
         <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.6; color: rgba(12, 12, 12, 0.7); margin-bottom: 48px;">
           Ready to build a hospitality asset? Request an allocation spot with our expansion team.
         </p>
@@ -1259,6 +1811,18 @@
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label for="app-capital" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
+              Deployable Capital
+            </label>
+            <select id="app-capital" required class="sand-select">
+              <option value="" disabled selected>Select deployable capital...</option>
+              <option value="₹1.5–3 Lakh">₹1.5–3 Lakh</option>
+              <option value="₹3–8 Lakh">₹3–8 Lakh</option>
+              <option value="₹8 Lakh+">₹8 Lakh+</option>
+            </select>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
             <label for="app-property" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
               Do you already have a property in mind?
             </label>
@@ -1271,14 +1835,13 @@
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label for="app-capital" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
-              Deployable Capital
+            <label for="app-existing-client" style="font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(12, 12, 12, 0.6); font-weight: 500;">
+              Are you an existing Red Flag client?
             </label>
-            <select id="app-capital" required class="sand-select">
+            <select id="app-existing-client" required class="sand-select">
               <option value="" disabled selected>Select an option...</option>
-              <option value="1.5-3L">₹1.5 Lakh – ₹3 Lakh (→ Studio)</option>
-              <option value="3-8L">₹3 Lakh – ₹8 Lakh (→ Villa)</option>
-              <option value="8L+">₹8 Lakh+ (→ Villa multi-property / Estate track)</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
             </select>
           </div>
 
@@ -1294,33 +1857,88 @@
   </div>
 
   <script>
-    // PRELOADER & VIDEO CANPLAYTHROUGH TRACKING
+    // FAST LOADER & BACKGROUND VIDEO AUTOPLAY
     (function() {
-      let framesProgress = 0;
-      const video = document.getElementById('scene-video');
-      const counter = document.getElementById('preloader-counter');
-      const fill = document.getElementById('preloader-fill');
       const preloader = document.getElementById('preloader');
+      const fill = document.getElementById('preloader-fill');
+      const bgVideos = Array.from(document.querySelectorAll('video'));
+      let isFinished = false;
+      let loadedCount = 0;
+      const totalVideos = bgVideos.length;
 
-      function finishPreloader() {
-        if (framesProgress >= 1) return;
-        framesProgress = 1;
-        if (counter) counter.textContent = '100%';
+      function finishLoader() {
+        if (isFinished) return;
+        isFinished = true;
+        clearTimeout(hardCapTimer);
+        clearInterval(progressTimer);
+
+        // Call play() on all background videos, catching rejection silently (iOS Low Power Mode safe)
+        bgVideos.forEach(v => {
+          try {
+            const p = v.play();
+            if (p !== undefined && typeof p.catch === 'function') {
+              p.catch(() => {});
+            }
+          } catch (e) {}
+        });
+
         if (fill) fill.style.width = '100%';
-        setTimeout(() => {
-          if (preloader) preloader.classList.add('loaded');
-        }, 350);
-      }
 
-      if (video) {
-        if (video.readyState >= 3) {
-          finishPreloader();
-        } else {
-          video.addEventListener('canplaythrough', finishPreloader, { once: true });
+        if (preloader) {
+          setTimeout(() => {
+            preloader.classList.add('loaded');
+            setTimeout(() => {
+              if (preloader.parentNode) preloader.remove();
+            }, 450);
+          }, 80);
         }
       }
-      // Safety timeout so the curtain can never stick!
-      setTimeout(finishPreloader, 5000);
+
+      // Hard-cap the wait at 4 seconds
+      const hardCapTimer = setTimeout(finishLoader, 4000);
+
+      // Smooth progress indicator
+      let pVal = 10;
+      const progressTimer = setInterval(() => {
+        if (pVal < 90) {
+          pVal += (90 - pVal) * 0.15;
+          if (fill) fill.style.width = pVal + '%';
+        }
+      }, 70);
+
+      function videoReady() {
+        loadedCount++;
+        if (fill && totalVideos > 0) {
+          const ratio = Math.max(pVal, (loadedCount / totalVideos) * 95);
+          fill.style.width = ratio + '%';
+        }
+        if (loadedCount >= totalVideos) {
+          finishLoader();
+        }
+      }
+
+      if (totalVideos === 0) {
+        finishLoader();
+      } else {
+        bgVideos.forEach(v => {
+          if (v.readyState >= 4) {
+            videoReady();
+          } else {
+            let done = false;
+            const onReady = () => {
+              if (done) return;
+              done = true;
+              v.removeEventListener('canplaythrough', onReady);
+              v.removeEventListener('canplay', onReady);
+              v.removeEventListener('loadeddata', onReady);
+              videoReady();
+            };
+            v.addEventListener('canplaythrough', onReady, { once: true });
+            v.addEventListener('canplay', onReady, { once: true });
+            v.addEventListener('loadeddata', onReady, { once: true });
+          }
+        });
+      }
     })();
 
     // SPRING TIMELINE ENGINE & HERO SLOTS MOTION
@@ -1541,28 +2159,6 @@
       render();
     })();
 
-    // MOBILE MENU TOGGLE
-    (function() {
-      const overlay = document.getElementById('mobile-menu-overlay');
-      const ham = document.getElementById('nav-hamburger');
-      const close = document.getElementById('menu-close');
-
-      function open() {
-        overlay.classList.add('open');
-        document.body.style.overflow = 'hidden';
-      }
-      function dismiss() {
-        overlay.classList.remove('open');
-        document.body.style.overflow = '';
-      }
-
-      if (ham) ham.addEventListener('click', open);
-      if (close) close.addEventListener('click', dismiss);
-      document.querySelectorAll('.menu-link-item').forEach(link => {
-        link.addEventListener('click', dismiss);
-      });
-    })();
-
     // DOCK ACTIVE INDICATOR
     (function() {
       const links = document.querySelectorAll('.op-dock-link');
@@ -1593,6 +2189,85 @@
       }, { passive: true });
     })();
 
+    // OCCUPANCY TOGGLE ENGINE
+    (function() {
+      const toggleBtns = document.querySelectorAll('.eco-toggle-btn');
+      const valGross = document.getElementById('val-gross');
+      const valComm = document.getElementById('val-comm');
+      const valCleaning = document.getElementById('val-cleaning');
+      const valNetpayout = document.getElementById('val-netpayout');
+      const valNetmonthly = document.getElementById('val-netmonthly');
+      const valReturn = document.getElementById('val-return');
+      const headlineVal = document.getElementById('eco-headline-val');
+      const headlineReturn = document.getElementById('eco-headline-return');
+      const headlineCaption = document.getElementById('eco-headline-caption');
+
+      const data = {
+        '45': {
+          gross: '₹1,21,500',
+          comm: '₹12,758',
+          cleaning: '₹16,500',
+          netpayout: '₹92,242',
+          netmonthly: '₹5,242',
+          returnRate: '10%',
+          caption: 'Illustrative, 3-key Villa at 45% occupancy.'
+        },
+        '55': {
+          gross: '₹1,48,500',
+          comm: '₹15,593',
+          cleaning: '₹18,500',
+          netpayout: '₹1,14,407',
+          netmonthly: '₹27,407',
+          returnRate: '51%',
+          caption: 'Illustrative, 3-key Villa at 55% occupancy.'
+        },
+        '60': {
+          gross: '₹1,62,000',
+          comm: '₹17,010',
+          cleaning: '₹20,400',
+          netpayout: '₹1,24,590',
+          netmonthly: '₹37,590',
+          returnRate: '69%',
+          caption: 'Illustrative, 3-key Villa at 60% occupancy.'
+        },
+        '65': {
+          gross: '₹1,75,500',
+          comm: '₹18,428',
+          cleaning: '₹22,300',
+          netpayout: '₹1,34,772',
+          netmonthly: '₹47,772',
+          returnRate: '88%',
+          caption: 'Illustrative, 3-key Villa at 65% occupancy.'
+        }
+      };
+
+      toggleBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const occ = this.getAttribute('data-occ');
+          if (!data[occ]) return;
+
+          toggleBtns.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          this.classList.add('active');
+          this.setAttribute('aria-selected', 'true');
+
+          const d = data[occ];
+          if (valGross) valGross.textContent = d.gross;
+          if (valComm) valComm.textContent = d.comm;
+          if (valCleaning) valCleaning.textContent = d.cleaning;
+          if (valNetpayout) valNetpayout.textContent = d.netpayout;
+          if (valNetmonthly) valNetmonthly.textContent = d.netmonthly;
+          if (valReturn) valReturn.textContent = d.returnRate;
+
+          if (headlineVal) headlineVal.innerHTML = d.gross + '<span style="font-size: 0.55em; color: rgba(255,255,255,0.6);">/mo</span>';
+          if (headlineReturn) headlineReturn.textContent = d.returnRate + ' Return on capital';
+          if (headlineCaption) headlineCaption.textContent = d.caption;
+        });
+      });
+    })();
+
     // APPLY FORM SUBMIT (WHATSAPP + NOTIFICATION)
     (function() {
       const form = document.getElementById('apply-form');
@@ -1604,23 +2279,25 @@
         const email = document.getElementById('app-email').value;
         const tel = document.getElementById('app-tel').value;
         const city = document.getElementById('app-city').value;
-        const prop = document.getElementById('app-property').value;
         const cap = document.getElementById('app-capital').value;
+        const prop = document.getElementById('app-property').value;
+        const existing = document.getElementById('app-existing-client').value;
 
         const text = "RED FLAG OUTPOST - ALLOCATION REQUEST\n" +
                      "Name: " + name + "\n" +
                      "Email: " + email + "\n" +
                      "Contact: " + tel + "\n" +
                      "Target City: " + city + "\n" +
-                     "Property Status: " + prop + "\n" +
-                     "Deployable Capital: " + cap;
+                     "Deployable Capital: " + cap + "\n" +
+                     "Property in Mind: " + prop + "\n" +
+                     "Existing Red Flag Client: " + existing;
 
         const waUrl = "https://wa.me/918881306632?text=" + encodeURIComponent(text);
         window.open(waUrl, '_blank');
 
         const btn = document.getElementById('apply-submit-btn');
         if (btn) {
-          btn.textContent = 'Request Received';
+          btn.textContent = 'Allocation Requested';
           btn.style.background = '#111111';
         }
       });
