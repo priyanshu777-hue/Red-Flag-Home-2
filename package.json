@@ -3,6 +3,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "lint": "echo 'No lint step'",
     "build": "echo 'No build step'"
   },
   "dependencies": {
