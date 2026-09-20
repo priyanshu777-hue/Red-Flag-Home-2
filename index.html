@@ -211,6 +211,12 @@
   width: 38px !important;
   height: 38px !important;
 }
+  #rf-country-current,
+.rf-country-option {
+  font-size: 1rem !important;
+  letter-spacing: 0 !important;
+  line-height: 1 !important;
+}
   header#rf-nav-pill {
   left: auto !important;
   right: 1.5rem !important;
@@ -2903,6 +2909,198 @@
     }
   </style>
 </head>
+<!-- ============================================================
+     MOBILE GLASS TAB BAR  —  paste this ENTIRE block on a new
+     line directly ABOVE the closing </body> tag in index.html.
+     Nothing else needs changing. Desktop is untouched.
+     ============================================================ -->
+
+<!-- top-left logo chip -->
+<a class="mtb-logo" href="/" aria-label="Red Flag Homes Network — home">
+  <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="">
+</a>
+
+<!-- bottom floating tab bar -->
+<nav class="mtb" id="mtb" aria-label="Mobile navigation">
+  <span class="mtb-pip" id="mtbPip" aria-hidden="true"></span>
+
+  <a class="mtb-tab is-on" href="/" data-sec="hero" aria-label="Home" aria-current="page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.2 12 3l9 7.2"/><path d="M5.6 9.2V21h12.8V9.2"/></svg>
+  </a>
+
+  <a class="mtb-tab" href="#journal" data-sec="journal" aria-label="Explore">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.2 8.8-2 5.4-5.4 2 2-5.4z"/></svg>
+  </a>
+
+  <a class="mtb-tab" href="#book" data-sec="book" aria-label="Book a stay">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10.5c0 5.2-8 11-8 11s-8-5.8-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10.2" r="2.8"/></svg>
+  </a>
+
+  <a class="mtb-tab" href="franchise.html" data-sec="franchise" aria-label="Partner with us">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 16.5 5.5-5.5 3.5 3.5 6-6.5"/><path d="M15 8h4v4"/></svg>
+  </a>
+
+  <a class="mtb-tab" href="#contact" data-sec="contact" aria-label="Account">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.2a7.4 7.4 0 0 1 14.4 0"/></svg>
+  </a>
+</nav>
+
+<style>
+/* ---------- mobile only ---------- */
+.mtb, .mtb-logo { display: none; }
+
+@media (max-width: 767.98px) {
+
+  /* hide the desktop pill and its mobile leftovers */
+  #rf-nav-pill,
+  .rf-nav-mob-only,
+  #rf-nav-menu-btn-mob { display: none !important; }
+
+  /* ---- logo chip, top left ---- */
+  .mtb-logo {
+    position: fixed;
+    left: 1rem;
+    top: calc(1rem + env(safe-area-inset-top, 0px));
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mtb-logo img {
+    width: 1.375rem;
+    height: 1.375rem;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* ---- floating tab bar ---- */
+  .mtb {
+    position: fixed;
+    left: 50%;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: fit-content;
+    padding: 0.5rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(28px) saturate(1.9);
+    -webkit-backdrop-filter: blur(28px) saturate(1.9);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.38),
+                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    transform: translateX(-50%);
+    transition: transform 320ms cubic-bezier(.16,1,.3,1),
+                opacity 320ms cubic-bezier(.16,1,.3,1);
+  }
+  .mtb.is-away {
+    transform: translateX(-50%) translateY(calc(100% + 2rem));
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* the sliding circle */
+  .mtb-pip {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    transition: transform 380ms cubic-bezier(.16,1,.3,1);
+    pointer-events: none;
+  }
+
+  .mtb-tab {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.75);
+    -webkit-tap-highlight-color: transparent;
+    transition: color 260ms ease;
+  }
+  .mtb-tab svg {
+    width: 1.375rem;
+    height: 1.375rem;
+    transition: transform 260ms cubic-bezier(.34,1.56,.64,1);
+  }
+  .mtb-tab.is-on { color: #fff; }
+  .mtb-tab:active svg { transform: scale(.88); }
+
+  /* keep content clear of the bar */
+  #footer { padding-bottom: 6rem !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mtb, .mtb-pip, .mtb-tab svg { transition: none !important; }
+}
+</style>
+
+<script>
+(function () {
+  var bar = document.getElementById('mtb');
+  var pip = document.getElementById('mtbPip');
+  if (!bar || !pip) return;
+
+  var tabs = [].slice.call(bar.querySelectorAll('.mtb-tab'));
+  var STEP = 3.1; /* 2.75rem tab + 0.35rem gap */
+
+  function activate(i) {
+    tabs.forEach(function (t, n) {
+      var on = n === i;
+      t.classList.toggle('is-on', on);
+      if (on) { t.setAttribute('aria-current', 'page'); }
+      else { t.removeAttribute('aria-current'); }
+    });
+    pip.style.transform = 'translateX(' + (i * STEP) + 'rem)';
+  }
+
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { activate(i); });
+  });
+
+  /* highlight the tab for whichever section is on screen */
+  var map = { hero: 0, journal: 1, book: 2, franchise: 3, contact: 4 };
+  Object.keys(map).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) activate(map[id]);
+      });
+    }, { threshold: 0.4 }).observe(el);
+  });
+
+  /* hide going down, show going up */
+  var last = window.scrollY;
+  addEventListener('scroll', function () {
+    var y = window.scrollY;
+    if (y < 80) bar.classList.remove('is-away');
+    else if (y > last + 6) bar.classList.add('is-away');
+    else if (y < last - 6) bar.classList.remove('is-away');
+    last = y;
+  }, { passive: true });
+})();
+</script>
+
 <body>
   <!-- BLACK FULLSCREEN FAST LOADER -->
   <div id="page-loader" style="position: fixed; inset: 0; z-index: 999999; background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto; transition: opacity 400ms ease, visibility 400ms ease;">
@@ -2932,14 +3130,14 @@
     <div class="rf-nav-right">
       <div class="rf-country-selector" id="rf-country-selector">
         <button type="button" class="rf-country-trigger" id="rf-country-trigger" aria-haspopup="listbox" aria-expanded="false" title="Select Market">
-          <span id="rf-country-current">IN</span>
+          <span id="rf-country-current">🇮🇳</span>
           <svg class="rf-country-chevron" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="rf-country-dropdown" id="rf-country-dropdown" role="listbox" aria-label="Select Market Country">
-          <button type="button" class="rf-country-option" role="option" data-code="IN" aria-selected="true">IN</button>
-          <button type="button" class="rf-country-option" role="option" data-code="GB" aria-selected="false">GB</button>
-          <button type="button" class="rf-country-option" role="option" data-code="AE" aria-selected="false">AE</button>
-          <button type="button" class="rf-country-option" role="option" data-code="US" aria-selected="false">US</button>
+          <button type="button" class="rf-country-option" role="option" data-code="IN" aria-selected="true" aria-label="India">🇮🇳</button>
+          <button type="button" class="rf-country-option" role="option" data-code="GB" aria-selected="false" aria-label="United Kingdom">🇬🇧</button>
+          <button type="button" class="rf-country-option" role="option" data-code="AE" aria-selected="false" aria-label="United Arab Emirates">🇦🇪</button>
+          <button type="button" class="rf-country-option" role="option" data-code="US" aria-selected="false" aria-label="United States">🇺🇸</button>
         </div>
       </div>
 
@@ -5013,7 +5211,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setMarketCountry(code, persist = true) {
       const normalized = (code || 'IN').toUpperCase();
-      if (countryCurrent) countryCurrent.textContent = normalized;
+            const FLAGS = { IN: '🇮🇳', GB: '🇬🇧', AE: '🇦🇪', US: '🇺🇸' };
+      if (countryCurrent) countryCurrent.textContent = FLAGS[normalized] || '🇮🇳';
 
       countryOptions.forEach(opt => {
         const optCode = opt.getAttribute('data-code') || '';
