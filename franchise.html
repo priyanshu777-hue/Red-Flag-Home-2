@@ -1236,6 +1236,8 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   </div>
 </section>
 
+<div id="rf-classic-mount"></div>
+
 <!-- ============================================================
      TIERS — replace the whole existing <section class="sec" id="tiers"> … </section>
      with everything below. Self-contained: markup, style and script.
@@ -2982,6 +2984,7 @@ window.render = render;
 window.recalcEconomics = render;
 window.getActiveMarket = () => MARKETS[currentMarketKey];
 window.formatMarketMoney = formatMarketMoney;
+window.MARKETS = MARKETS;
 
 // Build buttons in #fxSet
 const fxContainer = document.getElementById("fxSet");
@@ -2995,6 +2998,7 @@ if (fxContainer) {
     btn.setAttribute("aria-pressed", code === currentMarketKey ? "true" : "false");
     btn.addEventListener("click", () => {
       render(currentOcc, code);
+      window.dispatchEvent(new CustomEvent('rf:currency', { detail: code }));
     });
     fxContainer.appendChild(btn);
   });
@@ -3013,6 +3017,7 @@ window.addEventListener("storage", (e) => {
     const cur = ISO_TO_CURRENCY[e.newValue.toUpperCase()] || (MARKETS[e.newValue.toUpperCase()] ? e.newValue.toUpperCase() : null);
     if (cur && cur !== currentMarketKey) {
       render(currentOcc, cur);
+      window.dispatchEvent(new CustomEvent('rf:currency', { detail: cur }));
     }
   }
 });
@@ -3020,6 +3025,658 @@ window.addEventListener("storage", (e) => {
 // Run initial calculation and render using stored market (defaults to INR)
 const initialMarket = getStoredMarketCurrency();
 render(60, initialMarket);
+
+// On load, read localStorage.getItem('rf_market') and map it: IN→INR, GB→GBP, AE→AED, US→USD
+const rawStoredMarket = localStorage.getItem('rf_market');
+const marketMap = { IN: 'INR', GB: 'GBP', AE: 'AED', US: 'USD' };
+const initialClassicCode = (rawStoredMarket && marketMap[rawStoredMarket.toUpperCase()]) || 'INR';
+if (typeof window.rfClassicSetCurrency === 'function') {
+  window.rfClassicSetCurrency(initialClassicCode);
+}
+</script>
+
+<!-- ============================================================
+     RED FLAG OUTPOST CLASSIC — Script & Dynamic Gyre Engine
+     ============================================================ -->
+<script>
+(function () {
+  /* ===================== SETTINGS ===================== */
+  var SETTINGS = {
+    LAUNCH: "2026-10-01T00:00:00+05:30", // allocations open (India time)
+    TOTAL: 200,                          // founding allocations in India
+    LEFT: 200,                           // lower this as partners sign
+    ADR: 9000,                           // nightly rate for illustrative villa (INR)
+    BASE: 75000,                         // tenant rent today (INR)
+    UTIL: 12000,                         // electricity & utilities (INR)
+    FEE: 171110,                         // programme fee incl GST (INR)
+    MIN: 4999,                           // monthly minimum Red Flag fee (INR)
+    CLEAN: { 45: 16500, 55: 18500, 60: 20400, 65: 22300 }, // cleaning & upkeep by occupancy
+    RATES: { INR: 1, GBP: 110, AED: 22.8, USD: 84 },       // indicative display rates
+    SYMBOLS: { INR: "₹", GBP: "£", AED: "AED ", USD: "$" },
+    CITY: { GBP: "London", AED: "Dubai", USD: "New York" },
+    FORM_ENDPOINT: "",                   // coming-soon form destination ("" = opens an email)
+    TERMS_LINK: "#",                     // link to the Earn-Back terms
+    CONTACT_EMAIL: "hello@redflaghomes.in"
+  };
+  /* ===================================================== */
+
+  var STATE = { cur: "INR" };
+  var instances = [];
+
+  /* ---------------- STYLES ---------------- */
+  var CSS = [
+    "#rf-classic{--red:var(--accent,#E5231B);--gold:#ffca80;--mute:rgba(255,255,255,.6);--soft:rgba(255,255,255,.84);--rule:rgba(255,255,255,.14);background:var(--black,#000);color:var(--white,#fff);font-family:\"Instrument Sans\",system-ui,sans-serif;position:relative;overflow:hidden;isolation:isolate}",
+    "#rf-classic::before{content:\"\";position:absolute;top:0;left:0;right:0;height:160px;background:linear-gradient(to bottom,var(--black,#000) 0%,transparent 100%);z-index:5;pointer-events:none}",
+    "#rf-classic::after{content:\"\";position:absolute;bottom:0;left:0;right:0;height:160px;background:linear-gradient(to top,var(--black,#000) 0%,transparent 100%);z-index:5;pointer-events:none}",
+    "#rf-classic *{box-sizing:border-box}",
+    "#rf-classic p{margin:0;line-height:1.55}",
+    "#rf-classic h2,#rf-classic h3{margin:0;font-family:\"Instrument Sans\",system-ui,sans-serif}",
+    "#rf-classic .w{width:100%;max-width:68.75rem;margin:0 auto;padding:0 2.5rem}",
+    "@media(max-width:767.98px){#rf-classic .w{padding:0 1.5rem}}",
+    "#rf-classic .k{color:var(--red);letter-spacing:.22em;font-size:0.6875rem;text-transform:uppercase;margin-bottom:1.25rem;font-weight:500}",
+    "#rf-classic :focus-visible{outline:2px solid var(--red);outline-offset:3px}",
+
+    /* hero with the gyre */
+    "#rf-classic .hero{position:relative;min-height:clamp(660px,94svh,900px);display:flex;align-items:flex-end;overflow:hidden;isolation:isolate}",
+    "#rf-classic .hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:-2}",
+    "#rf-classic .hero .shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.72) 34%,rgba(0,0,0,0) 62%),linear-gradient(to right,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 55%)}",
+    "#rf-classic .hero.nogl{background:radial-gradient(60% 45% at 62% 38%,rgba(255,202,128,.18),transparent 70%),var(--black,#000)}",
+    "#rf-classic .hc{width:100%;padding-bottom:clamp(40px,6vw,64px)}",
+    "#rf-classic .big{font-size:clamp(2.75rem,6.5vw,5.5rem);font-weight:600;line-height:.95;letter-spacing:-.035em;text-shadow:0 2px 30px rgba(0,0,0,.6)}",
+    "#rf-classic .big span{display:block}",
+    "#rf-classic .gold{background:linear-gradient(100deg,#fff 0%,#ffe2b8 30%,#ffca80 60%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}",
+    "#rf-classic .bigsub{color:var(--soft);font-size:clamp(1rem,1.3vw,1.25rem);margin-top:1rem;max-width:44ch}",
+    "#rf-classic .bigsub b{color:#fff;font-weight:500}",
+    "#rf-classic .launch{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.14);display:grid;gap:0.75rem}",
+    "#rf-classic .clk-l{color:var(--red);font-size:0.6875rem;letter-spacing:.22em;text-transform:uppercase;font-weight:500}",
+    "#rf-classic .clk{display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;margin-top:0.5rem}",
+    "#rf-classic .u{min-width:62px}",
+    "#rf-classic .u b{display:block;font-size:clamp(2rem,4vw,3.25rem);font-weight:500;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}",
+    "#rf-classic .u small{color:var(--mute);font-size:0.6875rem;letter-spacing:.16em;text-transform:uppercase}",
+    "#rf-classic .live{font-size:clamp(1.5rem,3vw,2.25rem);font-weight:500;letter-spacing:-.02em;margin-top:0.375rem}",
+    "#rf-classic .left{font-size:0.9375rem;color:var(--soft)}",
+    "#rf-classic .left b{color:var(--red);font-weight:500}",
+
+    /* earn-back */
+    "#rf-classic .eb{background:var(--red);padding:clamp(40px,7vw,80px) 0}",
+    "#rf-classic .eb .k{color:#fff;opacity:.88}",
+    "#rf-classic .eb h3{font-size:clamp(2.25rem,5.5vw,4.5rem);font-weight:600;line-height:.97;letter-spacing:-.035em;max-width:14ch}",
+    "#rf-classic .eb .b{font-size:clamp(1rem,1.3vw,1.25rem);margin-top:1.25rem;max-width:48ch;line-height:1.55}",
+    "#rf-classic .ex{margin-top:1.5rem;display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:0.5rem 2rem;border-top:1px solid rgba(255,255,255,.35);padding-top:1.125rem}",
+    "#rf-classic .ex small{display:block;font-size:0.6875rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85}",
+    "#rf-classic .ex b{font-size:clamp(1.375rem,2.2vw,1.875rem);font-weight:500;letter-spacing:-.02em}",
+    "#rf-classic .fine{margin-top:1rem;font-size:0.875rem;opacity:.92}",
+    "#rf-classic .fine a{color:#fff;text-underline-offset:4px}",
+
+    /* body */
+    "#rf-classic .body{padding:clamp(30px,5vw,48px) 0 44px}",
+    "#rf-classic .path{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;background:none;border:0;border-bottom:1px solid var(--rule);color:#fff;font:inherit;text-align:left;padding:1.25rem 0;cursor:pointer;transition:color 0.15s ease}",
+    "#rf-classic .path span:first-child{font-size:clamp(1.25rem,2.2vw,1.75rem);font-weight:500;letter-spacing:-.015em}",
+    "#rf-classic .path small{display:block;color:var(--mute);font-size:0.875rem;margin-top:0.25rem;font-weight:400;letter-spacing:0}",
+    "#rf-classic .path i{font-style:normal;color:var(--red);font-size:1.625rem;line-height:1}",
+    "#rf-classic .path:hover span:first-child{color:var(--red)}",
+    "#rf-classic .price{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.625rem}",
+    "#rf-classic .pv{font-size:clamp(1.75rem,3.5vw,2.625rem);letter-spacing:-.03em;line-height:1;font-weight:500}",
+    "#rf-classic .pv.r{color:var(--red)}",
+    "#rf-classic .pl{color:var(--mute);font-size:0.875rem;margin-top:0.5rem;line-height:1.45}",
+    "#rf-classic .btn{display:inline-flex;align-items:center;justify-content:center;min-height:3.125rem;padding:0 1.625rem;border-radius:999px;font:inherit;font-size:0.8125rem;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;cursor:pointer;border:1px solid var(--red);background:var(--red);color:#fff;transition:transform 0.2s cubic-bezier(.25,1,.5,1),background 0.2s ease}",
+    "#rf-classic .btn:hover{transform:translateY(-1px)}",
+    "#rf-classic .cta{margin-top:1.625rem;width:100%}",
+
+    /* coming soon */
+    "#rf-classic .cs{display:none;margin-top:1.75rem;border:1px solid rgba(255,255,255,.15);border-radius:1.25rem;padding:1.375rem;background:rgba(255,255,255,0.03)}",
+    "#rf-classic .cs.on{display:block}",
+    "#rf-classic .cs h3{font-size:1.375rem;font-weight:500}",
+    "#rf-classic .cs .s{color:var(--soft);font-size:0.9375rem;margin-top:0.5rem}",
+    "#rf-classic .cs form{display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;margin-top:0.875rem}",
+    "#rf-classic .full{grid-column:1/-1}",
+    "#rf-classic label{display:grid;gap:0.375rem;font-size:0.8125rem;color:var(--mute)}",
+    "#rf-classic input,#rf-classic select{font:inherit;color:#fff;background:#111;border:1px solid rgba(255,255,255,.2);border-radius:0.5rem;padding:0.625rem}",
+    "#rf-classic .chk{display:flex;gap:0.625rem;align-items:flex-start}",
+    "#rf-classic .legal{color:rgba(255,255,255,0.5);font-size:0.75rem;margin-top:1.375rem;line-height:1.5}",
+
+    /* economics pop-up */
+    "#rf-classic dialog{max-width:560px;width:calc(100% - 28px);max-height:calc(100% - 40px);overflow:auto;background:#000;color:#fff;border:1px solid var(--red);border-radius:24px;padding:30px 26px 24px;font-family:\"Instrument Sans\",system-ui,sans-serif}",
+    "#rf-classic dialog::backdrop{background:rgba(0,0,0,.78)}",
+    "#rf-classic .x{position:absolute;top:10px;right:14px;background:none;border:0;color:var(--mute);font-size:28px;cursor:pointer;line-height:1}",
+    "#rf-classic .mt{font-size:clamp(1.625rem,3.5vw,2.125rem);font-weight:600;letter-spacing:-0.02em;line-height:1.05;margin-top:4px}",
+    "#rf-classic .mt:focus{outline:none}",
+    "#rf-classic .chips{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px}",
+    "#rf-classic .chips li{border:1px solid var(--rule);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--soft)}",
+    "#rf-classic .occ{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}",
+    "#rf-classic .opt{font:inherit;font-size:14px;padding:11px 6px;background:none;color:#fff;border:1px solid rgba(255,255,255,.2);cursor:pointer}",
+    "#rf-classic .opt[aria-pressed='true']{background:var(--red);border-color:var(--red)}",
+    "#rf-classic .lbl{color:var(--mute);font-size:13px;margin-top:20px}",
+    "#rf-classic .ln{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:15px}",
+    "#rf-classic .ln span:first-child{color:var(--mute)}",
+    "#rf-classic .ln.sub span{color:#fff}",
+    "#rf-classic .net{font-size:clamp(2.375rem,5vw,3.125rem);letter-spacing:-0.03em;line-height:1;margin-top:18px;font-weight:500}",
+    "#rf-classic .netl{color:var(--soft);margin-top:4px}",
+    "#rf-classic .back{color:var(--mute);font-size:14px}",
+    "#rf-classic .fx{color:rgba(255,255,255,.5);font-size:12px;margin-top:10px}",
+    "#rf-classic .swap{background:none;border:0;color:var(--mute);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:4px;cursor:pointer;margin-top:12px;padding:0}",
+
+    "@media(max-width:767.98px){#rf-classic .body{padding-bottom:6rem !important}}",
+    "@media(max-width:640px){#rf-classic .cs form{grid-template-columns:1fr}#rf-classic .ex{grid-template-columns:1fr;gap:0}#rf-classic .ex div{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.25)}#rf-classic .ex div:last-child{border:0}#rf-classic .ex b{font-size:22px}#rf-classic .hero .shade{background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.8) 42%,rgba(0,0,0,0) 66%)}}"
+  ].join("\n");
+
+  /* ---------------- MARKUP ---------------- */
+  var HTML =
+  '<section id="rf-classic" aria-labelledby="rfc-title">' +
+    '<div class="hero" data-r="hero">' +
+      '<canvas data-r="gl" aria-hidden="true"></canvas><div class="shade"></div>' +
+      '<div class="hc"><div class="w">' +
+        '<p class="k">Red Flag Outpost Classic</p>' +
+        '<h2 class="big" id="rfc-title"><span>Take home</span><span class="gold" data-r="big">\u20B91.16 lakh</span><span>a month.</span></h2>' +
+        '<p class="bigsub">From a 3-key villa you own, at 60% occupancy.* That\u2019s <b data-r="gain"></b> more than a tenant pays you \u2014 and we run everything.</p>' +
+        '<div class="launch" aria-live="polite"><div data-r="clock"></div>' +
+          '<p class="left"><b data-r="left">200</b> of <span data-r="total">200</span> founding allocations left in India. The first 200 keep 8% for life.</p></div>' +
+      '</div></div>' +
+    '</div>' +
+
+    '<div class="eb"><div class="w">' +
+      '<p class="k">The Earn-Back Promise</p>' +
+      '<h3>Earn it back in 12 months. Or we pay the difference.</h3>' +
+      '<p class="b">If your Outpost\u2019s net operating profit in its first 12 months after going live is less than the programme fee you paid, we pay you the difference. No quibbles. Written terms. Paid within 30 days.</p>' +
+      '<div class="ex"><div><small>Your Outpost nets</small><b data-r="ex1"></b></div><div><small>Your fee was</small><b data-r="ex2"></b></div><div><small>We pay you</small><b data-r="ex3"></b></div></div>' +
+      '<p class="fine">Example over year one. <a data-r="terms" href="#">Read the Earn-Back terms</a></p>' +
+    '</div></div>' +
+
+    '<div class="body"><div class="w">' +
+      '<button type="button" class="path" data-open="own" aria-haspopup="dialog"><span>I own a property<small>No rent, no deposit. See your numbers.</small></span><i aria-hidden="true">+</i></button>' +
+      '<button type="button" class="path" data-open="lease" aria-haspopup="dialog"><span>I don\u2019t own one<small>We help you find and lease it. See your numbers.</small></span><i aria-hidden="true">+</i></button>' +
+      '<div class="price"><div><div class="pv" data-r="fee"></div><p class="pl">one time, plus GST<br><span data-r="split"></span> \u00B7 up to 2 keys</p></div>' +
+        '<div><div class="pv r">8%</div><p class="pl">or <span data-r="min"></span> a month,<br>whichever is higher</p></div></div>' +
+      '<a class="btn cta" href="#apply">Apply for allocation</a>' +
+      '<div class="cs" data-r="cs" aria-live="polite">' +
+        '<h3>Outposts in <span data-r="cscity">London</span> are coming soon.</h3>' +
+        '<p class="s">Join the list and we\u2019ll contact you before allocations open. Own a property in India? You can <a href="#apply" style="color:#fff">apply today</a>.</p>' +
+        '<form data-r="form" novalidate>' +
+          '<label>Full name<input name="name" required autocomplete="name"></label>' +
+          '<label>Email<input name="email" type="email" required autocomplete="email"></label>' +
+          '<label>Phone / WhatsApp<input name="phone" type="tel" required autocomplete="tel"></label>' +
+          '<label>City<select name="city" data-r="cssel"><option>London</option><option>Dubai</option><option>New York</option></select></label>' +
+          '<label class="chk full"><input type="checkbox" name="consent" required> I agree to Red Flag contacting me about Outposts and to the Privacy Policy.</label>' +
+          '<div class="full"><button class="btn" type="submit">Request early access</button></div>' +
+        '</form><p class="s" data-r="ok" hidden></p>' +
+      '</div>' +
+      '<p class="legal" data-r="legal">*Illustrative: 3-key villa, \u20B99,000 average nightly rate, 60% occupancy, after 8% commission, cleaning, maintenance and utilities; compared with \u20B975,000 market rent. Returns are not guaranteed and a property can earn less than its costs. The Earn-Back Promise is subject to the Programme Terms. Prices plus applicable taxes.</p>' +
+    '</div></div>' +
+
+    '<dialog data-r="econ" aria-labelledby="rfc-et">' +
+      '<button class="x" type="button" data-close aria-label="Close">\u00D7</button>' +
+      '<p class="k" data-r="ek"></p><p class="mt" id="rfc-et" data-r="et" tabindex="-1" autofocus></p>' +
+      '<ul class="chips" data-r="chips"></ul>' +
+      '<p class="lbl">Occupancy</p><div class="occ" role="group" aria-label="Occupancy">' +
+        '<button type="button" class="opt" data-occ="45" aria-pressed="false">45%</button>' +
+        '<button type="button" class="opt" data-occ="55" aria-pressed="false">55%</button>' +
+        '<button type="button" class="opt" data-occ="60" aria-pressed="true">60%</button>' +
+        '<button type="button" class="opt" data-occ="65" aria-pressed="false">65%</button></div>' +
+      '<div aria-live="polite"><div class="net" data-r="net"></div><p class="netl" data-r="netl"></p><p class="back" data-r="back"></p></div>' +
+      '<div style="margin-top:16px">' +
+        '<div class="ln"><span>Gross bookings</span><span data-r="g"></span></div>' +
+        '<div class="ln"><span data-r="cl">Red Flag 8%</span><span data-r="c"></span></div>' +
+        '<div class="ln"><span>Cleaning &amp; maintenance, at cost</span><span data-r="kk"></span></div>' +
+        '<div class="ln sub"><span>Your payout</span><span data-r="p"></span></div>' +
+        '<div class="ln"><span>Electricity &amp; utilities</span><span data-r="u"></span></div>' +
+        '<div class="ln"><span data-r="bl"></span><span data-r="b"></span></div></div>' +
+      '<p class="fx" data-r="fx"></p>' +
+      '<div style="margin-top:18px"><a class="btn" style="width:100%" href="#apply" data-close>Apply for allocation</a></div>' +
+      '<button type="button" class="swap" data-r="swap"></button>' +
+    '</dialog>' +
+  '</section>';
+
+  /* ---------------- CURRENCY / MONEY MODEL ---------------- */
+  function money(inr, cur) {
+    cur = cur || STATE.cur;
+    var v = inr / SETTINGS.RATES[cur];
+    var sym = SETTINGS.SYMBOLS[cur];
+    if (cur === "INR") {
+      return sym + Math.round(v).toLocaleString("en-IN");
+    }
+    return sym + Math.round(v).toLocaleString("en-US");
+  }
+
+  function calc(occ, cur) {
+    cur = cur || STATE.cur;
+    var g = SETTINGS.ADR * 30 * (occ / 100);
+    var c = Math.max(Math.round(g * 0.08), SETTINGS.MIN);
+    var k = SETTINGS.CLEAN[occ] || Math.round(g * 0.126);
+    var p = g - c - k;
+    var own = p - SETTINGS.UTIL;
+    var gain = own - SETTINGS.BASE;
+    return { g: g, c: c, k: k, p: p, own: own, gain: gain };
+  }
+
+  var TXT = {
+    own: { k: "I own a property", t: "Turn a tenant\u2019s rent into a hospitality income.",
+      chips: ["No rent", "No deposit", "You pay electricity", "We run everything else"],
+      base: "What a tenant pays you today", netl: "more a month than a tenant pays you", swap: "I don\u2019t own a property" },
+    lease: { k: "I don\u2019t own one", t: "We find it, check the numbers, then run it.",
+      chips: ["Rent and deposit to your landlord", "You pay electricity", "We run everything else"],
+      base: "Rent to your landlord", netl: "a month to you, after rent", swap: "I already own a property" }
+  };
+
+  /* ---------------- CURRENCY / COUNTRY DETECTION ---------------- */
+  var WORDS = {
+    "INR": "INR", "\u20B9": "INR", "INDIA": "INR", "IN": "INR",
+    "GBP": "GBP", "\u00A3": "GBP", "UK": "GBP", "UNITED KINGDOM": "GBP", "LONDON": "GBP", "ENGLAND": "GBP", "GB": "GBP",
+    "AED": "AED", "UAE": "AED", "DUBAI": "AED", "UNITED ARAB EMIRATES": "AED", "AE": "AED",
+    "USD": "USD", "$": "USD", "USA": "USD", "US": "USD", "UNITED STATES": "USD", "NEW YORK": "USD", "NYC": "USD"
+  };
+  function codeFrom(text) {
+    var t = String(text || "").replace(/[^\w\s\u20B9\u00A3$]/g, " ").replace(/\s+/g, " ").trim().toUpperCase();
+    if (!t || t.length > 24) return null;
+    if (WORDS[t]) return WORDS[t];
+    var m = t.match(/\b(INR|GBP|AED|USD|GB|AE|US|IN)\b/);
+    return m ? (WORDS[m[1]] || m[1]) : null;
+  }
+  function setCurrency(code) {
+    code = String(code || "").toUpperCase();
+    if (!SETTINGS.RATES[code] || code === STATE.cur) return;
+    STATE.cur = code;
+    instances.forEach(function (i) { i.render(); });
+  }
+  window.rfClassicSetCurrency = setCurrency;
+  window.addEventListener("rf:currency", function (e) { setCurrency(e.detail); });
+
+  function outsideClassic(el) { return !(el && el.closest && el.closest("#rf-classic")); }
+  document.addEventListener("click", function (e) {
+    var el = e.target;
+    if (!outsideClassic(el)) return;
+    for (var i = 0; i < 4 && el && el !== document.body; i++, el = el.parentElement) {
+      var c = codeFrom(el.textContent) || codeFrom(el.getAttribute && (el.getAttribute("data-currency") || el.getAttribute("value") || el.getAttribute("aria-label")));
+      if (c) { setCurrency(c); return; }
+    }
+  }, true);
+  document.addEventListener("change", function (e) {
+    var t = e.target;
+    if (!t || !outsideClassic(t) || t.tagName !== "SELECT") return;
+    var opt = t.options[t.selectedIndex];
+    var c = codeFrom(t.value) || (opt && codeFrom(opt.textContent));
+    if (c) setCurrency(c);
+  }, true);
+  function detectActive() {
+    var nodes = document.querySelectorAll("button,[role=tab],[role=radio],[role=option],a,li,select");
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (!outsideClassic(n)) continue;
+      if (n.tagName === "SELECT") { var c0 = codeFrom(n.value); if (c0) { setCurrency(c0); return; } continue; }
+      var active = n.getAttribute("aria-pressed") === "true" || n.getAttribute("aria-selected") === "true" ||
+        n.getAttribute("aria-checked") === "true" || /^(active|on|checked)$/.test(n.getAttribute("data-state") || "") ||
+        /(^|\s|-)(active|selected|current|is-active)(\s|$)/i.test(n.className && n.className.baseVal === undefined ? n.className : "");
+      if (!active) continue;
+      var c = codeFrom(n.textContent);
+      if (c) { setCurrency(c); return; }
+    }
+  }
+
+  /* ---------------- GILDED GYRE (plain WebGL) ---------------- */
+  var GYRE = {
+    cGoldLow: "#ffca80", cGoldMid: "#382600", cGoldHigh: "#ffffff", cSpec: "#fffad6",
+    cRock: "#000000", cMoss: "#000000", cFoliage: "#05243d", cMist: "#000919", cWater: "#00030a", cWaterShallow: "#000a14",
+    radius: 1.6, tube: 0.01, rimTube: 1, latRings: 3, meridians: 2, spinSpeed: 0.29, tilt: -0.76, bobAmount: 0.245, bobSpeed: 0.7,
+    camDist: 5.75, camHeight: 1.16, lookY: 0.09, focal: 1.92, metalBright: 1.69, envReflect: 1.22, specPow: 75, specStr: 1.22,
+    rim: 0.18, innerGlow: 0.44, envBright: 1.08, foliageAmt: 0.82, waterY: -1.05, horizonDist: 9, reflStrength: 0.72,
+    rippleAmp: 0.62, rippleFreq: 7.5, rippleSpeed: 1.82, rippleChop: 0.46, waterTint: 0.42, sparkle: 1,
+    cursorRipple: 0.85, cursorSpeed: 1.7, cursorFreq: 13, cursorWidth: 0.5, cursorDecay: 1.1, cursorReach: 3, cursorLife: 5.4, cursorSpacing: 0.1,
+    grain: 0.008, vignette: 0.3, mouseStrength: 0.76, mouseLerp: 0.11, maxDpr: 1.5, minDpr: 0.5
+  };
+  var PREC = "#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n";
+  var VS = "attribute vec2 aPos; void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }";
+  var NOISE =
+    "float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }\n" +
+    "float noise(vec2 p){ vec2 i = floor(p), f = fract(p); float a = hash(i), b = hash(i + vec2(1,0)), c = hash(i + vec2(0,1)), d = hash(i + vec2(1,1)); vec2 u = f * f * (3.0 - 2.0 * f); return mix(mix(a, b, u.x), mix(c, d, u.x), u.y); }\n";
+  var BAKE_FS = PREC + "#define PI 3.14159265\n" +
+    "uniform vec2 uBakeRes; uniform float uEnvBright, uFoliage; uniform vec3 ucRock, ucMoss, ucFoliage, ucMist;\n" + NOISE +
+    "float fbm(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ s += a * noise(p); p = p * 2.03 + vec2(11.3, 7.7); a *= 0.5; } return s; }\n" +
+    "vec3 background(vec3 rd){ float dz = max(0.22, -rd.z + 0.35); vec2 q = vec2(rd.x, rd.y) / dz; float ax = abs(q.x); float wall = smoothstep(0.18, 1.15, ax);" +
+    " vec3 col = mix(ucMist, ucMoss, smoothstep(0.0, 0.7, ax)); col = mix(col, ucRock, wall);" +
+    " float veg = fbm(q * 3.0 + vec2(2.0, -1.0)); float veg2 = fbm(q * 7.0 + 10.0);" +
+    " col = mix(col, ucFoliage, smoothstep(0.55, 0.85, veg) * (0.35 + 0.65 * wall) * uFoliage);" +
+    " col = mix(col, ucFoliage * 0.7, smoothstep(0.60, 0.92, veg2) * 0.30 * uFoliage);" +
+    " float str = sin(q.x * 30.0 + veg * 3.0) * 0.5 + 0.5; col *= 1.0 - wall * 0.24 * str;" +
+    " float vy = clamp(q.y * 0.5 + 0.45, 0.0, 1.0); col *= mix(0.58, 1.30, vy);" +
+    " col += ucMist * 0.42 * (1.0 - wall) * smoothstep(-0.25, 0.7, q.y); return col * uEnvBright; }\n" +
+    "void main(){ vec2 uv = gl_FragCoord.xy / uBakeRes; float lon = (uv.x - 0.5) * 2.0 * PI; float lat = (uv.y - 0.5) * PI; float cl = cos(lat);" +
+    " vec3 dir = vec3(cl * cos(lon), sin(lat), cl * sin(lon)); gl_FragColor = vec4(background(dir), 1.0); }";
+  var MAIN_FS = PREC + "#define PI 3.14159265\n#define TRAIL_N 12\n" +
+    "uniform vec3 uTrail[TRAIL_N];\n" +
+    "uniform float uCursorAmp, uCursorSpeed, uCursorFreq, uCursorWidth, uCursorDecay, uCursorReach, uCursorLife, uBobAmt, uBobSpeed;\n" +
+    "uniform sampler2D uBgTex; uniform vec2 uRes, uMouse, uShift; uniform float uTime, uPhase, uAlpha, uEnergy;\n" +
+    "uniform float uRadius, uTube, uRimTube, uLat, uMer, uTilt, uCamDist, uCamHeight, uLookY, uFocal;\n" +
+    "uniform float uMetalBright, uEnvReflect, uSpecPow, uSpecStr, uRim, uInner;\n" +
+    "uniform float uWaterY, uHorizonDist, uReflStr, uRipAmp, uRipFreq, uRipSpeed, uRipChop, uWaterTint, uSparkle, uGrain, uVignette, uMouseStr;\n" +
+    "uniform vec3 ucGoldLow, ucGoldMid, ucGoldHigh, ucSpec, ucWater, ucWaterShallow;\n" +
+    "mat3 gRot, gRotT; const vec3 KEY = vec3(0.40, 0.66, 0.62);\n" + NOISE +
+    "float fbm(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 3; i++){ s += a * noise(p); p = p * 2.03 + vec2(11.3, 7.7); a *= 0.5; } return s; }\n" +
+    "vec3 bg(vec3 rd){ vec2 uv = vec2(atan(rd.z, rd.x) * (0.5 / PI) + 0.5, asin(clamp(rd.y, -1.0, 1.0)) / PI + 0.5); return texture2D(uBgTex, uv).rgb; }\n" +
+    "mat3 rotX(float a){ float c = cos(a), s = sin(a); return mat3(1.,0.,0., 0.,c,-s, 0.,s,c); }\n" +
+    "mat3 rotY(float a){ float c = cos(a), s = sin(a); return mat3(c,0.,s, 0.,1.,0., -s,0.,c); }\n" +
+    "mat3 transpose3(mat3 m){ return mat3(m[0][0], m[1][0], m[2][0], m[0][1], m[1][1], m[2][1], m[0][2], m[1][2], m[2][2]); }\n" +
+    "float sdTorusY(vec3 p, float ra, float rb){ vec2 q = vec2(length(p.xz) - ra, p.y); return length(q) - rb; }\n" +
+    "float sdTorusZ(vec3 p, float ra, float rb){ vec2 q = vec2(length(p.xy) - ra, p.z); return length(q) - rb; }\n" +
+    "float mapRings(vec3 p){ float R = uRadius; float d = 1e9; d = min(d, sdTorusZ(p, R, uTube * uRimTube));" +
+    " for (int i = 0; i < 32; i++){ if (i >= int(uLat)) break; float fi = (float(i) + 0.5) / uLat; float y = (fi * 2.0 - 1.0) * R * 0.985;" +
+    " float rr = sqrt(max(0.0001, R * R - y * y)); d = min(d, sdTorusY(p - vec3(0.0, y, 0.0), rr, uTube)); }" +
+    " for (int i = 0; i < 6; i++){ if (i >= int(uMer)) break; float a = (float(i) + 0.5) * PI / uMer; vec3 pm = rotY(a) * p; d = min(d, sdTorusZ(pm, R * 0.992, uTube)); }" +
+    " return d; }\n" +
+    "vec3 calcNormal(vec3 p){ vec2 k = vec2(1.0, -1.0); float e = 0.0016; return normalize(k.xyy * mapRings(p + k.xyy * e) + k.yyx * mapRings(p + k.yyx * e) + k.yxy * mapRings(p + k.yxy * e) + k.xxx * mapRings(p + k.xxx * e)); }\n" +
+    "vec3 shadeMetal(vec3 rd, vec3 n, float tHit){ vec3 v = -rd; vec3 refl = reflect(rd, n); vec3 env = bg(refl);" +
+    " float dif = max(0.0, dot(n, KEY)); float spec = pow(max(0.0, dot(refl, KEY)), uSpecPow); float fres = pow(1.0 - max(0.0, dot(n, v)), 3.0);" +
+    " vec3 gold = mix(ucGoldLow, ucGoldMid, dif); gold = mix(gold, ucGoldHigh, fres * 0.5);" +
+    " vec3 col = gold * 0.55 + env * gold * uEnvReflect + spec * ucSpec * uSpecStr; col += fres * uRim * ucGoldHigh;" +
+    " col += ucGoldMid * uInner * (0.45 + 0.55 * sin(tHit * 2.0 + uTime)); col *= uMetalBright * (1.0 + uEnergy * 0.45); return col; }\n" +
+    "vec3 marchScene(vec3 ro, vec3 rd, out float tHit, out float hitMask){ float bob = uBobAmt * sin(uTime * uBobSpeed);" +
+    " vec3 roO = gRot * (ro - vec3(0.0, bob, 0.0)); vec3 rdO = gRot * rd; float Rb = uRadius + uTube * uRimTube + 0.05;" +
+    " float bb = dot(roO, rdO); float cc = dot(roO, roO) - Rb * Rb; float disc = bb * bb - cc;" +
+    " if (disc < 0.0){ tHit = 1e9; hitMask = 0.0; return bg(rd); } float sq = sqrt(disc); float tFar = -bb + sq;" +
+    " if (tFar < 0.0){ tHit = 1e9; hitMask = 0.0; return bg(rd); } float t = max(-bb - sq, 0.0), d; bool hit = false;" +
+    " for (int i = 0; i < 80; i++){ vec3 p = roO + rdO * t; d = mapRings(p); if (d < 0.0008){ hit = true; break; } t += d; if (t > tFar) break; }" +
+    " tHit = t; if (!hit){ hitMask = 0.0; return bg(rd); } hitMask = 1.0; vec3 pO = roO + rdO * t; vec3 nO = calcNormal(pO); vec3 nW = gRotT * nO; return shadeMetal(rd, nW, t); }\n" +
+    "float waterH(vec2 q){ float amp = uRipAmp * (1.0 + uEnergy * 0.6); float r = length(q);" +
+    " float h = sin(r * uRipFreq - uTime * uRipSpeed) * exp(-r * 0.28); h += 0.5 * sin(q.x * uRipFreq * 0.5 + uTime * 0.6);" +
+    " h += 0.4 * (fbm(q * 1.6 + vec2(0.0, uTime * 0.15)) - 0.5); h *= amp;" +
+    " for (int i = 0; i < TRAIL_N; i++){ vec3 tr = uTrail[i]; float age = uTime - tr.z; if (age < 0.0 || age > uCursorLife) continue;" +
+    " float d = length(q - tr.xy); float front = age * uCursorSpeed; float w = max(uCursorWidth, 0.001);" +
+    " float env = exp(-(d - front) * (d - front) / (w * w)); float osc = sin((d - front) * uCursorFreq); float spread = exp(-front * uCursorReach);" +
+    " float ramp = smoothstep(0.0, 0.1, age); float taper = smoothstep(uCursorLife, uCursorLife * 0.55, age);" +
+    " float fade = exp(-age * uCursorDecay) * ramp * taper; h += uCursorAmp * env * osc * spread * fade; } return h; }\n" +
+    "vec3 waterNormal(vec2 q){ vec2 e = vec2(0.085, 0.0); float h0 = waterH(q); float hx = waterH(q + e.xy); float hy = waterH(q + e.yx); return normalize(vec3(h0 - hx, mix(0.9, 0.35, uRipChop), h0 - hy)); }\n" +
+    "vec3 toSRGB(vec3 c){ c = max(c, 0.0); return mix(c * 12.92, pow(c, vec3(0.41666)) * 1.055 - 0.055, step(0.0031308, c)); }\n" +
+    "void main(){ vec2 uv = (2.0 * gl_FragCoord.xy - uRes) / uRes.y; vec2 suv = uv + uShift;" +
+    " float ay = uPhase + uMouse.x * uMouseStr; float ax = uTilt + uMouse.y * uMouseStr * 0.6; gRot = rotY(ay) * rotX(ax); gRotT = transpose3(gRot);" +
+    " vec3 ro = vec3(0.0, uCamHeight, uCamDist); vec3 ta = vec3(0.0, uLookY, 0.0); vec3 fw = normalize(ta - ro); vec3 rt = normalize(cross(fw, vec3(0.0, 1.0, 0.0))); vec3 up = cross(rt, fw);" +
+    " vec3 rd = normalize(suv.x * rt + suv.y * up + uFocal * fw);" +
+    " float tG, gMask; vec3 directCol = marchScene(ro, rd, tG, gMask); vec3 col; float tW = (uWaterY - ro.y) / rd.y;" +
+    " bool onWater = rd.y < -0.0005 && tW > 0.0 && (gMask < 0.5 || tW < tG);" +
+    " if (onWater){ vec3 hp = ro + rd * tW; vec3 wn = waterNormal(hp.xz); vec3 refl = reflect(rd, wn); float rT, rM; vec3 rcol = marchScene(hp + wn * 0.01, refl, rT, rM);" +
+    " float depth = clamp(tW / 7.0, 0.0, 1.0); vec3 base = mix(ucWaterShallow, ucWater, depth); float fres = pow(1.0 - max(0.0, dot(-rd, wn)), 3.0); fres = mix(0.10, 1.0, fres);" +
+    " vec3 water = mix(rcol, base, uWaterTint); col = mix(base, water, clamp(fres * uReflStr, 0.0, 1.0)); col *= 1.0 + 0.10 * sin(hp.z * 8.0 - uTime * uRipSpeed);" +
+    " float sp = pow(max(0.0, dot(refl, KEY)), 220.0); col += sp * uSparkle * ucSpec * (1.4 + uEnergy);" +
+    " float hz = smoothstep(uHorizonDist * 0.55, uHorizonDist, tW); if (hz > 0.001) col = mix(col, bg(rd), hz); } else { col = directCol; }" +
+    " col += (hash(uv + uTime) - 0.5) * uGrain; float vig = 1.0 - uVignette * dot(uv * vec2(0.52, 0.62), uv * vec2(0.52, 0.62)); col *= clamp(vig, 0.0, 1.0);" +
+    " col = max(col, 0.0) * uAlpha; gl_FragColor = vec4(toSRGB(col), 1.0); }";
+
+  function hex3(h) { var n = parseInt(h.slice(1), 16); return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]; }
+
+  function startGyre(hero, canvas) {
+    var gl = canvas.getContext("webgl", { antialias: false, alpha: false, premultipliedAlpha: false, powerPreference: "high-performance" });
+    if (!gl) { hero.classList.add("nogl"); return function () {}; }
+    function sh(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { throw new Error(gl.getShaderInfoLog(s)); } return s; }
+    function prog(fs) { var p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs));
+      gl.bindAttribLocation(p, 0, "aPos"); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; }
+    var bakeP, mainP;
+    try { bakeP = prog(BAKE_FS); mainP = prog(MAIN_FS); }
+    catch (err) { console.warn("[Red Flag Outpost] WebGL shader failed, using static background.", err); hero.classList.add("nogl"); return function () {}; }
+
+    var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    // bake the static canyon backdrop once into a texture
+    var BW = 1024, BH = 512, tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, BW, BH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    var fb = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    gl.useProgram(bakeP); gl.viewport(0, 0, BW, BH);
+    function bu(n) { return gl.getUniformLocation(bakeP, n); }
+    gl.uniform2f(bu("uBakeRes"), BW, BH); gl.uniform1f(bu("uEnvBright"), GYRE.envBright); gl.uniform1f(bu("uFoliage"), GYRE.foliageAmt);
+    gl.uniform3fv(bu("ucRock"), hex3(GYRE.cRock)); gl.uniform3fv(bu("ucMoss"), hex3(GYRE.cMoss));
+    gl.uniform3fv(bu("ucFoliage"), hex3(GYRE.cFoliage)); gl.uniform3fv(bu("ucMist"), hex3(GYRE.cMist));
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    gl.useProgram(mainP);
+    var U = {}; function mu(n) { return U[n] || (U[n] = gl.getUniformLocation(mainP, n)); }
+    var f1 = { uCursorAmp: "cursorRipple", uCursorSpeed: "cursorSpeed", uCursorFreq: "cursorFreq", uCursorWidth: "cursorWidth", uCursorDecay: "cursorDecay",
+      uCursorReach: "cursorReach", uCursorLife: "cursorLife", uBobAmt: "bobAmount", uBobSpeed: "bobSpeed", uRadius: "radius", uTube: "tube",
+      uRimTube: "rimTube", uLat: "latRings", uMer: "meridians", uTilt: "tilt", uCamDist: "camDist", uCamHeight: "camHeight", uLookY: "lookY",
+      uMetalBright: "metalBright", uEnvReflect: "envReflect", uSpecPow: "specPow", uSpecStr: "specStr", uRim: "rim", uInner: "innerGlow",
+      uWaterY: "waterY", uHorizonDist: "horizonDist", uReflStr: "reflStrength", uRipAmp: "rippleAmp", uRipFreq: "rippleFreq",
+      uRipSpeed: "rippleSpeed", uRipChop: "rippleChop", uWaterTint: "waterTint", uSparkle: "sparkle", uGrain: "grain", uVignette: "vignette", uMouseStr: "mouseStrength" };
+    Object.keys(f1).forEach(function (k) { gl.uniform1f(mu(k), GYRE[f1[k]]); });
+    var c3 = { ucGoldLow: "cGoldLow", ucGoldMid: "cGoldMid", ucGoldHigh: "cGoldHigh", ucSpec: "cSpec", ucWater: "cWater", ucWaterShallow: "cWaterShallow" };
+    Object.keys(c3).forEach(function (k) { gl.uniform3fv(mu(k), hex3(GYRE[c3[k]])); });
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex); gl.uniform1i(mu("uBgTex"), 0);
+
+    var TRAIL_N = 12, trail = new Float32Array(TRAIL_N * 3);
+    for (var i = 0; i < TRAIL_N; i++) trail[i * 3 + 2] = -1000;
+    var trailHead = 0, lastX = 1e9, lastZ = 1e9;
+
+    // framing: on wide screens push the gyre right (text sits left); on tall phones lift it up (text sits low)
+    var W = 1, H = 1, focal = GYRE.focal, shiftX = 0, shiftY = 0;
+    function frame() {
+      var aspect = W / H;
+      focal = Math.min(GYRE.focal, 2.8 * aspect);
+      shiftX = aspect > 1.15 ? -Math.min(1.0, (aspect - 0.9) * 1.05) : 0;
+      shiftY = aspect < 0.85 ? -0.62 : (aspect < 1.15 ? -0.3 : 0);
+      gl.uniform1f(mu("uFocal"), focal); gl.uniform2f(mu("uShift"), shiftX, shiftY);
+    }
+    // Under 768px, cap DPR to 0.75 for high performance on mobile devices
+    var dprCeil = function () {
+      var isMobile = (window.innerWidth || 1000) < 768;
+      var cap = isMobile ? 0.75 : GYRE.maxDpr;
+      return Math.min(window.devicePixelRatio || 1, cap);
+    };
+    var dpr = dprCeil();
+    function size() {
+      var r = hero.getBoundingClientRect(); W = Math.max(1, r.width); H = Math.max(1, r.height);
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height); gl.uniform2f(mu("uRes"), canvas.width, canvas.height); frame();
+    }
+    size();
+    var ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(size) : null;
+    if (ro) ro.observe(hero); else window.addEventListener("resize", size);
+
+    var t0 = performance.now();
+    function now() { return (performance.now() - t0) / 1000; }
+    var mouse = [0, 0], mouseT = [0, 0], energy = 0, energyT = 0, phase = 0, last = now();
+
+    function cursorWater(cx, cy) {
+      var r = canvas.getBoundingClientRect(), w = r.width, h = r.height;
+      var ux = (((cx - r.left) / w) * 2 - 1) * (w / h) + shiftX, uy = -(((cy - r.top) / h) * 2 - 1) + shiftY;
+      var roY = GYRE.camHeight, roZ = GYRE.camDist, fwY = GYRE.lookY - roY, fwZ = -roZ, fl = Math.hypot(fwY, fwZ); fwY /= fl; fwZ /= fl;
+      var rtX = 1, upY = -fwZ, upZ = fwY;
+      var dx = ux * rtX, dy = uy * upY + focal * fwY, dz = uy * upZ + focal * fwZ, dl = Math.hypot(dx, dy, dz); dx /= dl; dy /= dl; dz /= dl;
+      if (dy > -1e-4) return null;
+      var t = (GYRE.waterY - roY) / dy; if (t <= 0 || t > 60) return null;
+      return { x: dx * t, z: roZ + dz * t };
+    }
+    function drop(cx, cy) {
+      var p = cursorWater(cx, cy); if (!p) return;
+      if (Math.hypot(p.x - lastX, p.z - lastZ) < GYRE.cursorSpacing) return;
+      trail[trailHead * 3] = p.x; trail[trailHead * 3 + 1] = p.z; trail[trailHead * 3 + 2] = now();
+      trailHead = (trailHead + 1) % TRAIL_N; lastX = p.x; lastZ = p.z;
+    }
+    function onMove(e) {
+      var r = canvas.getBoundingClientRect();
+      var nx = ((e.clientX - r.left) / r.width) * 2 - 1, ny = -(((e.clientY - r.top) / r.height) * 2 - 1);
+      energyT = Math.min(1, energyT + Math.hypot(nx - mouseT[0], ny - mouseT[1]) * 1.4);
+      mouseT = [nx, ny]; drop(e.clientX, e.clientY);
+    }
+    function onDown(e) { energyT = 1; drop(e.clientX, e.clientY); }
+
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduce) { hero.addEventListener("pointermove", onMove, { passive: true }); hero.addEventListener("pointerdown", onDown, { passive: true }); }
+
+    var raf = 0, visible = false, fpsAcc = 0, fpsN = 0, appear = performance.now();
+    function draw(t, dt) {
+      phase += dt * GYRE.spinSpeed; energyT *= 0.94; energy += (energyT - energy) * 0.1;
+      mouse[0] += (mouseT[0] - mouse[0]) * GYRE.mouseLerp; mouse[1] += (mouseT[1] - mouse[1]) * GYRE.mouseLerp;
+      gl.uniform1f(mu("uTime"), t); gl.uniform1f(mu("uPhase"), phase); gl.uniform1f(mu("uEnergy"), energy);
+      gl.uniform2f(mu("uMouse"), mouse[0], mouse[1]); gl.uniform3fv(mu("uTrail[0]") || mu("uTrail"), trail);
+      gl.uniform1f(mu("uAlpha"), reduce ? 1 : Math.max(0, Math.min(1, (performance.now() - appear - 250) / 1200)));
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+    function loop() {
+      raf = requestAnimationFrame(loop);
+      var t = now(), raw = t - last, dt = Math.min(0.05, raw); last = t;
+      fpsAcc += raw; fpsN++;
+      if (fpsAcc >= 0.5) {
+        var fps = fpsN / fpsAcc, next = dpr; fpsAcc = 0; fpsN = 0;
+        var minCap = ((window.innerWidth || 1000) < 768) ? 0.5 : GYRE.minDpr;
+        if (fps < 50 && dpr > minCap) next = Math.max(minCap, dpr - 0.15);
+        else if (fps > 58 && dpr < dprCeil()) next = Math.min(dprCeil(), dpr + 0.1);
+        if (Math.abs(next - dpr) > 0.001) { dpr = next; size(); }
+      }
+      draw(t, dt);
+    }
+    function start() { if (!raf && visible && !document.hidden && !reduce) { last = now(); loop(); } }
+    function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+    var io = typeof IntersectionObserver !== "undefined" ? new IntersectionObserver(function (es) {
+      visible = es[0].isIntersecting; if (visible) start(); else stop();
+    }, { rootMargin: "100px" }) : null;
+    if (io) io.observe(hero); else { visible = true; start(); }
+    function onVis() { if (document.hidden) stop(); else start(); }
+    document.addEventListener("visibilitychange", onVis);
+    if (reduce) { phase = 1.2; draw(3, 0); }
+
+    return function destroy() {
+      stop(); if (io) io.disconnect(); if (ro) ro.disconnect(); else window.removeEventListener("resize", size);
+      document.removeEventListener("visibilitychange", onVis);
+      hero.removeEventListener("pointermove", onMove); hero.removeEventListener("pointerdown", onDown);
+      var lose = gl.getExtension("WEBGL_lose_context"); if (lose) lose.loseContext();
+    };
+  }
+
+  /* ---------------- ONE SECTION INSTANCE ---------------- */
+  function init(root) {
+    var q = function (k) { return root.querySelector('[data-r="' + k + '"]'); };
+    var S = { path: "own", occ: 60 };
+    q("terms").href = SETTINGS.TERMS_LINK; q("total").textContent = SETTINGS.TOTAL;
+
+    // launch clock
+    var launchAt = new Date(SETTINGS.LAUNCH).getTime();
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function unit(v, l) { return '<div class="u"><b>' + v + '</b><small>' + l + '</small></div>'; }
+    function ago(s) {
+      if (s < 60) return s + (s === 1 ? " second" : " seconds");
+      var m = Math.floor(s / 60); if (m < 60) return m + (m === 1 ? " minute" : " minutes");
+      var h = Math.floor(m / 60); if (h < 24) return h + (h === 1 ? " hour" : " hours");
+      var d = Math.floor(h / 24); return d + (d === 1 ? " day" : " days");
+    }
+    function tick() {
+      var diff = Math.floor((launchAt - Date.now()) / 1000), c = q("clock");
+      if (diff > 0) {
+        var d = Math.floor(diff / 86400), h = Math.floor(diff % 86400 / 3600), m = Math.floor(diff % 3600 / 60), s = diff % 60;
+        c.innerHTML = '<p class="clk-l">Allocations open 1 October</p><div class="clk">' + unit(d, "days") + unit(pad(h), "hrs") + unit(pad(m), "min") + unit(pad(s), "sec") + "</div>";
+        q("left").textContent = SETTINGS.TOTAL;
+      } else {
+        c.innerHTML = '<p class="clk-l">Allocations open</p><p class="live">Launched ' + ago(-diff) + " ago</p>";
+        q("left").textContent = SETTINGS.LEFT;
+      }
+    }
+    tick(); var timer = setInterval(tick, 1000);
+
+    function render() {
+      var cur = STATE.cur, abroad = cur !== "INR";
+      var h = calc(60, "INR");
+
+      if (cur === "INR") {
+        q("big").textContent = "₹" + (Math.floor(h.own / 1000) / 100).toFixed(2) + " lakh";
+      } else {
+        q("big").textContent = money(h.own, cur);
+      }
+      q("gain").textContent = money(h.gain, cur);
+
+      q("ex1").textContent = money(120000, cur);
+      q("ex2").textContent = money(SETTINGS.FEE, cur);
+      q("ex3").textContent = money(SETTINGS.FEE - 120000, cur);
+
+      q("fee").textContent = money(SETTINGS.FEE, cur);
+      q("split").textContent = money(49999, cur) + " + " + money(95000, cur);
+      q("min").textContent = money(SETTINGS.MIN, cur);
+
+      var T = TXT[S.path], r = calc(S.occ, "INR"), n = r.gain;
+      q("ek").textContent = T.k; q("et").textContent = T.t; q("swap").textContent = T.swap + " →";
+      q("chips").innerHTML = T.chips.map(function (x) { return "<li>" + x + "</li>"; }).join("");
+      q("g").textContent = money(r.g, cur);
+      q("c").textContent = "−" + money(r.c, cur);
+      q("cl").textContent = (r.g * 0.08 >= SETTINGS.MIN) ? "Red Flag 8%" : "Red Flag minimum";
+      q("kk").textContent = "−" + money(r.k, cur);
+      q("p").textContent = money(r.p, cur);
+      q("u").textContent = "−" + money(SETTINGS.UTIL, cur);
+      q("bl").textContent = T.base;
+      q("b").textContent = "−" + money(SETTINGS.BASE, cur);
+      q("net").textContent = (n < 0 ? "−" : "") + money(Math.abs(n), cur);
+      q("netl").textContent = T.netl;
+      q("back").textContent = n > 0 ? "Programme fee earned back in about " + (SETTINGS.FEE / n).toFixed(1) + " months" : "Below breakeven at this occupancy";
+
+      q("fx").textContent = abroad ? "Shown in " + cur + " at an indicative rate for comparison. Programme contracts and fees in India are in INR." : "Illustrative: 3-key villa in India. Subject to Programme Terms.";
+
+      q("cs").classList.toggle("on", abroad);
+      if (abroad && SETTINGS.CITY[cur]) {
+        q("cscity").textContent = SETTINGS.CITY[cur];
+        if (q("cssel")) q("cssel").value = SETTINGS.CITY[cur];
+      }
+    }
+
+    var econ = q("econ"), can = econ && typeof econ.showModal === "function";
+    root.querySelectorAll("[data-open]").forEach(function (b) {
+      b.addEventListener("click", function () { S.path = b.getAttribute("data-open"); render(); if (can && !econ.open) econ.showModal(); });
+    });
+    q("swap").addEventListener("click", function () { S.path = S.path === "own" ? "lease" : "own"; render(); });
+    root.querySelectorAll("[data-occ]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        root.querySelectorAll("[data-occ]").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+        b.setAttribute("aria-pressed", "true"); S.occ = +b.getAttribute("data-occ"); render();
+      });
+    });
+    econ.addEventListener("click", function (e) { if (e.target === econ || e.target.closest("[data-close]")) econ.close(); });
+
+    q("form").addEventListener("submit", function (e) {
+      e.preventDefault(); var f = e.target; if (!f.checkValidity()) { f.reportValidity(); return; }
+      var d = { name: f.name.value, email: f.email.value, phone: f.phone.value, city: f.city.value, currency: STATE.cur, source: "Outpost Classic coming soon" };
+      var ok = q("ok");
+      var done = function () { f.hidden = true; ok.hidden = false; ok.textContent = "You\u2019re on the list for " + d.city + ". We\u2019ll contact you before allocations open."; };
+      if (SETTINGS.FORM_ENDPOINT) {
+        fetch(SETTINGS.FORM_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) }).then(done)
+          .catch(function () { ok.hidden = false; ok.textContent = "That didn\u2019t send. Email " + SETTINGS.CONTACT_EMAIL + " and we\u2019ll add you."; });
+      } else {
+        location.href = "mailto:" + SETTINGS.CONTACT_EMAIL + "?subject=" + encodeURIComponent("Outpost waitlist: " + d.city) + "&body=" + encodeURIComponent(JSON.stringify(d, null, 2)); done();
+      }
+    });
+
+    render();
+    var stopGyre = startGyre(q("hero"), q("gl"));
+    return { root: root, render: render, destroy: function () { clearInterval(timer); stopGyre(); } };
+  }
+
+  /* ---------------- AUTO-MOUNT (works with React tabs) ---------------- */
+  function injectCSS() {
+    if (document.getElementById("rf-classic-css")) return;
+    var s = document.createElement("style"); s.id = "rf-classic-css"; s.textContent = CSS; document.head.appendChild(s);
+  }
+  function scan() {
+    document.querySelectorAll("#rf-classic-mount,[data-rf-classic]").forEach(function (host) {
+      if (host.querySelector("#rf-classic")) return;
+      injectCSS(); host.innerHTML = HTML;
+      instances.push(init(host.querySelector("#rf-classic")));
+      detectActive();
+    });
+    instances = instances.filter(function (i) { if (document.contains(i.root)) return true; i.destroy(); return false; });
+  }
+  var pending = 0;
+  new MutationObserver(function () { if (!pending) pending = requestAnimationFrame(function () { pending = 0; scan(); }); })
+    .observe(document.documentElement, { childList: true, subtree: true });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", scan); else scan();
+  window.addEventListener("load", function () { scan(); detectActive(); });
+})();
+</script>
+<script>
+(function () {
+  var rawStoredMarket = localStorage.getItem('rf_market');
+  var marketMap = { IN: 'INR', GB: 'GBP', AE: 'AED', US: 'USD' };
+  var code = (rawStoredMarket && marketMap[rawStoredMarket.toUpperCase()]) || 'INR';
+  if (typeof window.rfClassicSetCurrency === 'function') {
+    window.rfClassicSetCurrency(code);
+  }
+})();
 </script>
 </body>
 </html>
