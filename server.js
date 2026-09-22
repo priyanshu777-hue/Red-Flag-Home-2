@@ -5,25 +5,36 @@ const { GoogleGenAI } = require('@google/genai');
 const app = express();
 app.use(express.json());
 
-// Initialize Gemini
-let ai;
-try {
-  ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY,
-    httpOptions: {
-      headers: {
-        'User-Agent': 'aistudio-build',
-      }
+// Initialize Gemini lazily to prevent startup crashes when API key is unconfigured
+let aiClient = null;
+function getAi() {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+  if (!aiClient) {
+    try {
+      aiClient = new GoogleGenAI({
+        apiKey: apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+    } catch (e) {
+      console.error("Gemini initialization error:", e.message);
+      return null;
     }
-  });
-} catch (e) {
-  console.error("Gemini API Key missing or invalid");
+  }
+  return aiClient;
 }
 
 app.post('/api/chat', async (req, res) => {
   try {
     const { history, message } = req.body;
     
+    const ai = getAi();
     if (!ai) {
       return res.status(500).json({ error: "Gemini API Key not configured in environment." });
     }
@@ -78,6 +89,7 @@ app.post('/api/chat', async (req, res) => {
 app.post('/api/destination-intelligence', async (req, res) => {
   try {
     const { destination, query } = req.body;
+    const ai = getAi();
     if (!ai) {
       return res.status(500).json({ error: "Gemini API Key not configured." });
     }
@@ -128,6 +140,24 @@ app.post('/api/destination-intelligence', async (req, res) => {
 });
 
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', service: 'red-flag-homes-network' });
+});
+
+// Explicit Service Worker endpoint with proper headers
+app.get('/sw.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+  res.setHeader('Service-Worker-Allowed', '/');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'sw.js'));
+});
+
+// Explicit Web App Manifest endpoint
+app.get('/manifest.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/manifest+json; charset=UTF-8');
+  res.sendFile(path.join(__dirname, 'manifest.json'));
+});
+
 app.use(express.static(__dirname));
 
 app.get('/franchise.html', (req, res) => {
@@ -135,10 +165,12 @@ app.get('/franchise.html', (req, res) => {
 });
 
 app.get('*', (req, res) => {
-
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// The container environment uses an internal Nginx reverse proxy listening on port 8080
+// that routes all external traffic directly to localhost:3000.
+// The application must always listen on port 3000 in both development and production deployment.
 const PORT = 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server listening on port ${PORT}`);

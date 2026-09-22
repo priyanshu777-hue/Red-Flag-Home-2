@@ -7,6 +7,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Red Flag Homes Network</title>
+  <meta name="description" content="You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.">
+  <meta property="og:title" content="Red Flag Homes Network">
+  <meta property="og:description" content="You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.">
+  <meta name="theme-color" content="#0A0505">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="stylesheet" href="/pwa.css">
 
   <script>
   // Performance: Video Lazy Loading & Play/Pause
@@ -362,6 +370,8 @@
     #vid-base {
       position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
       filter: brightness(0.5);
+      transform-origin: center center;
+      will-change: transform, border-radius, filter;
     }
     #hero-veil {
       position: absolute; inset: 0; background: var(--scrim-page); pointer-events: none; opacity: 0;
@@ -425,8 +435,88 @@
     .btn-pill.btn-outline { background: transparent; border: 1px solid var(--raw-color-velvet-700); color: var(--foreground); }
     .btn-pill.btn-outline:hover { background: var(--raw-color-velvet-700); }
 
+    /* Home Hero - Subtle Earn-Back Promise Row */
+    .hero-eb-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.85rem;
+      margin-top: -0.5rem;
+      flex-wrap: wrap;
+      pointer-events: auto;
+      text-align: center;
+      opacity: 0.92;
+      transition: opacity 0.25s ease;
+    }
+    .hero-eb-row:hover {
+      opacity: 1;
+    }
+    .hero-eb-earn {
+      font-family: var(--typeface-ui, sans-serif);
+      font-size: 11px;
+      line-height: 1.3;
+      color: var(--foreground-accent-muted, rgba(242, 228, 225, 0.45));
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .hero-eb-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      text-decoration: none;
+      background: rgba(229, 35, 27, 0.08);
+      border: 1px solid rgba(229, 35, 27, 0.28);
+      border-radius: 999px;
+      padding: 2px 10px 2px 3px;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .hero-eb-badge:hover {
+      background: rgba(229, 35, 27, 0.16);
+      border-color: rgba(229, 35, 27, 0.5);
+      transform: translateY(-0.5px);
+    }
+    .hero-eb-seal {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      display: block;
+    }
+    .hero-eb-badge-title {
+      font-family: var(--typeface-ui, sans-serif);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--foreground, #F2E4E1);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .hero-eb-more {
+      font-family: var(--typeface-ui, sans-serif);
+      font-size: 11px;
+      line-height: 1.3;
+      color: var(--foreground-accent-muted, rgba(242, 228, 225, 0.65));
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+    .hero-eb-more:hover {
+      color: var(--foreground-accent, #F2E4E1);
+    }
+
     @media (max-width: 1024px) {
       #explore-btn { display: none; }
+    }
+    @media (max-width: 768px) {
+      #titles {
+        padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
+      }
+      .hero-eb-row {
+        gap: 0.5rem 0.75rem;
+        max-width: 320px;
+        margin: 0.25rem auto 0 auto;
+        justify-content: center;
+      }
     }
     @media (max-width: 640px), (max-height: 700px) {
       #hero-actions { flex-direction: column; width: 100%; max-width: 300px; margin: 0 auto; }
@@ -493,8 +583,8 @@
     #b4-header { padding: 4rem 1.5rem; text-align: center; }
     #b4-panels { display: flex; width: 100vw; height: 75vh; }
     .b4-panel { flex: 1; position: relative; overflow: hidden; cursor: pointer; border-left: 1px solid var(--scrim-scene); transition: flex 0.6s cubic-bezier(0.2, 0, 0, 1); }
-    .b4-panel-img-wrap { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
-    .b4-panel-img { position: absolute; height: 120%; width: calc(100% + 101px); left: -50.5px; top: -10%; object-fit: cover; will-change: transform; }
+    .b4-panel-img-wrap { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+    .b4-panel-img { position: absolute; height: 128%; width: calc(100% + 90px); left: -45px; top: -14%; object-fit: cover; will-change: transform; transform: translate3d(0, 0, 0) scale(1.05); }
     .b4-panel-scrim { position: absolute; inset: 0; background: linear-gradient(to top, var(--scrim-panel), transparent); pointer-events: none; opacity: 1; transition: opacity 0.6s; }
     .b4-panel-content { position: absolute; bottom: 2rem; left: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; opacity: 0; transform: translateY(1rem); transition: all 0.6s; color: var(--foreground-accent-strong); }
     .b4-panel.active { flex: 2.5; }
@@ -507,7 +597,7 @@
       #b4-header { padding-top: 104px; padding-bottom: 48px; }
       #b4-panels { flex-direction: column; height: auto; }
       .b4-panel { flex: none !important; height: 62dvh; min-height: 26rem; filter: none !important; margin-bottom: 1px; }
-      .b4-panel-img { top: -10%; height: 120%; width: 100%; left: 0; transform: translateY(0); will-change: transform; }
+      .b4-panel-img { top: -14%; height: 128%; width: 100%; left: 0; will-change: transform; transform: translate3d(0, 0, 0) scale(1.04); }
       .b4-panel-content { inset: 0; bottom: auto; left: 1.5rem; right: 1.5rem; height: 100%; align-items: center; justify-content: center; text-align: center; gap: 2rem; opacity: 1; transform: none; z-index: 2; }
     }
     @media (max-width: 640px) {
@@ -530,7 +620,66 @@
     .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--foreground-accent-muted); margin-top: 0.5rem; }
     .stat-arrow { font-size: 2rem; font-weight: 300; }
     .stat-yield { font-size: 1.25rem; font-family: var(--typeface-ui); font-weight: 500; margin-bottom: 0.5rem; }
-    .stat-disclaimer { font-size: 0.8rem; font-style: italic; color: var(--foreground-accent-muted); margin-bottom: 4rem; font-family: var(--typeface-display); letter-spacing: 0.05em;}
+    .stat-disclaimer { font-size: 0.8rem; font-style: italic; color: var(--foreground-accent-muted); margin-bottom: 0; font-family: var(--typeface-display); letter-spacing: 0.05em;}
+
+    /* Prominent Red Flag Outpost Earn-Back Promise Block */
+    .franchise-eb-block {
+      width: 100%;
+      max-width: 680px;
+      margin: 3.25rem 0 3.25rem 0;
+      padding-top: 2.75rem;
+      border-top: 1px solid rgba(229, 35, 27, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 24px;
+      text-align: left;
+      box-sizing: border-box;
+    }
+    .franchise-eb-seal-wrap {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .franchise-eb-seal {
+      width: 88px;
+      height: 88px;
+      display: block;
+      flex-shrink: 0;
+    }
+    .franchise-eb-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+    .franchise-eb-headline {
+      margin: 0;
+      font-family: var(--typeface-display);
+      font-size: 28px;
+      line-height: 1.15;
+      color: var(--foreground, #F2E4E1);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    .franchise-eb-sub {
+      margin: 8px 0 0 0;
+      font-family: var(--typeface-ui, sans-serif);
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--foreground-accent-muted, rgba(242, 228, 225, 0.55));
+    }
+    .franchise-eb-tc {
+      color: var(--foreground-accent-muted, rgba(242, 228, 225, 0.7));
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s ease;
+    }
+    .franchise-eb-tc:hover {
+      color: var(--accent, #E5231B);
+    }
+
     .franchise-points { display: flex; justify-content: center; gap: 2rem; margin-bottom: 4rem; flex-wrap: wrap; }
     .point-item { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid var(--foreground-accent-muted); padding: 0.5rem 1rem; border-radius: 2rem; }
     
@@ -553,7 +702,13 @@
         margin-top: 4px !important; /* Align slightly with the smaller text */
         font-size: 16px !important;
       }
-      .franchise-points { flex-direction: column !important; gap: 1rem !important; align-items: flex-start !important; }
+      .franchise-points {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+      }
     }
 
     /* Article Card Section */
@@ -2259,16 +2414,18 @@
         width: 100% !important;
         height: 200px !important;
         overflow: hidden !important;
+        pointer-events: none !important;
       }
       .b4-panel-img {
         position: absolute !important;
         inset: auto !important;
         width: 100% !important;
-        height: 130% !important;
+        height: 136% !important;
         left: 0 !important;
-        top: -15% !important;
+        top: -18% !important;
         object-fit: cover !important;
         will-change: transform !important;
+        transform: translate3d(0, 0, 0) scale(1.03) !important;
       }
       .b4-panel-scrim {
         display: none !important;
@@ -2404,41 +2561,87 @@
 
       /* Red Flag Outpost Specific Mobile Overrides */
       .stat-yield {
-        text-align: center !important;
+        text-align: left !important;
         font-size: 16px !important;
         width: 100% !important;
         display: block !important;
       }
       .stat-disclaimer {
-        text-align: center !important;
+        text-align: left !important;
         width: 100% !important;
         display: block !important;
+        margin-bottom: 0 !important;
+      }
+      .franchise-eb-block {
+        width: 100% !important;
+        margin: 32px 0 !important;
+        padding: 32px 0 0 0 !important;
+        border-top: 1px solid rgba(229, 35, 27, 0.45) !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 16px !important;
+        text-align: left !important;
+        box-sizing: border-box !important;
+      }
+      .franchise-eb-seal {
+        width: 72px !important;
+        height: 72px !important;
+        flex-shrink: 0 !important;
+      }
+      .franchise-eb-content {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+      }
+      .franchise-eb-headline {
+        font-size: 22px !important;
+        line-height: 1.15 !important;
+        text-align: left !important;
+      }
+      .franchise-eb-sub {
+        font-size: 12px !important;
+        text-align: left !important;
+        margin-top: 6px !important;
       }
       .franchise-points {
         display: flex !important;
-        flex-direction: column !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
         align-items: center !important;
-        justify-content: center !important;
+        justify-content: flex-start !important;
         width: 100% !important;
         gap: 8px !important;
+        margin-bottom: 2rem !important;
       }
       .point-item {
-        width: 240px !important;
+        width: auto !important;
+        max-width: none !important;
         text-align: center !important;
-        font-size: 12px !important;
-        padding: 8px 12px !important;
+        font-size: 11px !important;
+        padding: 6px 10px !important;
         box-sizing: border-box !important;
-        display: block !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        white-space: nowrap !important;
+        border-radius: 999px !important;
       }
       .franchise-action {
         width: 100% !important;
         display: flex !important;
-        justify-content: center !important;
+        justify-content: flex-start !important;
         padding-bottom: 80px !important; /* Space for chat button */
       }
       .franchise-action .btn-pill {
-        width: 240px !important;
+        width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
       }
 
       /* Right Rail Shrink & Move */
@@ -3430,6 +3633,7 @@
         <a href="#franchise" class="rf-menu-overlay-link" style="--stagger-i: 1">Partner</a>
         <a href="#journal" class="rf-menu-overlay-link" style="--stagger-i: 2">Explore</a>
         <a href="#contact" class="rf-menu-overlay-link" style="--stagger-i: 3">Contact</a>
+        <button type="button" class="rf-menu-overlay-link pwa-install-trigger" style="--stagger-i: 4; text-align: left;">Install App</button>
       </nav>
     </div>
   </div>
@@ -3452,6 +3656,18 @@
       <div id="hero-actions">
         <a href="#book" class="btn-pill btn-fill interactive-btn"><span class="btn-dot"></span><span class="btn-label-default">Book a Stay</span><span class="btn-label-hover">Book a Stay →</span></a>
         <a href="franchise.html" class="btn-pill btn-outline">Partner With Us</a>
+      </div>
+      <div id="hero-eb-row" class="hero-eb-row">
+        <span class="hero-eb-earn">See how much you can earn</span>
+        <a href="franchise.html#rf-classic" class="hero-eb-badge" aria-label="Earn-Back Promise">
+          <svg class="hero-eb-seal" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="50" cy="50" r="48" fill="#E5231B"/>
+            <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="1.8"/>
+            <text x="50" y="52" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-family="'Instrument Serif', Georgia, serif" font-size="40" font-weight="600" letter-spacing="-0.02em">12</text>
+          </svg>
+          <span class="hero-eb-badge-title">Earn-Back Promise</span>
+        </a>
+        <a href="franchise.html" class="hero-eb-more">Know more</a>
       </div>
     </div>
     
@@ -3831,6 +4047,20 @@
     <div class="stat-yield">≈ 2x yield spread</div>
     <div class="stat-disclaimer">Illustrative, 3-key Villa at 60% occupancy.</div>
 
+    <div class="franchise-eb-block" id="franchise-eb-block">
+      <div class="franchise-eb-seal-wrap">
+        <svg class="franchise-eb-seal" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="50" cy="50" r="48" fill="#E5231B"/>
+          <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="1.8"/>
+          <text x="50" y="52" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-family="'Instrument Serif', Georgia, serif" font-size="40" font-weight="600" letter-spacing="-0.02em">12</text>
+        </svg>
+      </div>
+      <div class="franchise-eb-content">
+        <h3 class="franchise-eb-headline">Earn it back in 12 months, or we pay the difference.</h3>
+        <p class="franchise-eb-sub">With Outpost Classic. <a href="franchise.html#rf-classic" class="franchise-eb-tc">T&amp;C*</a></p>
+      </div>
+    </div>
+
     <div class="franchise-points">
       <div class="point-item">Zero staff</div>
       <div class="point-item">No experience needed</div>
@@ -3839,7 +4069,7 @@
     </div>
 
     <div class="franchise-action">
-      <a href="franchise.html" class="btn-pill btn-fill interactive-btn"><span class="btn-dot"></span><span class="btn-label-default">View The Blueprint</span><span class="btn-label-hover">View The Blueprint →</span></a>
+      <a href="franchise.html" class="btn-pill btn-fill interactive-btn"><span class="btn-dot"></span><span class="btn-label-default">Enter the Outpost</span><span class="btn-label-hover">Enter the Outpost →</span></a>
     </div>
   </div>
 </section>
@@ -4102,7 +4332,9 @@
     
     // Run custom animations inside the single loop
     if (typeof tickHero === 'function') tickHero(time);
+    if (typeof tickHeroVideoScroll === 'function') tickHeroVideoScroll();
     if (typeof tickB3 === 'function') tickB3(time);
+    if (typeof tickB4 === 'function') tickB4();
     
     requestAnimationFrame(raf);
   }
@@ -4284,9 +4516,37 @@
       el.style.opacity = e;
       el.style.transform = `translateY(${(1 - e) * 1.25}rem)`;
     });
-
-    
   }
+
+  // Scroll-triggered scale-down animation effect for hero background video
+  function tickHeroVideoScroll() {
+    if (!vidBase || isReduced) return;
+    const sy = (typeof lenis !== 'undefined' && lenis && typeof lenis.scroll === 'number')
+      ? lenis.scroll
+      : (window.scrollY || window.pageYOffset || 0);
+    const heroH = window.innerHeight || 800;
+    const sp = Math.min(1, Math.max(0, sy / heroH));
+
+    // Smooth scale-down from 1.0 down to 0.85 as user scrolls down
+    const scale = 1 - sp * 0.15;
+    const radius = sp * 24;
+    const brightness = 0.5 - sp * 0.12;
+    const shadowAlpha = sp * 0.6;
+
+    vidBase.style.transform = `scale3d(${scale.toFixed(4)}, ${scale.toFixed(4)}, 1)`;
+    vidBase.style.borderRadius = `${radius.toFixed(1)}px`;
+    vidBase.style.filter = `brightness(${brightness.toFixed(3)})`;
+    if (shadowAlpha > 0.01) {
+      vidBase.style.boxShadow = `0 20px 80px rgba(0, 0, 0, ${shadowAlpha.toFixed(2)})`;
+    } else {
+      vidBase.style.boxShadow = 'none';
+    }
+  }
+
+  if (typeof lenis !== 'undefined' && lenis && typeof lenis.on === 'function') {
+    lenis.on('scroll', tickHeroVideoScroll);
+  }
+  window.addEventListener('scroll', tickHeroVideoScroll, { passive: true });
 
   // Block 3
   const b3Pin = document.getElementById('b3-pin-container');
@@ -4338,33 +4598,38 @@
     if (isReduced || !b4Wrap || !b4Imgs.length) return;
     const vh = window.innerHeight || document.documentElement.clientHeight;
     const blockRect = b4Wrap.getBoundingClientRect();
-    if (blockRect.bottom < -100 || blockRect.top > vh + 100) return;
+    if (blockRect.bottom < -150 || blockRect.top > vh + 150) return;
 
-    const isMobile = window.innerWidth <= 1024;
+    const isMobile = window.innerWidth <= 768;
+    const isTablet = window.innerWidth <= 1024 && !isMobile;
+    const maxShift = isMobile ? 24 : (isTablet ? 34 : 48);
+    const baseScale = isMobile ? 1.03 : 1.05;
+
     for (let i = 0; i < b4Imgs.length; i++) {
       const img = b4Imgs[i];
       const panel = img.closest('.b4-panel') || img.parentElement;
       const targetRect = panel.getBoundingClientRect();
-      const centerY = targetRect.top + targetRect.height / 2;
-      const progress = (centerY - vh / 2) / (vh / 2);
-      const clamped = Math.max(-1.4, Math.min(1.4, progress));
-      const maxShift = isMobile ? 18 : 36;
-      const translateY = -clamped * maxShift;
-      img.style.transform = `translate3d(0, ${translateY.toFixed(2)}px, 0)`;
+
+      // Only calculate if panel is in or near viewport
+      if (targetRect.bottom < -80 || targetRect.top > vh + 80) continue;
+
+      const panelCenter = targetRect.top + targetRect.height * 0.5;
+      const viewportCenter = vh * 0.5;
+      const range = (vh + targetRect.height) * 0.5;
+      const progress = Math.max(-1.15, Math.min(1.15, (panelCenter - viewportCenter) / range));
+      
+      const translateY = -progress * maxShift;
+      img.style.transform = `translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${baseScale})`;
     }
   }
 
-  let lastT = performance.now();
-  function masterTick(t) {
-    let dt = (t - lastT) / 1000;
-    if(dt > 0.1) dt = 0.016;
-    lastT = t;
-    tickB3();
-    tickB4();
-    
-    requestAnimationFrame(masterTick);
+  // Immediate sync on scroll, resize, and initial page layout
+  if (typeof lenis !== 'undefined' && lenis) {
+    lenis.on('scroll', tickB4);
   }
-  requestAnimationFrame(masterTick);
+  window.addEventListener('scroll', tickB4, { passive: true });
+  window.addEventListener('resize', tickB4, { passive: true });
+  tickB4();
 
   // Booking Form Logic
   const bookSubmitBtn = document.getElementById('book-submit-btn');
@@ -5722,5 +5987,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 </script>
+<script src="/pwa-init.js" defer></script>
 </body>
 </html>

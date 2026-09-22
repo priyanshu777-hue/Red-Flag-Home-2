@@ -6,6 +6,10 @@
 <title>Red Flag Outpost — No property? No problem.</title>
 <meta name="description" content="You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.">
 <meta name="theme-color" content="#000000">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="stylesheet" href="/pwa.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -210,6 +214,23 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 #h0 .hero-desc{position:static;bottom:auto;left:auto;right:auto;width:auto;font-family:"Instrument Sans",system-ui,sans-serif;color:rgba(255,255,255,.75);max-width:34ch;text-align:left;margin-top:1.75rem;line-height:1.55;font-size:1rem}
 @media(max-width:767.98px){#h0 .hero-desc{margin-top:1.25rem;font-size:.9375rem}}
 .hero-desc-inner{display:block;opacity:0;transform:translateY(0.4em);filter:blur(8px);will-change:transform,opacity,filter}
+
+/* Hero actions, Explore tiers, and Earn-Back Promise refinements */
+#heroTiersBtn{opacity:.85;transition:opacity .35s var(--ease-glide),transform .35s var(--ease-glide)}
+#heroTiersBtn:hover{opacity:1;transform:translateY(1px)}
+.hero-eb-seal{width:22px!important;height:22px!important;color:var(--accent,#E5231B);flex-shrink:0}
+.hero-eb-main{font-family:"Instrument Sans",system-ui,sans-serif;font-size:1rem;font-weight:500;line-height:1.35;color:rgba(255,255,255,.95);margin:.35rem 0 .25rem 0}
+.hero-eb-desc{font-family:"Instrument Sans",system-ui,sans-serif;font-size:13px;line-height:1.45;color:rgba(255,255,255,.52);margin:.25rem 0 0 0;max-width:44ch}
+.hero-tc-link{font-size:8px!important;color:rgba(255,255,255,.45)!important;text-decoration:underline;text-underline-offset:2px;display:inline-block;margin-left:3px;vertical-align:1px;transition:color .2s,opacity .2s}
+.hero-tc-link:hover{color:var(--accent,#E5231B)!important;opacity:.9}
+@media(max-width:767.98px){
+  .hero-anchor{max-height:calc(100dvh - 5.5rem)}
+  #h0 .hero-actions{margin-top:1.25rem!important}
+  #heroTiersBtn{font-size:11px!important;padding:.35rem .65rem!important;height:1.75rem!important;display:inline-flex!important;align-items:center!important;line-height:1.75rem!important}
+  .hero-eb-main{font-size:.9375rem;line-height:1.35}
+  .hero-eb-desc{font-size:12px;line-height:1.4}
+  .hero-founding-line{font-size:8px!important;letter-spacing:.08em!important;white-space:nowrap!important;margin-top:.625rem!important}
+}
 
 @keyframes heroRise{
   0%{opacity:0;transform:translateY(0.4em);filter:blur(8px)}
@@ -451,6 +472,212 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
   font-variant-numeric:tabular-nums;
 }
 
+/* 6-Month Projected Growth D3 Multi-Line Chart */
+.growth-chart-wrap{
+  margin:2.5rem 0 3.5rem;
+  padding:1.75rem 1.75rem 1.25rem;
+  background:rgba(18,19,17,0.7);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;
+  position:relative;
+}
+@media(max-width:640px){
+  .growth-chart-wrap{padding:1.25rem 1rem 1rem;margin:2rem 0 2.5rem}
+}
+.growth-chart-header{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:1rem;
+  margin-bottom:1.25rem;
+  padding-bottom:1rem;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.growth-chart-title{
+  font-size:1rem;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--white);
+  margin-bottom:.35rem;
+}
+.growth-chart-subtitle{
+  font-size:.8125rem;
+  color:rgba(255,255,255,0.6);
+  line-height:1.4;
+}
+.growth-chart-controls{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.75rem;
+}
+.growth-toggle-group{
+  display:inline-flex;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:999px;
+  padding:2px;
+  gap:2px;
+}
+.growth-toggle-btn{
+  background:transparent;
+  border:none;
+  color:rgba(255,255,255,0.65);
+  padding:.35rem .85rem;
+  font-size:.6875rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  font-weight:500;
+  border-radius:999px;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:all .25s ease;
+}
+.growth-toggle-btn:hover{
+  color:#fff;
+}
+.growth-toggle-btn[aria-pressed="true"]{
+  background:var(--accent);
+  color:#fff;
+  font-weight:600;
+}
+.growth-chart-legend{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.65rem;
+  margin-bottom:1rem;
+  font-size:.75rem;
+  letter-spacing:.03em;
+  color:rgba(255,255,255,0.7);
+}
+@media(max-width:640px){
+  .growth-chart-legend{gap:.45rem;font-size:.6875rem}
+}
+.growth-legend-item{
+  display:inline-flex;
+  align-items:center;
+  gap:.45rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px;
+  padding:4px 8px;
+  color:rgba(255,255,255,0.75);
+  cursor:pointer;
+  font-family:inherit;
+  font-size:inherit;
+  white-space:nowrap;
+  transition:all .2s ease;
+}
+.growth-legend-item:hover{
+  border-color:rgba(255,255,255,0.22);
+  color:#fff;
+}
+.growth-legend-item.is-dimmed{
+  opacity:0.32;
+  text-decoration:line-through;
+  border-color:transparent;
+  background:transparent;
+}
+.growth-legend-swatch{
+  width:12px;
+  height:3px;
+  border-radius:1px;
+}
+.growth-legend-swatch.swatch-villa{
+  background:var(--accent);
+}
+.growth-legend-swatch.swatch-classic{
+  background:#f59e0b;
+}
+.growth-legend-swatch.swatch-studio{
+  background:#94a3b8;
+}
+.growth-legend-swatch.swatch-trad{
+  background:rgba(255,255,255,0.6);
+  border-top:1.5px dashed rgba(255,255,255,0.9);
+  height:0;
+}
+.growth-d3-chart{
+  width:100%;
+  height:300px;
+  position:relative;
+  overflow:visible;
+}
+@media(max-width:640px){
+  .growth-d3-chart{height:250px}
+}
+.growth-line{
+  fill:none;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  transition:opacity .3s ease;
+}
+.growth-line-trad{
+  stroke:rgba(255,255,255,0.48);
+  stroke-dasharray:5 4;
+  stroke-width:2;
+}
+.growth-line-villa{
+  stroke:var(--accent);
+}
+.growth-line-classic{
+  stroke:#f59e0b;
+}
+.growth-line-studio{
+  stroke:#94a3b8;
+}
+.growth-area{
+  opacity:0.08;
+  pointer-events:none;
+  transition:opacity .3s ease;
+}
+.growth-dot{
+  stroke-width:2;
+  cursor:pointer;
+  transition:r .2s cubic-bezier(0.16,1,0.3,1),filter .2s,opacity .3s ease;
+}
+.growth-dot:hover{
+  filter:drop-shadow(0 0 6px currentColor);
+}
+.growth-crosshair{
+  stroke:rgba(255,255,255,0.22);
+  stroke-width:1;
+  stroke-dasharray:3 3;
+  pointer-events:none;
+}
+.growth-spread-badge{
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  fill:var(--accent);
+}
+.growth-chart-callout{
+  margin-top:.75rem;
+  padding-top:.75rem;
+  border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:.75rem;
+  font-size:.75rem;
+  color:rgba(255,255,255,0.6);
+}
+.growth-callout-spread{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  color:var(--accent);
+  font-weight:600;
+  letter-spacing:.04em;
+}
+
 table.fin{width:100%;border-collapse:collapse}
 table.fin td{padding:1.125rem 0;border-bottom:1px solid rgba(255,255,255,.12);font-size:.9375rem}
 table.fin td:last-child{text-align:right;font-variant-numeric:tabular-nums}
@@ -542,7 +769,8 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 #foot .cta{display:flex;flex-direction:column;align-items:center;gap:2rem;text-align:center}
 @media(min-width:768px){#foot .cta{grid-column:span 2;max-width:31.5rem;align-items:flex-start;text-align:left;padding-left:1.25rem}}
 #foot nav ul{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;list-style:none}
-@media(min-width:768px){#foot nav{grid-column-start:4;padding-left:1.25rem}#foot nav ul{flex-direction:column;gap:1.125rem}}
+@media(min-width:768px){#foot nav{grid-column:1/span 2;padding-left:1.25rem;margin-top:-0.5rem}#foot nav ul{flex-direction:row;flex-wrap:wrap;gap:1.25rem}}
+@media(min-width:1400px){#foot nav{grid-column-start:3;margin-top:0}#foot nav ul{flex-direction:column;gap:1.125rem}}
 #foot nav a{display:inline-block;transition:transform .35s var(--ease-glide),opacity .35s}
 #foot nav a:hover{transform:translateX(4px);opacity:.7}
 #wordmark{position:relative;z-index:5;display:flex;width:100%;justify-content:center;margin-top:4rem}
@@ -589,18 +817,57 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
     transform:none!important;
   }
   .dock-mob{
-    display:flex;width:100%;height:100%;align-items:center;justify-content:space-around;
+    display:flex;width:100%;height:100%;align-items:center;justify-content:space-between;
+    padding:0 8px;gap:4px;box-sizing:border-box;
   }
   .mob-tab{
-    flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:.25rem;text-decoration:none;color:rgba(255,255,255,.65);
+    flex:1 1 0;min-width:0;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:.2rem;text-decoration:none;color:rgba(255,255,255,.65);
     transition:color .2s var(--ease-glide);-webkit-tap-highlight-color:transparent;
+    box-sizing:border-box;padding:0 2px;
   }
-  .mob-tab svg{width:1.25rem;height:1.25rem}
-  .mob-tab span{font-size:.5625rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1}
-  .mob-tab:hover,.mob-tab:active{color:#fff}
+  .mob-tab svg{width:1.25rem;height:1.25rem;flex-shrink:0}
+  .mob-tab span{font-size:.5625rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1;white-space:nowrap}
+  .mob-tab:hover,.mob-tab:active,.mob-tab.active,.mob-tab.is-active{color:#fff}
   .mob-tab.mob-apply{color:var(--accent)}
-  .mob-tab.mob-apply:hover,.mob-tab.mob-apply:active{color:#ff3830}
+  .mob-tab.mob-apply:hover,.mob-tab.mob-apply:active,.mob-tab.mob-apply.active,.mob-tab.mob-apply.is-active{color:#ff3830}
+
+  /* Earn-Back Promise Badge in Mobile Dock */
+  .mob-tab.mob-eb{
+    flex:1.75 1 0;min-width:0;height:44px;display:flex;flex-direction:row;align-items:center;justify-content:center;
+    gap:6px;padding:0 8px;
+    background:rgba(229,35,27,0.12);border:1px solid rgba(229,35,27,0.35);border-radius:999px;
+    color:rgba(255,255,255,.85);box-sizing:border-box;
+    transition:background .2s ease,border-color .2s ease,color .2s ease,box-shadow .2s ease;
+  }
+  .mob-tab.mob-eb:hover,.mob-tab.mob-eb:active{
+    background:rgba(229,35,27,0.18);border-color:rgba(229,35,27,0.5);color:#fff;
+  }
+  .mob-tab.mob-eb.active,.mob-tab.mob-eb.is-active{
+    background:rgba(229,35,27,0.22);border-color:rgba(229,35,27,0.65);color:#fff;
+    box-shadow:0 0 12px rgba(229,35,27,0.25);
+  }
+  .dock-eb-seal{
+    width:26px;height:26px;flex-shrink:0;display:block;
+  }
+  .mob-eb-text{
+    display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+    line-height:1.15;white-space:nowrap;
+  }
+  .mob-eb-text span{
+    font-size:10px!important;letter-spacing:.08em!important;text-transform:uppercase!important;
+    font-weight:500!important;line-height:1.15!important;color:inherit!important;white-space:nowrap!important;
+  }
+  #chat-trigger-btn{
+    bottom:calc(4.25rem + 12px + env(safe-area-inset-bottom,0px))!important;
+    left:12px!important;
+  }
+  #chatbot-container{
+    bottom:calc(4.25rem + 12px + env(safe-area-inset-bottom,0px))!important;
+    left:12px!important;
+    width:calc(100vw - 24px)!important;
+    max-width:calc(100vw - 24px)!important;
+  }
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -1082,19 +1349,30 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
         <div class="exit hero-col" id="heroCol">
           <p class="hero-eyebrow">Red Flag Outpost</p>
           <h1 class="hero-headline" aria-label="No property? No problem.">
-            <span class="hero-line" aria-hidden="true">
-              <span class="h-char" style="--i:0">N</span><span class="h-char" style="--i:1">o</span>
+            <span class="hero-line" style="white-space: nowrap;" aria-hidden="true">
+              <span class="h-char" style="--i:0">N</span><span class="h-char" style="--i:1">o</span><span class="h-space">&nbsp;</span><span class="h-char" style="--i:2">p</span><span class="h-char" style="--i:3">r</span><span class="h-char" style="--i:4">o</span><span class="h-char" style="--i:5">p</span><span class="h-char" style="--i:6">e</span><span class="h-char" style="--i:7">r</span><span class="h-char" style="--i:8">t</span><span class="h-char" style="--i:9">y</span><span class="h-char" style="--i:10">?</span>
             </span>
-            <span class="hero-line" aria-hidden="true">
-              <span class="h-char" style="--i:2">p</span><span class="h-char" style="--i:3">r</span><span class="h-char" style="--i:4">o</span><span class="h-char" style="--i:5">p</span><span class="h-char" style="--i:6">e</span><span class="h-char" style="--i:7">r</span><span class="h-char" style="--i:8">t</span><span class="h-char" style="--i:9">y</span><span class="h-char" style="--i:10">?</span>
-            </span>
-            <span class="hero-line" aria-hidden="true">
+            <span class="hero-line" style="white-space: nowrap;" aria-hidden="true">
               <span class="h-char" style="--i:11">N</span><span class="h-char" style="--i:12">o</span><span class="h-space">&nbsp;</span><span class="h-char" style="--i:13">p</span><span class="h-char" style="--i:14">r</span><span class="h-char" style="--i:15">o</span><span class="h-char" style="--i:16">b</span><span class="h-char" style="--i:17">l</span><span class="h-char" style="--i:18">e</span><span class="h-char" style="--i:19">m</span><span class="h-char" style="--i:20">.</span>
             </span>
           </h1>
           <div class="desc hero-desc">
             <span class="hero-desc-inner">You bring the capital and the location. We bring the blueprint, the brand, and the AI system that runs it.</span>
           </div>
+          <div class="hero-actions" style="margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; pointer-events: auto;">
+            <a href="#tiers" class="alink plain t-caption" id="heroTiersBtn">Explore tiers &rarr;</a>
+          </div>
+          <div class="hero-eb-block" style="margin-top: 1.25rem; pointer-events: auto;">
+            <div class="eb-badge-header">
+              <svg class="eb-shield hero-eb-seal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span class="eb-tag">EARN-BACK PROMISE</span>
+            </div>
+            <p class="hero-eb-main">Earn it back in 12 months, or we pay the difference.</p>
+            <p class="hero-eb-desc">If your first 12 months' net profit is less than your programme fee, we pay you the difference.&nbsp;<a class="hero-tc-link" href="#">T&amp;C*</a></p>
+          </div>
+          <p class="hero-founding-line" style="margin-top: 0.875rem; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.48); pointer-events: auto;">
+            Founding Partner Programme &middot; Limited allocations 2026&ndash;27
+          </p>
         </div>
       </div>
     </div>
@@ -1215,6 +1493,48 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
       <div id="occupancy-d3-chart" class="occupancy-d3-chart"></div>
     </div>
 
+    <!-- 6-Month Projected Growth Differences (D3.js Multi-Line Chart) -->
+    <div class="growth-chart-wrap" id="growthChartWrap">
+      <div class="growth-chart-header">
+        <div>
+          <h3 class="growth-chart-title">6-Month Projected Growth: Traditional Let vs. Outpost</h3>
+          <p class="growth-chart-subtitle">Visualizing revenue trajectory differences between static rent and Red Flag Outpost models</p>
+        </div>
+        <div class="growth-chart-controls">
+          <div class="growth-toggle-group" role="group" aria-label="Growth chart view mode">
+            <button type="button" class="growth-toggle-btn" id="growthModeMonthly" data-mode="monthly" aria-pressed="true">Monthly Payout</button>
+            <button type="button" class="growth-toggle-btn" id="growthModeCumulative" data-mode="cumulative" aria-pressed="false">Cumulative Total</button>
+          </div>
+        </div>
+      </div>
+      <div class="growth-chart-legend" id="growthLegend" aria-label="Toggle model series">
+        <button type="button" class="growth-legend-item" data-series="villa" aria-pressed="true">
+          <span class="growth-legend-swatch swatch-villa"></span>
+          <span>Red Flag Outpost (Villa)</span>
+        </button>
+        <button type="button" class="growth-legend-item" data-series="classic" aria-pressed="true">
+          <span class="growth-legend-swatch swatch-classic"></span>
+          <span>Red Flag Outpost (Classic)</span>
+        </button>
+        <button type="button" class="growth-legend-item" data-series="studio" aria-pressed="true">
+          <span class="growth-legend-swatch swatch-studio"></span>
+          <span>Red Flag Outpost (Studio)</span>
+        </button>
+        <button type="button" class="growth-legend-item" data-series="trad" aria-pressed="true">
+          <span class="growth-legend-swatch swatch-trad"></span>
+          <span>Traditional Let (Fixed)</span>
+        </button>
+      </div>
+      <div id="growth-d3-chart" class="growth-d3-chart"></div>
+      <div class="growth-chart-callout" id="growthCallout">
+        <div class="growth-callout-spread">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true"><path d="M7 17l10-10M17 7H7M17 7v10"/></svg>
+          <span id="growthSpreadText">≈ 2.0x yield spread over traditional let at Month 6 run-rate</span>
+        </div>
+        <span id="growthSummaryText">Click legend items to isolate models · Hover for month-by-month spread</span>
+      </div>
+    </div>
+
     <table class="fin">
       <tbody>
         <tr><td>Gross booking revenue</td><td id="r-gross">₹1,62,000</td></tr>
@@ -1246,7 +1566,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 <section class="sec" id="tiers">
   <div class="wrap">
     <p class="eyebrow">Choose your tier</p>
-    <h2 class="h-sec">Two ways in. One system.</h2>
+    <h2 class="h-sec">Three ways in. One system.</h2>
   </div>
 
   <div class="deck-stage" id="deckStage">
@@ -1254,7 +1574,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 
     <div class="deck" id="deck">
 
-      <article class="tcard" data-i="0">
+      <article class="tcard" data-tier="studio" data-i="0">
         <div class="tcard__in">
           <header>
             <span class="tcard__kind">Entry</span>
@@ -1271,7 +1591,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
         </div>
       </article>
 
-      <article class="tcard is-feat" data-i="1">
+      <article class="tcard is-feat" data-tier="villa" data-i="1">
         <div class="tcard__in">
           <span class="tcard__flag">Most allocated</span>
           <header>
@@ -1289,7 +1609,35 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
         </div>
       </article>
 
-      <article class="tcard is-locked" data-i="2">
+      <article class="tcard is-classic" data-tier="classic" data-i="2">
+        <div class="tcard__in">
+          <span class="tcard__flag -exclusive">Exclusive</span>
+          <header>
+            <span class="tcard__kind">Exclusive</span>
+            <h3>Red Flag Outpost Classic</h3>
+            <p class="tcard__sub">Own or lease &middot; both welcome</p>
+          </header>
+          <dl>
+            <div><dt>Franchise fee</dt><dd>&#8377;59,999</dd></div>
+            <div><dt>Setup &amp; procuring</dt><dd>&#8377;1,11,111</dd></div>
+            <div class="is-total"><dt>Total programme cost</dt><dd>&#8377;1,71,110</dd></div>
+          </dl>
+          <div class="tcard__rate-wrap">
+            <div class="tcard__rate"><b>8%</b><span>management commission</span></div>
+            <p class="tcard__min">minimum <span class="tcard__min-val">&#8377;4,999</span> a month</p>
+          </div>
+          <div class="tcard__eb">
+            <div class="tcard__eb-head">
+              <svg class="eb-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span class="eb-tag">EARN-BACK PROMISE</span>
+            </div>
+            <p class="tcard__eb-text">If your first 12 months' net profit is less than your programme fee, we pay you the difference. <a class="tcard__eb-link eb-terms-link" href="#">Terms &rarr;</a></p>
+          </div>
+          <a class="tcard__cta -solid -classic-btn" href="#apply">Apply for Classic</a>
+        </div>
+      </article>
+
+      <article class="tcard is-locked" data-tier="estate" data-i="3">
         <div class="tcard__in">
           <span class="tcard__flag -quiet">By invitation</span>
           <header>
@@ -1330,8 +1678,8 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   perspective:1800px;perspective-origin:50% 45%;touch-action:pan-y;user-select:none}
 .deck-halo{position:absolute;top:44%;left:50%;translate:-50% -50%;width:min(70vw,40rem);aspect-ratio:1;
   pointer-events:none;background:radial-gradient(closest-side,rgba(229,35,27,.5),transparent 70%);opacity:.2;filter:blur(40px)}
-.deck{position:relative;width:100%;height:30rem;transform-style:preserve-3d}
-.tcard{position:absolute;top:0;left:50%;width:20rem;height:28.5rem;margin-left:-10rem;
+.deck{position:relative;width:100%;height:35rem;transform-style:preserve-3d}
+.tcard{position:absolute;top:0;left:50%;width:20.5rem;height:33.5rem;margin-left:-10.25rem;
   transform-style:preserve-3d;cursor:pointer;
   transition:transform .65s cubic-bezier(.22,.61,.36,1),opacity .65s cubic-bezier(.22,.61,.36,1),filter .65s}
 .tcard__in{position:absolute;inset:0;display:flex;flex-direction:column;
@@ -1341,33 +1689,56 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   padding:2rem 1.75rem;overflow:hidden;transition:border-color .5s,box-shadow .5s}
 .tcard.is-active .tcard__in{border-color:rgba(255,255,255,.22);box-shadow:0 2rem 4rem rgba(0,0,0,.55)}
 .tcard.is-feat.is-active .tcard__in{border-color:var(--accent);box-shadow:0 2rem 5rem rgba(229,35,27,.28)}
+.tcard.is-classic.is-active .tcard__in{border-color:var(--accent);box-shadow:0 2rem 5rem rgba(229,35,27,.48),0 0 50px rgba(229,35,27,.35)}
 .tcard:not(.is-active){filter:saturate(.5)}
 .tcard__flag{position:absolute;right:1.5rem;top:1.5rem;font-size:.5625rem;letter-spacing:.16em;
   text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:.3rem .7rem}
 .tcard__flag.-quiet{color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.22)}
+.tcard__flag.-exclusive{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
 .tcard__kind{display:block;font-size:.5625rem;letter-spacing:.24em;text-transform:uppercase;
   color:rgba(255,255,255,.4);margin-bottom:.875rem}
 .tcard h3{font-size:1.375rem;font-weight:400;letter-spacing:-.01em;line-height:1.2}
 .tcard__sub{margin-top:.5rem;font-size:.8125rem;line-height:1.5;color:rgba(255,255,255,.5)}
-.tcard dl{margin:1.75rem 0 0;display:flex;flex-direction:column}
+.tcard dl{margin:1.5rem 0 0;display:flex;flex-direction:column}
 .tcard dl>div{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
-  padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.07)}
+  padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.07)}
 .tcard dt{font-size:.8125rem;color:rgba(255,255,255,.55)}
 .tcard dd{font-size:.9375rem;font-variant-numeric:tabular-nums}
-.tcard dl>div.is-total{border-bottom:none;padding-top:1rem}
+.tcard dl>div.is-total{border-bottom:none;padding-top:.875rem}
 .tcard dl>div.is-total dt{color:rgba(255,255,255,.8)}
 .tcard dl>div.is-total dd{font-size:1.125rem}
-.tcard__rate{margin-top:auto;padding-top:1.5rem;display:flex;align-items:baseline;gap:.625rem}
+.tcard__rate-wrap{margin-top:auto;padding-top:1rem}
+.tcard__rate{margin-top:auto;padding-top:1.25rem;display:flex;align-items:baseline;gap:.625rem}
+.tcard__rate-wrap .tcard__rate{margin-top:0;padding-top:0}
 .tcard__rate b{font-size:2.25rem;font-weight:400;letter-spacing:-.03em;line-height:1}
-.tcard.is-feat .tcard__rate b{color:var(--accent)}
+.tcard.is-feat .tcard__rate b,.tcard.is-classic .tcard__rate b{color:var(--accent)}
 .tcard__rate span{font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45)}
-.tcard__cta{margin-top:1.5rem;display:block;text-align:center;border:1px solid rgba(255,255,255,.25);
+.tcard__min{font-size:.75rem;color:rgba(255,255,255,.55);margin:.3rem 0 0;line-height:1.3}
+.tcard__cta{margin-top:1.25rem;display:block;text-align:center;border:1px solid rgba(255,255,255,.25);
   border-radius:999px;padding:.75rem 1rem;font-size:.6875rem;letter-spacing:.16em;text-transform:uppercase;
   transition:background-color .35s,border-color .35s,color .35s}
 .tcard__cta:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5)}
 .tcard__cta.-solid{background:var(--accent);border-color:var(--accent)}
 .tcard__cta.-solid:hover{opacity:.9}
+.tcard__cta.-classic-btn{background:var(--accent);border-color:var(--accent);color:#fff}
 .tcard__note{margin-top:1.5rem;font-size:.8125rem;line-height:1.5;color:rgba(255,255,255,.45)}
+
+/* Earn-Back Promise shared styling */
+.eb-shield{color:var(--accent,#E5231B);display:inline-block;vertical-align:-2px;flex-shrink:0}
+.eb-tag{font-size:.6875rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent,#E5231B);font-weight:600}
+.eb-badge-header{display:flex;align-items:center;gap:.45rem}
+.eb-badge-desc{font-size:.8125rem;line-height:1.45;color:rgba(255,255,255,.78);margin:.35rem 0 0}
+.eb-terms-link{color:var(--accent,#E5231B);text-decoration:underline;text-underline-offset:3px;font-size:inherit;white-space:nowrap;transition:opacity .2s}
+.eb-terms-link:hover{opacity:.85}
+
+.tcard__eb{margin-top:.875rem;padding-top:.75rem;border-top:1px solid rgba(229,35,27,.45)}
+.tcard__eb-head{display:flex;align-items:center;gap:.4rem}
+.tcard__eb-text{font-size:.75rem;line-height:1.4;color:rgba(255,255,255,.78);margin:.35rem 0 0}
+
+.apply-eb-badge{border:1px solid var(--accent);border-radius:.75rem;padding:1rem 1.25rem;background:rgba(229,35,27,.05);margin:.5rem 0 1.25rem}
+.apply-eb-msg{font-size:.8125rem;line-height:1.45;color:#2c2d2a;margin:.4rem 0 0}
+.apply-eb-msg .eb-terms-link{color:var(--accent);font-weight:500}
+
 .deck-nav{display:flex;align-items:center;gap:1.25rem;margin-top:1rem}
 .deck-nav button{width:2.75rem;height:2.75rem;display:grid;place-items:center;
   border:1px solid rgba(255,255,255,.18);border-radius:999px;transition:border-color .35s,background-color .35s}
@@ -1378,9 +1749,10 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   background:rgba(255,255,255,.25);transition:background-color .35s,width .35s}
 .deck-dots button[aria-current="true"]{background:var(--accent);width:1.5rem}
 @media(max-width:767.98px){
-  .deck{height:31rem}
-  .tcard{width:17.5rem;margin-left:-8.75rem;height:29.5rem}
+  .deck{height:36rem}
+  .tcard{width:17.5rem;margin-left:-8.75rem;height:34.5rem}
   .deck-stage{margin-top:2rem}
+  .tick-eb{display:none!important}
 }
 @media (prefers-reduced-motion:reduce){.tcard{transition:none}}
 </style>
@@ -1392,7 +1764,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   var cards=[].slice.call(deck.querySelectorAll(".tcard"));
   var dots=document.getElementById("deckDots");
   var stage=document.getElementById("deckStage");
-  var active=1;
+  var active=2;
 
   cards.forEach(function(c,i){
     var b=document.createElement("button");
@@ -1409,9 +1781,9 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
     var gapX=window.innerWidth>=768?21:15;
     cards.forEach(function(c,i){
       var d=i-active, ad=Math.abs(d);
-      var x=d*gapX, rotY=d*-22, z=ad*-9, sc=ad?0.86:1;
+      var x=d*gapX, rotY=d*-22, z=ad*-9, sc=ad?Math.max(0.74,1-ad*0.14):1;
       c.style.transform="translate3d("+x+"rem,"+(ad?0.75:0)+"rem,"+z+"rem) rotateY("+rotY+"deg) scale("+sc+")";
-      c.style.opacity=ad>1?0:(ad?0.55:1);
+      c.style.opacity=ad>2?0:(ad===2?0.24:(ad===1?0.58:1));
       c.style.zIndex=String(10-ad);
       c.style.pointerEvents=ad>1?"none":"auto";
       c.classList.toggle("is-active",!ad);
@@ -1550,6 +1922,13 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
       <div><label for="f-client">Are you an existing Red Flag client?</label>
         <select id="f-client" name="client" required><option value="">Select</option><option>Yes</option><option>No</option></select>
       </div>
+      <div class="apply-eb-badge">
+        <div class="eb-badge-header">
+          <svg class="eb-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="eb-tag">EARN-BACK PROMISE</span>
+        </div>
+        <p class="apply-eb-msg">Classic partners are covered by the Earn-Back Promise. If your first 12 months' net profit is less than your programme fee, we pay you the difference. <a class="eb-terms-link" href="#">Terms &rarr;</a></p>
+      </div>
       <button type="submit">Request allocation</button>
     </form>
   </div>
@@ -1578,6 +1957,291 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
       </ul>
     </nav>
   </div>
+
+<!-- ================= DESKTOP FOOTER FAQ START — copy from here ================= -->
+<div id="faq" class="rff" role="region" aria-labelledby="rff-title">
+<style>
+.rff{--rff-red:#E5231B;--rff-soft:#c4c4c4;--rff-mute:#8a8a8a;--rff-rule:rgba(255,255,255,.1);
+  position:relative;width:100%;max-width:520px;box-sizing:border-box;font-family:inherit;color:#fff;text-align:left;
+  background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.12);border-radius:20px;
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);padding:20px 22px 8px}
+.rff *{box-sizing:border-box}
+.rff-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--rff-rule)}
+.rff-top h2{margin:0;font-size:18px;font-weight:500;letter-spacing:-.015em;line-height:1.2}
+.rff-top a{color:var(--rff-mute);font-size:12px;text-decoration:none;white-space:nowrap}
+.rff-top a:hover{color:#fff}
+
+/* the list scrolls inside the panel when space is short */
+.rff-list{max-height:clamp(200px,calc(85vh - 220px),420px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent;padding-right:4px;margin-right:-6px;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 calc(100% - 28px),transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 0,#000 calc(100% - 28px),transparent 100%)}
+.rff-list::-webkit-scrollbar{width:4px}
+.rff-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.25);border-radius:4px}
+
+.rff-q{border-bottom:1px solid var(--rff-rule)}
+.rff-q:last-child{border-bottom:0;margin-bottom:24px}
+.rff-q summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr 16px;gap:14px;align-items:center;
+  padding:14px 0;font-size:15px;font-weight:500;line-height:1.35;letter-spacing:-.01em;-webkit-tap-highlight-color:transparent}
+.rff-q summary::-webkit-details-marker{display:none}
+.rff-q summary:focus-visible{outline:2px solid var(--rff-red);outline-offset:3px;border-radius:2px}
+.rff-t{display:flex;align-items:center;gap:10px}
+.rff-i{position:relative;width:16px;height:16px}
+.rff-i::before,.rff-i::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:1.5px;background:var(--rff-red);
+  transform:translate(-50%,-50%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.rff-i::after{transform:translate(-50%,-50%) rotate(90deg)}
+.rff-q[open] .rff-i::after{transform:translate(-50%,-50%) rotate(0deg)}
+.rff-a p{margin:0;padding:0 22px 16px 0;color:var(--rff-soft);font-size:14px;line-height:1.6}
+.rff-a b{color:#fff;font-weight:500}
+.rff-a a{color:#fff;text-decoration:underline;text-decoration-color:var(--rff-red);text-underline-offset:3px}
+.rff-q[open] .rff-a p{animation:rff-in .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes rff-in{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+
+.rff-seal{flex:none;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--rff-red);
+  color:#fff;font-size:10px;font-weight:500;box-shadow:inset 0 0 0 2px var(--rff-red),inset 0 0 0 3px rgba(255,255,255,.55)}
+.rff-eb .rff-a p{color:#fff}
+.rff-a .rff-tc{font-size:11px;color:var(--rff-mute);margin-top:-8px}
+.rff-a .rff-tc a{color:var(--rff-mute);text-decoration-color:var(--rff-mute)}
+
+@media (max-width:767.98px){ .rff{display:none !important} } /* desktop & tablet only — phones use the two-line box */
+@media (min-width:768px){
+  #faq.rff{position:absolute;top:3.5rem;right:2rem;z-index:20;width:min(520px, calc(100% - 4rem));max-width:520px}
+}
+@media (min-width:768px) and (max-width:1199.98px){
+  #faq.rff{width:min(500px, calc(52% - 1rem))}
+}
+@media (max-height:640px){ .rff-list{max-height:clamp(180px,34vh,300px)} }
+@media (prefers-reduced-motion:reduce){
+  .rff-i::before,.rff-i::after{transition:none}
+  .rff-q[open] .rff-a p{animation:none}
+}
+</style>
+
+  <div class="rff-top">
+    <h2 id="rff-title">Frequently asked questions</h2>
+    <a href="https://wa.me/918881306632" target="_blank" rel="noopener">Ask us</a>
+  </div>
+
+  <!-- data-lenis-prevent lets this list scroll on its own instead of the page -->
+  <div class="rff-list" data-lenis-prevent tabindex="0" aria-label="Questions">
+    <details class="rff-q">
+      <summary><span class="rff-t">What is Outpost Classic?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>A programme where Red Flag designs, brands, launches and runs your short-stay property end to end. You pay a one-time programme fee, then <b>8% of booking revenue or ₹4,999 a month, whichever is higher</b>.</p></div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">I already own a property. What do I pay?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>The programme fee, electricity and utilities. No rent, no deposit.</p></div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">I don’t own a property. Can I still join?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>Yes. We help you find and assess a high-demand property before you sign a lease. You pay the programme fee, the rent and deposit to your landlord, and electricity.</p></div>
+    </details>
+    <details class="rff-q rff-eb">
+      <summary><span class="rff-t"><span class="rff-seal" aria-hidden="true">12</span>What is the Earn-Back Promise?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a">
+        <p>If your Outpost’s net operating profit in its first 12 full months after going live is less than the programme fee you paid, <b>we pay you the difference</b>, within 30 days of a valid claim. No questions asked.</p>
+        <p class="rff-tc"><a href="#terms">T&amp;C*</a></p>
+      </div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">Is my return guaranteed?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>No. Earnings depend on occupancy, rates, season and location, and a property can earn less or more than its costs. The only guarantee is the Earn-Back Promise, exactly as written.</p></div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">Why is your commission only 8%?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>Our operations run on an AI system rather than a large payroll, so each extra property costs us little to run.</p></div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">Can I start with less than the cost, if I have a valid issue?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>Yes, with Setup Flex. <a href="#apply">Talk to our team</a> to see how it works for you.</p></div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">How long until my property is live?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>Under 45 days from signing, if the property is ready to work on.</p></div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">When and how am I paid?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>Twice a month, on the 1st and 16th, with a statement showing every booking and deduction.</p></div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">Can I still use my property?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>Yes. Owner nights are agreed at signing and blocked in the calendar. Nights you block beyond that allowance are excluded from the Earn-Back Promise.</p></div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">I live abroad. Can I join?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>Yes. NRIs can join fully remotely for a property in India. Payouts go to your NRO account, and Indian tax is deducted at source as the law requires.</p></div>
+    </details>
+    <details class="rff-q">
+      <summary><span class="rff-t">Do you operate in Dubai, London and New York?</span><span class="rff-i" aria-hidden="true"></span></summary>
+      <div class="rff-a"><p>We run Indian Outposts for partners living there now. Dubai Outposts open in 2027 under local holiday-home licensing; London and New York follow where local short-stay rules allow.</p></div>
+    </details>
+  </div>
+
+<script>
+(function(){
+  var box=document.getElementById('faq'); if(!box) return;
+  var qs=box.querySelectorAll('.rff-q');
+  qs.forEach(function(d){d.addEventListener('toggle',function(){
+    if(!d.open) return;
+    qs.forEach(function(o){ if(o!==d) o.open=false; });
+    /* keep the opened answer in view inside the scrolling list */
+    var list=box.querySelector('.rff-list');
+    var top=d.offsetTop-list.offsetTop;
+    if(top<list.scrollTop||top+d.offsetHeight>list.scrollTop+list.clientHeight) list.scrollTo({top:top-4,behavior:'smooth'});
+  });});
+})();
+</script>
+</div>
+<!-- ================= DESKTOP FOOTER FAQ END — copy to here ================= -->
+
+<!-- ================= MOBILE FOOTER FAQ START — copy from here ================= -->
+<div class="rfm" id="faq-mobile">
+<style>
+.rfm{display:none}
+@media (max-width:767.98px){
+  .rfm{display:block;width:100%;margin:18px 0 6px;font-family:inherit;text-align:left;position:relative;z-index:15}
+  .rfm *{box-sizing:border-box}
+
+  /* the two-line glass box that sits in the footer */
+  .rfm-open{display:grid;grid-template-columns:24px 1fr 14px;align-items:center;gap:12px;
+    width:min(100%,320px);margin:0 auto;padding:10px 14px;border-radius:14px;cursor:pointer;
+    background:rgba(0,0,0,.34);border:1px solid rgba(255,255,255,.16);color:#fff;font:inherit;text-align:left;
+    -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);-webkit-tap-highlight-color:transparent}
+  .rfm-open:active{transform:scale(.985)}
+  .rfm-open:focus-visible{outline:2px solid #E5231B;outline-offset:3px}
+  .rfm-open b{display:block;font-size:14px;font-weight:500;line-height:1.25;letter-spacing:-.01em}
+  .rfm-open small{display:block;font-size:11.5px;line-height:1.3;color:rgba(255,255,255,.62);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rfm-q-mark{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,.35);font-size:13px;font-weight:500}
+  .rfm-chev{width:8px;height:8px;border-right:1.5px solid #E5231B;border-top:1.5px solid #E5231B;transform:rotate(-45deg);justify-self:end;margin-top:3px}
+
+  /* the sheet that slides up when tapped — it floats over the page, so the footer never changes size */
+  .rfm-sheet{position:fixed;inset:auto 0 0 0;margin:0;width:100%;max-width:100%;max-height:min(80svh,640px);
+    padding:0;border:0;border-radius:22px 22px 0 0;background:rgba(14,12,12,.96);color:#fff;
+    -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:0 -20px 50px rgba(0,0,0,.5);
+    display:flex;flex-direction:column;overflow:hidden;z-index:3000}
+  .rfm-sheet:not([open]){display:none}
+  .rfm-sheet[open]{animation:rfm-up .38s cubic-bezier(.2,.8,.2,1)}
+  .rfm-sheet::backdrop{background:rgba(0,0,0,.55)}
+  @keyframes rfm-up{from{transform:translateY(100%)}to{transform:none}}
+  .rfm-grab{width:38px;height:4px;border-radius:4px;background:rgba(255,255,255,.25);margin:10px auto 4px}
+  .rfm-head{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+  .rfm-head h2{margin:0;font-size:18px;font-weight:500;letter-spacing:-.015em}
+  .rfm-x{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:none;color:#fff;font-size:18px;line-height:1;cursor:pointer}
+  .rfm-list{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 20px calc(22px + env(safe-area-inset-bottom,0px))}
+
+  .rfm-q{border-bottom:1px solid rgba(255,255,255,.1)}
+  .rfm-q:last-child{border-bottom:0}
+  .rfm-q summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr 16px;gap:14px;align-items:center;padding:15px 0;font-size:15px;font-weight:500;line-height:1.35;-webkit-tap-highlight-color:transparent}
+  .rfm-q summary::-webkit-details-marker{display:none}
+  .rfm-q summary:focus-visible{outline:2px solid #E5231B;outline-offset:3px}
+  .rfm-t{display:flex;align-items:center;gap:10px}
+  .rfm-i{position:relative;width:16px;height:16px}
+  .rfm-i::before,.rfm-i::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:1.5px;background:#E5231B;transform:translate(-50%,-50%);transition:transform .3s}
+  .rfm-i::after{transform:translate(-50%,-50%) rotate(90deg)}
+  .rfm-q[open] .rfm-i::after{transform:translate(-50%,-50%) rotate(0)}
+  .rfm-a p{margin:0;padding:0 8px 16px 0;color:#c4c4c4;font-size:14px;line-height:1.6}
+  .rfm-a b{color:#fff;font-weight:500}
+  .rfm-a a{color:#fff;text-decoration:underline;text-decoration-color:#E5231B;text-underline-offset:3px}
+  .rfm-seal{flex:none;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#E5231B;color:#fff;font-size:10px;font-weight:500;box-shadow:inset 0 0 0 2px #E5231B,inset 0 0 0 3px rgba(255,255,255,.55)}
+  .rfm-eb .rfm-a p{color:#fff}
+  .rfm-a .rfm-tc{font-size:11px;color:#8a8a8a;margin-top:-8px}
+  .rfm-a .rfm-tc a{color:#8a8a8a;text-decoration-color:#8a8a8a}
+}
+@media (prefers-reduced-motion:reduce){.rfm-sheet[open]{animation:none}.rfm-i::before,.rfm-i::after{transition:none}}
+</style>
+
+  <button type="button" class="rfm-open" aria-haspopup="dialog" aria-controls="rfm-sheet">
+    <span class="rfm-q-mark" aria-hidden="true">?</span>
+    <span><b>Frequently asked questions</b><small>Fees, Earn-Back, payouts, NRIs</small></span>
+    <span class="rfm-chev" aria-hidden="true"></span>
+  </button>
+
+  <dialog class="rfm-sheet" id="rfm-sheet" aria-labelledby="rfm-title">
+    <div class="rfm-grab" aria-hidden="true"></div>
+    <div class="rfm-head">
+      <h2 id="rfm-title">Frequently asked questions</h2>
+      <button type="button" class="rfm-x" aria-label="Close">×</button>
+    </div>
+    <div class="rfm-list" data-lenis-prevent>
+<details class="rfm-q">
+      <summary><span class="rfm-t">What is Outpost Classic?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>A programme where Red Flag designs, brands, launches and runs your short-stay property end to end. You pay a one-time programme fee, then <b>8% of booking revenue or ₹4,999 a month, whichever is higher</b>.</p></div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">I already own a property. What do I pay?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>The programme fee, electricity and utilities. No rent, no deposit.</p></div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">I don’t own a property. Can I still join?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>Yes. We help you find and assess a high-demand property before you sign a lease. You pay the programme fee, the rent and deposit to your landlord, and electricity.</p></div>
+    </details>
+    <details class="rfm-q rfm-eb">
+      <summary><span class="rfm-t"><span class="rfm-seal" aria-hidden="true">12</span>What is the Earn-Back Promise?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a">
+        <p>If your Outpost’s net operating profit in its first 12 full months after going live is less than the programme fee you paid, <b>we pay you the difference</b>, within 30 days of a valid claim. No questions asked.</p>
+        <p class="rfm-tc"><a href="#terms">T&amp;C*</a></p>
+      </div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">Is my return guaranteed?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>No. Earnings depend on occupancy, rates, season and location, and a property can earn less or more than its costs. The only guarantee is the Earn-Back Promise, exactly as written.</p></div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">Why is your commission only 8%?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>Our operations run on an AI system rather than a large payroll, so each extra property costs us little to run.</p></div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">Can I start with less than the cost, if I have a valid issue?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>Yes, with Setup Flex. <a href="#apply">Talk to our team</a> to see how it works for you.</p></div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">How long until my property is live?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>Under 45 days from signing, if the property is ready to work on.</p></div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">When and how am I paid?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>Twice a month, on the 1st and 16th, with a statement showing every booking and deduction.</p></div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">Can I still use my property?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>Yes. Owner nights are agreed at signing and blocked in the calendar. Nights you block beyond that allowance are excluded from the Earn-Back Promise.</p></div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">I live abroad. Can I join?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>Yes. NRIs can join fully remotely for a property in India. Payouts go to your NRO account, and Indian tax is deducted at source as the law requires.</p></div>
+    </details>
+    <details class="rfm-q">
+      <summary><span class="rfm-t">Do you operate in Dubai, London and New York?</span><span class="rfm-i" aria-hidden="true"></span></summary>
+      <div class="rfm-a"><p>We run Indian Outposts for partners living there now. Dubai Outposts open in 2027 under local holiday-home licensing; London and New York follow where local short-stay rules allow.</p></div>
+    </details>
+    </div>
+  </dialog>
+
+<script>
+(function(){
+  var root=document.getElementById('faq-mobile'); if(!root) return;
+  var sheet=root.querySelector('.rfm-sheet'), openBtn=root.querySelector('.rfm-open'), closeBtn=root.querySelector('.rfm-x');
+  if(!sheet || typeof sheet.showModal!=='function') return;
+  function open(){ sheet.showModal(); if(window.lenis&&lenis.stop) lenis.stop(); }
+  function close(){ sheet.close(); }
+  sheet.addEventListener('close',function(){ if(window.lenis&&lenis.start) lenis.start(); openBtn.focus(); });
+  openBtn.addEventListener('click',open);
+  closeBtn.addEventListener('click',close);
+  sheet.addEventListener('click',function(e){ if(e.target===sheet) close(); });           /* tap outside */
+  sheet.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener('click',close); });
+  var qs=sheet.querySelectorAll('.rfm-q');
+  qs.forEach(function(d){ d.addEventListener('toggle',function(){ if(d.open) qs.forEach(function(o){ if(o!==d) o.open=false; }); }); });
+  /* swipe down on the handle area to close */
+  var y0=null, head=sheet.querySelector('.rfm-grab');
+  [head, sheet.querySelector('.rfm-head')].forEach(function(el){
+    el.addEventListener('touchstart',function(e){ y0=e.touches[0].clientY; },{passive:true});
+    el.addEventListener('touchend',function(e){ if(y0!==null && e.changedTouches[0].clientY-y0>60) close(); y0=null; },{passive:true});
+  });
+})();
+</script>
+</div>
+<!-- ================= MOBILE FOOTER FAQ END — copy to here ================= -->
+
   <p id="wordmark"><span class="sr-only">Red Flag Outpost</span><span id="wmInner" aria-hidden="true"></span></p>
   <p class="foot-legal">© 2026 Red Flag Homes Network. All rights reserved. A company of Red Flag World Holdings Ltd, London.</p>
 </footer>
@@ -1607,23 +2271,26 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
         </div>
       </div>
       <div class="dock-mob" aria-label="Mobile Navigation">
-        <a class="mob-tab" href="#top" aria-label="Home">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          <span>Home</span>
+        <a class="mob-tab mob-eb" href="#rf-classic" data-sec="rf-classic" aria-label="Earn-Back Promise">
+          <svg class="dock-eb-seal" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="50" cy="50" r="48" fill="#E5231B"/>
+            <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="1.8"/>
+            <text x="50" y="52" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-family="'Instrument Serif', Georgia, serif" font-size="40" font-weight="600" letter-spacing="-0.02em">12</text>
+          </svg>
+          <div class="mob-eb-text">
+            <span>Earn-Back</span>
+            <span>Promise</span>
+          </div>
         </a>
-        <a class="mob-tab" href="#echo" aria-label="Outpost">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v5"/></svg>
-          <span>Outpost</span>
-        </a>
-        <a class="mob-tab" href="#economics" aria-label="Yield">
+        <a class="mob-tab" href="#economics" data-sec="economics" aria-label="Yield">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
           <span>Yield</span>
         </a>
-        <a class="mob-tab" href="#reviews" aria-label="Stories">
+        <a class="mob-tab" href="#reviews" data-sec="reviews" aria-label="Stories">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
           <span>Stories</span>
         </a>
-        <a class="mob-tab mob-apply" href="#apply" aria-label="Apply">
+        <a class="mob-tab mob-apply" href="#apply" data-sec="apply" aria-label="Apply">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
           <span>Apply</span>
         </a>
@@ -1649,6 +2316,7 @@ setRoot();addEventListener("resize",setRoot);
 
 /* ---------- lenis + ticker ---------- */
 const lenis=new Lenis({smoothWheel:true,anchors:true});
+window.lenis=lenis;
 const subs=[];
 function frame(t){lenis.raf(t);for(const f of subs){try{f(t)}catch(e){console.error(e)}}requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
@@ -1957,10 +2625,89 @@ menuBtn?.addEventListener("click",()=>{
 menu?.addEventListener("click",e=>{if(e.target.tagName==="A"){menu.classList.remove("open");menuBtn.setAttribute("aria-expanded","false")}});
 addEventListener("keydown",e=>{if(e.key==="Escape"){menu?.classList.remove("open");menuBtn?.setAttribute("aria-expanded","false")}});
 
+/* ---------- mobile bottom nav: active state tracking & smooth scroll ---------- */
+(function() {
+  const mobDock = document.querySelector('.dock-mob');
+  if (!mobDock) return;
+
+  const ebBadge = mobDock.querySelector('.mob-tab.mob-eb');
+  function scrollToClassic(e) {
+    if (e) e.preventDefault();
+    const target = document.getElementById('rf-classic') || document.getElementById('rf-classic-mount') || document.getElementById('rfc-title');
+    if (!target) return;
+    if (window.lenis && typeof window.lenis.scrollTo === 'function') {
+      window.lenis.scrollTo(target, { offset: -24, duration: 1.2 });
+    } else {
+      const top = target.getBoundingClientRect().top + window.pageYOffset - 24;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    }
+  }
+  if (ebBadge) {
+    ebBadge.addEventListener('click', scrollToClassic);
+  }
+
+  const navItems = [
+    { id: 'rf-classic', fallbackId: 'rf-classic-mount', tab: mobDock.querySelector('[data-sec="rf-classic"]') },
+    { id: 'economics', tab: mobDock.querySelector('[data-sec="economics"]') },
+    { id: 'reviews', tab: mobDock.querySelector('[data-sec="reviews"]') },
+    { id: 'apply', tab: mobDock.querySelector('[data-sec="apply"]') }
+  ];
+
+  function updateActiveNav() {
+    if (window.innerWidth >= 768) return;
+    const viewMid = window.innerHeight * 0.42;
+    let activeItem = null;
+
+    // Check if scrolled near bottom of page -> highlight Apply
+    const scrollBottom = window.innerHeight + window.pageYOffset;
+    const docHeight = document.documentElement.scrollHeight;
+    if (scrollBottom >= docHeight - 80) {
+      activeItem = navItems.find(it => it.id === 'apply');
+    } else {
+      for (const item of navItems) {
+        const el = document.getElementById(item.id) || (item.fallbackId ? document.getElementById(item.fallbackId) : null);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= viewMid && rect.bottom >= viewMid * 0.35) {
+          activeItem = item;
+          break;
+        }
+      }
+    }
+
+    navItems.forEach(item => {
+      if (!item.tab) return;
+      const isCurrent = item === activeItem;
+      item.tab.classList.toggle('active', isCurrent);
+      item.tab.classList.toggle('is-active', isCurrent);
+      if (isCurrent) {
+        item.tab.setAttribute('aria-current', 'page');
+      } else {
+        item.tab.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  if (window.lenis && typeof window.lenis.on === 'function') {
+    window.lenis.on('scroll', updateActiveNav);
+  }
+  window.addEventListener('resize', updateActiveNav, { passive: true });
+  window.addEventListener('load', updateActiveNav);
+  setTimeout(updateActiveNav, 300);
+  setTimeout(updateActiveNav, 1000);
+})();
+
 /* ---------- ticker ---------- */
 const TICK=["9–12% commission","Cleaning handled","Maintenance handled","Zero staff","Creator-led marketing","AI-run operations"];
 const row=document.getElementById("tickRow");
-for(let r=0;r<2;r++)TICK.forEach(x=>{const s=document.createElement("span");s.textContent=x+" ·";row.appendChild(s)});
+for(let r=0;r<2;r++){
+  const ebSpan=document.createElement("span");
+  ebSpan.className="tick-eb";
+  ebSpan.innerHTML='<svg class="eb-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" style="display:inline-block;vertical-align:-1px;margin-right:4px" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span style="color:var(--accent);font-weight:600;letter-spacing:var(--track-caps)">EARN-BACK PROMISE</span> ·';
+  row.appendChild(ebSpan);
+  TICK.forEach(x=>{const s=document.createElement("span");s.textContent=x+" ·";row.appendChild(s)});
+}
 
 /* ---------- economics toggle & D3.js occupancy trends ---------- */
 const DATA={
@@ -2326,6 +3073,526 @@ if(chartContainer && typeof ResizeObserver !== "undefined"){
     }, 120);
   });
   ro.observe(chartContainer);
+}
+
+/* ---------- 6-Month Projected Growth Differences (D3.js Multi-Line Chart) ---------- */
+let growthViewMode = "monthly"; // "monthly" | "cumulative"
+const growthSeriesState = {
+  villa: true,
+  classic: true,
+  studio: true,
+  trad: true
+};
+
+const GROWTH_SERIES_CONFIG = {
+  villa: {
+    id: "villa",
+    name: "Red Flag Outpost (Villa)",
+    shortName: "Outpost Villa",
+    color: "#E5231B",
+    strokeColor: "#E5231B",
+    areaColor: "rgba(229,35,27,0.14)",
+    className: "growth-line-villa",
+    dash: null
+  },
+  classic: {
+    id: "classic",
+    name: "Red Flag Outpost (Classic)",
+    shortName: "Outpost Classic",
+    color: "#f59e0b",
+    strokeColor: "#f59e0b",
+    areaColor: "rgba(245,158,11,0.08)",
+    className: "growth-line-classic",
+    dash: null
+  },
+  studio: {
+    id: "studio",
+    name: "Red Flag Outpost (Studio)",
+    shortName: "Outpost Studio",
+    color: "#94a3b8",
+    strokeColor: "#94a3b8",
+    areaColor: "rgba(148,163,184,0.06)",
+    className: "growth-line-studio",
+    dash: null
+  },
+  trad: {
+    id: "trad",
+    name: "Traditional Let (Fixed)",
+    shortName: "Traditional Let",
+    color: "rgba(255,255,255,0.7)",
+    strokeColor: "rgba(255,255,255,0.5)",
+    areaColor: null,
+    className: "growth-line-trad",
+    dash: "5 4"
+  }
+};
+
+function getCleaningSchedule(occ, gross, marketKey) {
+  if (marketKey === "INR") {
+    if (typeof INDIA_CLEANING !== "undefined" && INDIA_CLEANING && INDIA_CLEANING[occ] !== undefined) {
+      return INDIA_CLEANING[occ];
+    }
+    return Math.round(gross * 0.126);
+  }
+  return Math.round(gross * 0.126);
+}
+
+function calculateGrowthSeries(market, occTier) {
+  const m = market || (window.getActiveMarket ? window.getActiveMarket() : { symbol: "₹", locale: "en-IN", adr: 9000, rent: 75000, code: "INR" });
+  const trends = (typeof OCC_TRENDS !== "undefined" && OCC_TRENDS[occTier]) ? OCC_TRENDS[occTier] : (typeof OCC_TRENDS !== "undefined" && OCC_TRENDS[60] ? OCC_TRENDS[60] : []);
+  
+  let cumTrad = 0;
+  let cumVilla = 0;
+  let cumClassic = 0;
+  let cumStudio = 0;
+
+  const points = (trends.length ? trends : [
+    { month: "Month 1", short: "M1", stage: "Creator Drop", occ: 42 },
+    { month: "Month 2", short: "M2", stage: "Rapid Traction", occ: 52 },
+    { month: "Month 3", short: "M3", stage: "High Yield", occ: 59 },
+    { month: "Month 4", short: "M4", stage: "Brand Momentum", occ: 64 },
+    { month: "Month 5", short: "M5", stage: "Peak Pacing", occ: 68 },
+    { month: "Month 6", short: "M6", stage: "Target Run-Rate", occ: 72 }
+  ]).map((item, idx) => {
+    const occ = item.occ;
+    // 1. Traditional Let (Fixed monthly rent benchmark)
+    const tradMonthly = m.rent;
+    cumTrad += tradMonthly;
+
+    // 2. Red Flag Outpost (Villa Model - 10.5% commission)
+    const villaGross = m.adr * 30 * (occ / 100);
+    const villaComm = villaGross * 0.105;
+    const villaClean = getCleaningSchedule(occ, villaGross, m.code);
+    const villaMonthly = Math.round(villaGross - villaComm - villaClean);
+    cumVilla += villaMonthly;
+
+    // 3. Red Flag Outpost (Classic Model - 8.0% commission with Earn-Back Promise)
+    const classicGross = villaGross;
+    const classicComm = classicGross * 0.08;
+    const classicClean = villaClean;
+    const classicMonthly = Math.round(classicGross - classicComm - classicClean);
+    cumClassic += classicMonthly;
+
+    // 4. Red Flag Outpost (Studio Model - 60% scale ADR, 12% commission)
+    const studioGross = (m.adr * 0.60) * 30 * (occ / 100);
+    const studioComm = studioGross * 0.12;
+    const studioClean = Math.round(studioGross * 0.14);
+    const studioMonthly = Math.round(studioGross - studioComm - studioClean);
+    cumStudio += studioMonthly;
+
+    return {
+      index: idx,
+      month: item.month,
+      short: item.short,
+      stage: item.stage,
+      occ: occ,
+      monthly: {
+        trad: tradMonthly,
+        villa: villaMonthly,
+        classic: classicMonthly,
+        studio: studioMonthly
+      },
+      cumulative: {
+        trad: cumTrad,
+        villa: cumVilla,
+        classic: cumClassic,
+        studio: cumStudio
+      }
+    };
+  });
+
+  return { points, market: m };
+}
+
+function initGrowthChart() {
+  const container = document.getElementById("growth-d3-chart");
+  if (!container || !window.d3) return;
+
+  const d3 = window.d3;
+  container.innerHTML = "";
+
+  let tooltip = document.getElementById("growth-chart-tooltip");
+  if (!tooltip) {
+    tooltip = document.createElement("div");
+    tooltip.id = "growth-chart-tooltip";
+    tooltip.className = "d3-chart-tooltip";
+    container.appendChild(tooltip);
+  }
+
+  const rect = container.getBoundingClientRect();
+  const width = Math.max(280, rect.width || container.clientWidth || 600);
+  const height = Math.max(220, container.clientHeight || 300);
+  const isMobile = width < 540;
+
+  const margin = {
+    top: 36,
+    right: isMobile ? 18 : 36,
+    bottom: 38,
+    left: isMobile ? 54 : 72
+  };
+
+  const currentOccValue = typeof currentOcc !== "undefined" ? currentOcc : (typeof currentOccTier !== "undefined" ? currentOccTier : 60);
+  const activeM = window.getActiveMarket ? window.getActiveMarket() : { symbol: "₹", locale: "en-IN", adr: 9000, rent: 75000, code: "INR" };
+  const { points } = calculateGrowthSeries(activeM, currentOccValue);
+
+  const mode = growthViewMode; // "monthly" or "cumulative"
+  const fmtMoney = (val, m) => (window.formatMarketMoney ? window.formatMarketMoney(val, m) : (activeM.symbol + Math.round(val).toLocaleString(activeM.locale || "en-IN")));
+
+  // Calculate dynamic max domain from currently active series
+  const activeKeys = Object.keys(growthSeriesState).filter(k => growthSeriesState[k]);
+  let maxVal = 0;
+  points.forEach(p => {
+    activeKeys.forEach(k => {
+      const v = p[mode][k];
+      if (v > maxVal) maxVal = v;
+    });
+  });
+  if (maxVal === 0) maxVal = activeM.rent * 2;
+  const yCeiling = maxVal * 1.15; // 15% headroom for badges
+
+  const svg = d3.select(container)
+    .append("svg")
+    .attr("width", "100%")
+    .attr("height", height)
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "none")
+    .style("overflow", "visible");
+
+  const defs = svg.append("defs");
+
+  // Gradients for area fills
+  const gradVilla = defs.append("linearGradient")
+    .attr("id", "growthAreaVilla")
+    .attr("x1", "0%").attr("y1", "0%")
+    .attr("x2", "0%").attr("y2", "100%");
+  gradVilla.append("stop").attr("offset", "0%").attr("stop-color", "#E5231B").attr("stop-opacity", "0.22");
+  gradVilla.append("stop").attr("offset", "100%").attr("stop-color", "#E5231B").attr("stop-opacity", "0.0");
+
+  const gradClassic = defs.append("linearGradient")
+    .attr("id", "growthAreaClassic")
+    .attr("x1", "0%").attr("y1", "0%")
+    .attr("x2", "0%").attr("y2", "100%");
+  gradClassic.append("stop").attr("offset", "0%").attr("stop-color", "#f59e0b").attr("stop-opacity", "0.15");
+  gradClassic.append("stop").attr("offset", "100%").attr("stop-color", "#f59e0b").attr("stop-opacity", "0.0");
+
+  // Scales
+  const xScale = d3.scalePoint()
+    .domain(points.map(d => isMobile ? d.short : d.month))
+    .range([margin.left, width - margin.right])
+    .padding(0.12);
+
+  const yScale = d3.scaleLinear()
+    .domain([0, yCeiling])
+    .range([height - margin.bottom, margin.top]);
+
+  // Horizontal Grid Lines
+  const yTicks = yScale.ticks(isMobile ? 4 : 5);
+  svg.append("g")
+    .attr("class", "d3-grid")
+    .selectAll("line")
+    .data(yTicks)
+    .join("line")
+    .attr("x1", margin.left)
+    .attr("x2", width - margin.right)
+    .attr("y1", d => yScale(d))
+    .attr("y2", d => yScale(d));
+
+  // Axes
+  const xAxis = d3.axisBottom(xScale).tickSize(0).tickPadding(12);
+  svg.append("g")
+    .attr("class", "d3-axis d3-axis-x")
+    .attr("transform", `translate(0, ${height - margin.bottom})`)
+    .call(xAxis);
+
+  const yAxis = d3.axisLeft(yScale)
+    .ticks(isMobile ? 4 : 5)
+    .tickFormat(d => fmtMoney(d, activeM))
+    .tickSize(0)
+    .tickPadding(8);
+  svg.append("g")
+    .attr("class", "d3-axis d3-axis-y")
+    .attr("transform", `translate(${margin.left}, 0)`)
+    .call(yAxis);
+
+  // Line & Area generators
+  const lineGen = (key) => d3.line()
+    .x(d => xScale(isMobile ? d.short : d.month))
+    .y(d => yScale(d[mode][key]))
+    .curve(d3.curveMonotoneX);
+
+  const areaGen = (key) => d3.area()
+    .x(d => xScale(isMobile ? d.short : d.month))
+    .y0(height - margin.bottom)
+    .y1(d => yScale(d[mode][key]))
+    .curve(d3.curveMonotoneX);
+
+  // Render Area under Villa
+  if (growthSeriesState.villa) {
+    svg.append("path")
+      .datum(points)
+      .attr("class", "growth-area")
+      .attr("d", areaGen("villa"))
+      .attr("fill", "url(#growthAreaVilla)");
+  }
+
+  // Draw Lines in ordered sequence: trad, studio, classic, villa
+  const drawOrder = ["trad", "studio", "classic", "villa"];
+  const linesGroup = svg.append("g").attr("class", "growth-lines-group");
+
+  drawOrder.forEach(key => {
+    const cfg = GROWTH_SERIES_CONFIG[key];
+    const path = linesGroup.append("path")
+      .datum(points)
+      .attr("class", `growth-line ${cfg.className}`)
+      .attr("d", lineGen(key))
+      .attr("stroke", cfg.strokeColor)
+      .attr("stroke-dasharray", cfg.dash || null)
+      .attr("opacity", growthSeriesState[key] ? 1 : 0);
+
+    const totalLength = path.node() ? path.node().getTotalLength() : 0;
+    if (totalLength > 0 && growthSeriesState[key]) {
+      path.attr("stroke-dasharray", cfg.dash ? cfg.dash : `${totalLength} ${totalLength}`)
+        .attr("stroke-dashoffset", cfg.dash ? null : totalLength)
+        .transition()
+        .duration(800)
+        .ease(d3.easeCubicOut)
+        .attr("stroke-dashoffset", cfg.dash ? null : 0);
+    }
+  });
+
+  // Data Dots
+  const dotsGroup = svg.append("g").attr("class", "growth-dots-group");
+  drawOrder.forEach(key => {
+    const cfg = GROWTH_SERIES_CONFIG[key];
+    dotsGroup.selectAll(`.dot-${key}`)
+      .data(points)
+      .join("circle")
+      .attr("class", `growth-dot dot-${key}`)
+      .attr("cx", d => xScale(isMobile ? d.short : d.month))
+      .attr("cy", d => yScale(d[mode][key]))
+      .attr("r", isMobile ? 3 : 3.5)
+      .attr("fill", "#0f110f")
+      .attr("stroke", cfg.strokeColor)
+      .attr("opacity", growthSeriesState[key] ? 1 : 0);
+  });
+
+  // End of Month 6 Spread Badge Annotation
+  const m6Point = points[points.length - 1];
+  if (growthSeriesState.villa && growthSeriesState.trad) {
+    const villaVal = m6Point[mode].villa;
+    const tradVal = m6Point[mode].trad;
+    const spreadMult = (villaVal / Math.max(1, tradVal)).toFixed(1);
+    const badgeText = `${spreadMult}x Spread`;
+    const m6X = xScale(isMobile ? m6Point.short : m6Point.month);
+    const m6Y = yScale(villaVal);
+
+    const badgeG = svg.append("g")
+      .attr("class", "growth-spread-group")
+      .attr("transform", `translate(${m6X}, ${m6Y - 12})`);
+
+    badgeG.append("text")
+      .attr("class", "growth-spread-badge")
+      .attr("text-anchor", isMobile ? "end" : "middle")
+      .attr("x", isMobile ? -6 : 0)
+      .attr("y", 0)
+      .text(badgeText);
+  }
+
+  // Update Callout Footer Text
+  const calloutSpreadEl = document.getElementById("growthSpreadText");
+  if (calloutSpreadEl) {
+    const v6 = m6Point[mode].villa;
+    const t6 = m6Point[mode].trad;
+    const mult = (v6 / Math.max(1, t6)).toFixed(1);
+    if (mode === "monthly") {
+      const diff = v6 - t6;
+      calloutSpreadEl.textContent = `≈ ${mult}x yield spread (${fmtMoney(diff, activeM)}/mo extra) over traditional let at Month 6 run-rate`;
+    } else {
+      const cumDiff = v6 - t6;
+      calloutSpreadEl.textContent = `≈ ${mult}x 6-month cumulative payout (${fmtMoney(cumDiff, activeM)} total advantage over traditional lease)`;
+    }
+  }
+
+  // Crosshair vertical line
+  const crosshair = svg.append("line")
+    .attr("class", "growth-crosshair")
+    .attr("y1", margin.top)
+    .attr("y2", height - margin.bottom)
+    .attr("opacity", 0);
+
+  // Overlay rect for tracking hover
+  const overlay = svg.append("rect")
+    .attr("class", "growth-overlay")
+    .attr("x", margin.left)
+    .attr("y", margin.top)
+    .attr("width", (width - margin.right) - margin.left)
+    .attr("height", (height - margin.bottom) - margin.top)
+    .attr("fill", "transparent")
+    .style("cursor", "crosshair");
+
+  function onPointerMove(event) {
+    const [pointerX] = d3.pointer(event, container);
+    let closest = points[0];
+    let minDiff = Infinity;
+    points.forEach(p => {
+      const px = xScale(isMobile ? p.short : p.month);
+      const diff = Math.abs(px - pointerX);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = p;
+      }
+    });
+
+    const cx = xScale(isMobile ? closest.short : closest.month);
+    crosshair
+      .attr("x1", cx)
+      .attr("x2", cx)
+      .attr("opacity", 1);
+
+    // Enlarge active dots
+    dotsGroup.selectAll(".growth-dot")
+      .attr("r", function(d) {
+        return d.index === closest.index ? 6 : (isMobile ? 3 : 3.5);
+      });
+
+    // Populate Tooltip
+    const tradVal = closest[mode].trad;
+    const villaVal = closest[mode].villa;
+    const classicVal = closest[mode].classic;
+    const studioVal = closest[mode].studio;
+
+    const vSpread = Math.round(((villaVal - tradVal) / tradVal) * 100);
+    const cSpread = Math.round(((classicVal - tradVal) / tradVal) * 100);
+    const vMult = (villaVal / Math.max(1, tradVal)).toFixed(1);
+
+    tooltip.innerHTML = `
+      <div class="d3-tooltip-month">
+        <span>${closest.month} · ${closest.stage}</span>
+        <span class="d3-tooltip-status profitable">${closest.occ}% Occ</span>
+      </div>
+      <div class="d3-tooltip-row">
+        <span style="color:#ffffff;display:inline-flex;align-items:center;gap:5px">
+          <span style="width:8px;height:8px;border-radius:2px;background:#E5231B;display:inline-block"></span>
+          Red Flag Outpost (Villa):
+        </span>
+        <b>${fmtMoney(villaVal, activeM)} <span style="color:#4ade80;font-size:11px">(${vSpread >= 0 ? '+' + vSpread + '%' : vSpread + '%'} · ${vMult}x)</span></b>
+      </div>
+      <div class="d3-tooltip-row">
+        <span style="color:rgba(255,255,255,0.85);display:inline-flex;align-items:center;gap:5px">
+          <span style="width:8px;height:8px;border-radius:2px;background:#f59e0b;display:inline-block"></span>
+          Red Flag Outpost (Classic):
+        </span>
+        <b>${fmtMoney(classicVal, activeM)} <span style="color:#f59e0b;font-size:11px">(${cSpread >= 0 ? '+' + cSpread + '%' : cSpread + '%'})</span></b>
+      </div>
+      <div class="d3-tooltip-row">
+        <span style="color:rgba(255,255,255,0.7);display:inline-flex;align-items:center;gap:5px">
+          <span style="width:8px;height:8px;border-radius:2px;background:#94a3b8;display:inline-block"></span>
+          Red Flag Outpost (Studio):
+        </span>
+        <b>${fmtMoney(studioVal, activeM)}</b>
+      </div>
+      <div class="d3-tooltip-row" style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px">
+        <span style="color:rgba(255,255,255,0.6);display:inline-flex;align-items:center;gap:5px">
+          <span style="width:8px;height:0;border-top:1.5px dashed rgba(255,255,255,0.8);display:inline-block"></span>
+          Traditional Let (Fixed):
+        </span>
+        <b>${fmtMoney(tradVal, activeM)} <span style="color:rgba(255,255,255,0.5);font-size:10px">(Baseline)</span></b>
+      </div>
+      <div class="d3-tooltip-row" style="margin-top:4px;color:var(--accent);font-size:11px;font-weight:600">
+        <span>Spread Advantage:</span>
+        <span>+${fmtMoney(villaVal - tradVal, activeM)} ${mode === 'monthly' ? '/ month' : 'cumulative'}</span>
+      </div>
+    `;
+
+    const tooltipX = cx;
+    const tooltipY = Math.min(yScale(villaVal), yScale(classicVal));
+    tooltip.style.left = tooltipX + "px";
+    tooltip.style.top = Math.max(margin.top + 10, tooltipY) + "px";
+    tooltip.classList.add("visible");
+  }
+
+  function onPointerLeave() {
+    crosshair.attr("opacity", 0);
+    dotsGroup.selectAll(".growth-dot").attr("r", isMobile ? 3 : 3.5);
+    tooltip.classList.remove("visible");
+  }
+
+  overlay
+    .on("mousemove", onPointerMove)
+    .on("touchmove", onPointerMove)
+    .on("mouseleave", onPointerLeave)
+    .on("touchend", onPointerLeave);
+}
+
+function updateGrowthChart() {
+  if (document.getElementById("growth-d3-chart")) {
+    initGrowthChart();
+  }
+}
+window.updateGrowthChart = updateGrowthChart;
+
+function setupGrowthChartControls() {
+  const btnMonthly = document.getElementById("growthModeMonthly");
+  const btnCumulative = document.getElementById("growthModeCumulative");
+
+  if (btnMonthly && btnCumulative) {
+    btnMonthly.onclick = () => {
+      if (growthViewMode === "monthly") return;
+      growthViewMode = "monthly";
+      btnMonthly.setAttribute("aria-pressed", "true");
+      btnCumulative.setAttribute("aria-pressed", "false");
+      initGrowthChart();
+    };
+
+    btnCumulative.onclick = () => {
+      if (growthViewMode === "cumulative") return;
+      growthViewMode = "cumulative";
+      btnCumulative.setAttribute("aria-pressed", "true");
+      btnMonthly.setAttribute("aria-pressed", "false");
+      initGrowthChart();
+    };
+  }
+
+  document.querySelectorAll(".growth-legend-item").forEach(item => {
+    item.onclick = () => {
+      const seriesKey = item.dataset.series;
+      if (!seriesKey || growthSeriesState[seriesKey] === undefined) return;
+      growthSeriesState[seriesKey] = !growthSeriesState[seriesKey];
+      item.classList.toggle("is-dimmed", !growthSeriesState[seriesKey]);
+      item.setAttribute("aria-pressed", String(growthSeriesState[seriesKey]));
+      initGrowthChart();
+    };
+  });
+}
+
+function setupGrowthChart() {
+  if (window.d3) {
+    setupGrowthChartControls();
+    initGrowthChart();
+  } else {
+    const s = document.querySelector('script[src*="d3"]');
+    if (s) {
+      s.addEventListener('load', () => {
+        setupGrowthChartControls();
+        initGrowthChart();
+      });
+    } else {
+      setTimeout(setupGrowthChart, 50);
+    }
+  }
+}
+setupGrowthChart();
+
+const growthChartContainer = document.getElementById("growth-d3-chart");
+if (growthChartContainer && typeof ResizeObserver !== "undefined") {
+  let gResizeTimer;
+  const gro = new ResizeObserver(() => {
+    clearTimeout(gResizeTimer);
+    gResizeTimer = setTimeout(() => {
+      initGrowthChart();
+    }, 120);
+  });
+  gro.observe(growthChartContainer);
 }
 
 /* ---------- Toast Notification System ---------- */
@@ -2725,8 +3992,8 @@ const MARKETS = {
     rent: 75000,
     util: 12000,
     deposit: 450000,
-    franchise: { studio: 29999, villa: 49999 },
-    setup: { studio: 99000, villa: 150000 }
+    franchise: { studio: 29999, villa: 49999, classic: 59999 },
+    setup: { studio: 99000, villa: 150000, classic: 111111 }
   },
   GBP: {
     name: "UK",
@@ -2738,8 +4005,8 @@ const MARKETS = {
     rent: 2200,
     util: 340,
     deposit: 13200,
-    franchise: { studio: 2600, villa: 4400 },
-    setup: { studio: 8700, villa: 13200 }
+    franchise: { studio: 2600, villa: 4400, classic: 5300 },
+    setup: { studio: 8700, villa: 13200, classic: 9800 }
   },
   AED: {
     name: "UAE",
@@ -2751,8 +4018,8 @@ const MARKETS = {
     rent: 11000,
     util: 1700,
     deposit: 66000,
-    franchise: { studio: 11800, villa: 19700 },
-    setup: { studio: 39000, villa: 59000 }
+    franchise: { studio: 11800, villa: 19700, classic: 23600 },
+    setup: { studio: 39000, villa: 59000, classic: 43700 }
   },
   USD: {
     name: "US",
@@ -2764,8 +4031,8 @@ const MARKETS = {
     rent: 2900,
     util: 450,
     deposit: 17400,
-    franchise: { studio: 3800, villa: 6400 },
-    setup: { studio: 12600, villa: 19100 }
+    franchise: { studio: 3800, villa: 6400, classic: 7600 },
+    setup: { studio: 12600, villa: 19100, classic: 14100 }
   }
 };
 
@@ -2936,22 +4203,41 @@ function render(newOcc, newMarketKey) {
     echoPEl.textContent = `${formatMarketMoney(gross, m)} gross monthly revenue at ${occ}% occupancy. Approximately 2x the yield spread of a traditional let. Full workings below.`;
   }
 
-  // 5. The three <dd> cells on each of the first two #deck .tcard cards (franchise fee, setup, total)
-  const cards = document.querySelectorAll("#deck .tcard");
-  if (cards.length >= 2) {
-    // Card 0: Studio
-    const studioDds = cards[0].querySelectorAll("dd");
-    if (studioDds.length >= 3) {
+  // 5. The three <dd> cells on each #deck .tcard card (found by data-tier)
+  const studioCard = document.querySelector('#deck .tcard[data-tier="studio"]');
+  if (studioCard) {
+    const studioDds = studioCard.querySelectorAll("dd");
+    if (studioDds.length >= 3 && m.franchise && m.franchise.studio !== undefined) {
       studioDds[0].textContent = formatMarketMoney(m.franchise.studio, m);
       studioDds[1].textContent = formatMarketMoney(m.setup.studio, m);
       studioDds[2].textContent = formatMarketMoney(m.franchise.studio + m.setup.studio, m);
     }
-    // Card 1: Villa
-    const villaDds = cards[1].querySelectorAll("dd");
-    if (villaDds.length >= 3) {
+  }
+
+  const villaCard = document.querySelector('#deck .tcard[data-tier="villa"]');
+  if (villaCard) {
+    const villaDds = villaCard.querySelectorAll("dd");
+    if (villaDds.length >= 3 && m.franchise && m.franchise.villa !== undefined) {
       villaDds[0].textContent = formatMarketMoney(m.franchise.villa, m);
       villaDds[1].textContent = formatMarketMoney(m.setup.villa, m);
       villaDds[2].textContent = formatMarketMoney(m.franchise.villa + m.setup.villa, m);
+    }
+  }
+
+  const classicCard = document.querySelector('#deck .tcard[data-tier="classic"]');
+  if (classicCard) {
+    const classicDds = classicCard.querySelectorAll("dd");
+    if (classicDds.length >= 3 && m.franchise && m.franchise.classic !== undefined) {
+      classicDds[0].textContent = formatMarketMoney(m.franchise.classic, m);
+      classicDds[1].textContent = formatMarketMoney(m.setup.classic, m);
+      classicDds[2].textContent = formatMarketMoney(m.franchise.classic + m.setup.classic, m);
+    }
+    const minValEl = classicCard.querySelector(".tcard__min-val");
+    if (minValEl) {
+      const minInr = 4999;
+      const rate = m.code === "INR" ? 1 : (m.code === "GBP" ? 110 : (m.code === "AED" ? 22.8 : 84));
+      const minConverted = Math.round(minInr / rate);
+      minValEl.textContent = formatMarketMoney(minConverted, m);
     }
   }
 
@@ -2974,9 +4260,12 @@ function render(newOcc, newMarketKey) {
     });
   }
 
-  // Update D3 chart if available
+  // Update D3 charts if available
   if (typeof updateOccupancyChart === "function") {
     updateOccupancyChart(occ);
+  }
+  if (typeof updateGrowthChart === "function") {
+    updateGrowthChart();
   }
 }
 
@@ -3060,169 +4349,181 @@ if (typeof window.rfClassicSetCurrency === 'function') {
   };
   /* ===================================================== */
 
+  window.RF_SETTINGS = SETTINGS;
+  function syncTermsLinks() {
+    var terms = (SETTINGS && SETTINGS.TERMS_LINK) || "#";
+    document.querySelectorAll(".eb-terms-link").forEach(function(a) {
+      a.href = terms;
+    });
+  }
+  syncTermsLinks();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", syncTermsLinks);
+  }
+
   var STATE = { cur: "INR" };
   var instances = [];
 
   /* ---------------- STYLES ---------------- */
   var CSS = [
-    "#rf-classic{--red:var(--accent,#E5231B);--gold:#ffca80;--mute:rgba(255,255,255,.6);--soft:rgba(255,255,255,.84);--rule:rgba(255,255,255,.14);background:var(--black,#000);color:var(--white,#fff);font-family:\"Instrument Sans\",system-ui,sans-serif;position:relative;overflow:hidden;isolation:isolate}",
+    "#rf-classic{display:block;width:100vw;max-width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);--red:var(--accent,#E5231B);--gold:#ffca80;--mute:rgba(255,255,255,.6);--soft:rgba(255,255,255,.84);--rule:rgba(255,255,255,.14);background:var(--black,#000);color:var(--white,#fff);font-family:\"Instrument Sans\",system-ui,sans-serif;position:relative;overflow:hidden;isolation:isolate}",
     "#rf-classic::before{content:\"\";position:absolute;top:0;left:0;right:0;height:160px;background:linear-gradient(to bottom,var(--black,#000) 0%,transparent 100%);z-index:5;pointer-events:none}",
     "#rf-classic::after{content:\"\";position:absolute;bottom:0;left:0;right:0;height:160px;background:linear-gradient(to top,var(--black,#000) 0%,transparent 100%);z-index:5;pointer-events:none}",
     "#rf-classic *{box-sizing:border-box}",
     "#rf-classic p{margin:0;line-height:1.55}",
     "#rf-classic h2,#rf-classic h3{margin:0;font-family:\"Instrument Sans\",system-ui,sans-serif}",
-    "#rf-classic .w{width:100%;max-width:68.75rem;margin:0 auto;padding:0 2.5rem}",
-    "@media(max-width:767.98px){#rf-classic .w{padding:0 1.5rem}}",
-    "#rf-classic .k{color:var(--red);letter-spacing:.22em;font-size:0.6875rem;text-transform:uppercase;margin-bottom:1.25rem;font-weight:500}",
+    "#rf-classic .rfc-w{width:100%;max-width:68.75rem;margin:0 auto;padding:0 2.5rem}",
+    "@media(max-width:767.98px){#rf-classic .rfc-w{padding:0 1.5rem}}",
+    "#rf-classic .rfc-k{color:var(--red);letter-spacing:.22em;font-size:0.6875rem;text-transform:uppercase;margin-bottom:1.25rem;font-weight:500}",
     "#rf-classic :focus-visible{outline:2px solid var(--red);outline-offset:3px}",
 
     /* hero with the gyre */
-    "#rf-classic .hero{position:relative;min-height:clamp(660px,94svh,900px);display:flex;align-items:flex-end;overflow:hidden;isolation:isolate}",
-    "#rf-classic .hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:-2}",
-    "#rf-classic .hero .shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.72) 34%,rgba(0,0,0,0) 62%),linear-gradient(to right,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 55%)}",
-    "#rf-classic .hero.nogl{background:radial-gradient(60% 45% at 62% 38%,rgba(255,202,128,.18),transparent 70%),var(--black,#000)}",
-    "#rf-classic .hc{width:100%;padding-bottom:clamp(40px,6vw,64px)}",
-    "#rf-classic .big{font-size:clamp(2.75rem,6.5vw,5.5rem);font-weight:600;line-height:.95;letter-spacing:-.035em;text-shadow:0 2px 30px rgba(0,0,0,.6)}",
-    "#rf-classic .big span{display:block}",
-    "#rf-classic .gold{background:linear-gradient(100deg,#fff 0%,#ffe2b8 30%,#ffca80 60%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}",
-    "#rf-classic .bigsub{color:var(--soft);font-size:clamp(1rem,1.3vw,1.25rem);margin-top:1rem;max-width:44ch}",
-    "#rf-classic .bigsub b{color:#fff;font-weight:500}",
-    "#rf-classic .launch{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.14);display:grid;gap:0.75rem}",
-    "#rf-classic .clk-l{color:var(--red);font-size:0.6875rem;letter-spacing:.22em;text-transform:uppercase;font-weight:500}",
-    "#rf-classic .clk{display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;margin-top:0.5rem}",
-    "#rf-classic .u{min-width:62px}",
-    "#rf-classic .u b{display:block;font-size:clamp(2rem,4vw,3.25rem);font-weight:500;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}",
-    "#rf-classic .u small{color:var(--mute);font-size:0.6875rem;letter-spacing:.16em;text-transform:uppercase}",
-    "#rf-classic .live{font-size:clamp(1.5rem,3vw,2.25rem);font-weight:500;letter-spacing:-.02em;margin-top:0.375rem}",
-    "#rf-classic .left{font-size:0.9375rem;color:var(--soft)}",
-    "#rf-classic .left b{color:var(--red);font-weight:500}",
+    "#rf-classic .rfc-hero{position:relative;min-height:clamp(660px,94svh,900px);display:flex;align-items:flex-end;overflow:hidden;isolation:isolate}",
+    "#rf-classic .rfc-hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:-2}",
+    "#rf-classic .rfc-hero .rfc-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.72) 34%,rgba(0,0,0,0) 62%),linear-gradient(to right,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 55%)}",
+    "#rf-classic .rfc-hero.rfc-nogl{background:radial-gradient(60% 45% at 62% 38%,rgba(255,202,128,.18),transparent 70%),var(--black,#000)}",
+    "#rf-classic .rfc-hc{width:100%;padding-bottom:clamp(40px,6vw,64px)}",
+    "#rf-classic .rfc-big{font-size:clamp(2.75rem,6.5vw,5.5rem);font-weight:600;line-height:.95;letter-spacing:-.035em;text-shadow:0 2px 30px rgba(0,0,0,.6)}",
+    "#rf-classic .rfc-big span{display:block}",
+    "#rf-classic .rfc-gold{background:linear-gradient(100deg,#fff 0%,#ffe2b8 30%,#ffca80 60%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}",
+    "#rf-classic .rfc-bigsub{color:var(--soft);font-size:clamp(1rem,1.3vw,1.25rem);margin-top:1rem;max-width:44ch}",
+    "#rf-classic .rfc-bigsub b{color:#fff;font-weight:500}",
+    "#rf-classic .rfc-launch{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.14);display:grid;gap:0.75rem}",
+    "#rf-classic .rfc-clk-l{color:var(--red);font-size:0.6875rem;letter-spacing:.22em;text-transform:uppercase;font-weight:500}",
+    "#rf-classic .rfc-clk{display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;margin-top:0.5rem}",
+    "#rf-classic .rfc-u{min-width:62px}",
+    "#rf-classic .rfc-u b{display:block;font-size:clamp(2rem,4vw,3.25rem);font-weight:500;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}",
+    "#rf-classic .rfc-u small{color:var(--mute);font-size:0.6875rem;letter-spacing:.16em;text-transform:uppercase}",
+    "#rf-classic .rfc-live{font-size:clamp(1.5rem,3vw,2.25rem);font-weight:500;letter-spacing:-.02em;margin-top:0.375rem}",
+    "#rf-classic .rfc-left{font-size:0.9375rem;color:var(--soft)}",
+    "#rf-classic .rfc-left b{color:var(--red);font-weight:500}",
 
     /* earn-back */
-    "#rf-classic .eb{background:var(--red);padding:clamp(40px,7vw,80px) 0}",
-    "#rf-classic .eb .k{color:#fff;opacity:.88}",
-    "#rf-classic .eb h3{font-size:clamp(2.25rem,5.5vw,4.5rem);font-weight:600;line-height:.97;letter-spacing:-.035em;max-width:14ch}",
-    "#rf-classic .eb .b{font-size:clamp(1rem,1.3vw,1.25rem);margin-top:1.25rem;max-width:48ch;line-height:1.55}",
-    "#rf-classic .ex{margin-top:1.5rem;display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:0.5rem 2rem;border-top:1px solid rgba(255,255,255,.35);padding-top:1.125rem}",
-    "#rf-classic .ex small{display:block;font-size:0.6875rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85}",
-    "#rf-classic .ex b{font-size:clamp(1.375rem,2.2vw,1.875rem);font-weight:500;letter-spacing:-.02em}",
-    "#rf-classic .fine{margin-top:1rem;font-size:0.875rem;opacity:.92}",
-    "#rf-classic .fine a{color:#fff;text-underline-offset:4px}",
+    "#rf-classic .rfc-eb{background:var(--red);padding:clamp(40px,7vw,80px) 0}",
+    "#rf-classic .rfc-eb .rfc-k{color:#fff;opacity:.88}",
+    "#rf-classic .rfc-eb h3{font-size:clamp(2.25rem,5.5vw,4.5rem);font-weight:600;line-height:.97;letter-spacing:-.035em;max-width:14ch}",
+    "#rf-classic .rfc-eb .rfc-b{font-size:clamp(1rem,1.3vw,1.25rem);margin-top:1.25rem;max-width:48ch;line-height:1.55}",
+    "#rf-classic .rfc-ex{margin-top:1.5rem;display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:0.5rem 2rem;border-top:1px solid rgba(255,255,255,.35);padding-top:1.125rem}",
+    "#rf-classic .rfc-ex small{display:block;font-size:0.6875rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85}",
+    "#rf-classic .rfc-ex b{font-size:clamp(1.375rem,2.2vw,1.875rem);font-weight:500;letter-spacing:-.02em}",
+    "#rf-classic .rfc-fine{margin-top:1rem;font-size:0.875rem;opacity:.92}",
+    "#rf-classic .rfc-fine a{color:#fff;text-underline-offset:4px}",
 
     /* body */
-    "#rf-classic .body{padding:clamp(30px,5vw,48px) 0 44px}",
-    "#rf-classic .path{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;background:none;border:0;border-bottom:1px solid var(--rule);color:#fff;font:inherit;text-align:left;padding:1.25rem 0;cursor:pointer;transition:color 0.15s ease}",
-    "#rf-classic .path span:first-child{font-size:clamp(1.25rem,2.2vw,1.75rem);font-weight:500;letter-spacing:-.015em}",
-    "#rf-classic .path small{display:block;color:var(--mute);font-size:0.875rem;margin-top:0.25rem;font-weight:400;letter-spacing:0}",
-    "#rf-classic .path i{font-style:normal;color:var(--red);font-size:1.625rem;line-height:1}",
-    "#rf-classic .path:hover span:first-child{color:var(--red)}",
-    "#rf-classic .price{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.625rem}",
-    "#rf-classic .pv{font-size:clamp(1.75rem,3.5vw,2.625rem);letter-spacing:-.03em;line-height:1;font-weight:500}",
-    "#rf-classic .pv.r{color:var(--red)}",
-    "#rf-classic .pl{color:var(--mute);font-size:0.875rem;margin-top:0.5rem;line-height:1.45}",
-    "#rf-classic .btn{display:inline-flex;align-items:center;justify-content:center;min-height:3.125rem;padding:0 1.625rem;border-radius:999px;font:inherit;font-size:0.8125rem;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;cursor:pointer;border:1px solid var(--red);background:var(--red);color:#fff;transition:transform 0.2s cubic-bezier(.25,1,.5,1),background 0.2s ease}",
-    "#rf-classic .btn:hover{transform:translateY(-1px)}",
-    "#rf-classic .cta{margin-top:1.625rem;width:100%}",
+    "#rf-classic .rfc-body{padding:clamp(30px,5vw,48px) 0 44px}",
+    "#rf-classic .rfc-path{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;background:none;border:0;border-bottom:1px solid var(--rule);color:#fff;font:inherit;text-align:left;padding:1.25rem 0;cursor:pointer;transition:color 0.15s ease}",
+    "#rf-classic .rfc-path span:first-child{font-size:clamp(1.25rem,2.2vw,1.75rem);font-weight:500;letter-spacing:-.015em}",
+    "#rf-classic .rfc-path small{display:block;color:var(--mute);font-size:0.875rem;margin-top:0.25rem;font-weight:400;letter-spacing:0}",
+    "#rf-classic .rfc-path i{font-style:normal;color:var(--red);font-size:1.625rem;line-height:1}",
+    "#rf-classic .rfc-path:hover span:first-child{color:var(--red)}",
+    "#rf-classic .rfc-price{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.625rem}",
+    "#rf-classic .rfc-pv{font-size:clamp(1.75rem,3.5vw,2.625rem);letter-spacing:-.03em;line-height:1;font-weight:500}",
+    "#rf-classic .rfc-pv.rfc-r{color:var(--red)}",
+    "#rf-classic .rfc-pl{color:var(--mute);font-size:0.875rem;margin-top:0.5rem;line-height:1.45}",
+    "#rf-classic .rfc-btn{display:inline-flex;align-items:center;justify-content:center;min-height:3.125rem;padding:0 1.625rem;border-radius:999px;font:inherit;font-size:0.8125rem;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;cursor:pointer;border:1px solid var(--red);background:var(--red);color:#fff;transition:transform 0.2s cubic-bezier(.25,1,.5,1),background 0.2s ease}",
+    "#rf-classic .rfc-btn:hover{transform:translateY(-1px)}",
+    "#rf-classic .rfc-cta{margin-top:1.625rem;width:100%}",
 
     /* coming soon */
-    "#rf-classic .cs{display:none;margin-top:1.75rem;border:1px solid rgba(255,255,255,.15);border-radius:1.25rem;padding:1.375rem;background:rgba(255,255,255,0.03)}",
-    "#rf-classic .cs.on{display:block}",
-    "#rf-classic .cs h3{font-size:1.375rem;font-weight:500}",
-    "#rf-classic .cs .s{color:var(--soft);font-size:0.9375rem;margin-top:0.5rem}",
-    "#rf-classic .cs form{display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;margin-top:0.875rem}",
-    "#rf-classic .full{grid-column:1/-1}",
+    "#rf-classic .rfc-cs{display:none;margin-top:1.75rem;border:1px solid rgba(255,255,255,.15);border-radius:1.25rem;padding:1.375rem;background:rgba(255,255,255,0.03)}",
+    "#rf-classic .rfc-cs.rfc-on{display:block}",
+    "#rf-classic .rfc-cs h3{font-size:1.375rem;font-weight:500}",
+    "#rf-classic .rfc-cs .rfc-s{color:var(--soft);font-size:0.9375rem;margin-top:0.5rem}",
+    "#rf-classic .rfc-cs form{display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;margin-top:0.875rem}",
+    "#rf-classic .rfc-full{grid-column:1/-1}",
     "#rf-classic label{display:grid;gap:0.375rem;font-size:0.8125rem;color:var(--mute)}",
     "#rf-classic input,#rf-classic select{font:inherit;color:#fff;background:#111;border:1px solid rgba(255,255,255,.2);border-radius:0.5rem;padding:0.625rem}",
-    "#rf-classic .chk{display:flex;gap:0.625rem;align-items:flex-start}",
-    "#rf-classic .legal{color:rgba(255,255,255,0.5);font-size:0.75rem;margin-top:1.375rem;line-height:1.5}",
+    "#rf-classic .rfc-chk{display:flex;gap:0.625rem;align-items:flex-start}",
+    "#rf-classic .rfc-legal{color:rgba(255,255,255,0.5);font-size:0.75rem;margin-top:1.375rem;line-height:1.5}",
 
     /* economics pop-up */
     "#rf-classic dialog{max-width:560px;width:calc(100% - 28px);max-height:calc(100% - 40px);overflow:auto;background:#000;color:#fff;border:1px solid var(--red);border-radius:24px;padding:30px 26px 24px;font-family:\"Instrument Sans\",system-ui,sans-serif}",
     "#rf-classic dialog::backdrop{background:rgba(0,0,0,.78)}",
-    "#rf-classic .x{position:absolute;top:10px;right:14px;background:none;border:0;color:var(--mute);font-size:28px;cursor:pointer;line-height:1}",
-    "#rf-classic .mt{font-size:clamp(1.625rem,3.5vw,2.125rem);font-weight:600;letter-spacing:-0.02em;line-height:1.05;margin-top:4px}",
-    "#rf-classic .mt:focus{outline:none}",
-    "#rf-classic .chips{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px}",
-    "#rf-classic .chips li{border:1px solid var(--rule);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--soft)}",
-    "#rf-classic .occ{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}",
-    "#rf-classic .opt{font:inherit;font-size:14px;padding:11px 6px;background:none;color:#fff;border:1px solid rgba(255,255,255,.2);cursor:pointer}",
-    "#rf-classic .opt[aria-pressed='true']{background:var(--red);border-color:var(--red)}",
-    "#rf-classic .lbl{color:var(--mute);font-size:13px;margin-top:20px}",
-    "#rf-classic .ln{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:15px}",
-    "#rf-classic .ln span:first-child{color:var(--mute)}",
-    "#rf-classic .ln.sub span{color:#fff}",
-    "#rf-classic .net{font-size:clamp(2.375rem,5vw,3.125rem);letter-spacing:-0.03em;line-height:1;margin-top:18px;font-weight:500}",
-    "#rf-classic .netl{color:var(--soft);margin-top:4px}",
-    "#rf-classic .back{color:var(--mute);font-size:14px}",
-    "#rf-classic .fx{color:rgba(255,255,255,.5);font-size:12px;margin-top:10px}",
-    "#rf-classic .swap{background:none;border:0;color:var(--mute);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:4px;cursor:pointer;margin-top:12px;padding:0}",
+    "#rf-classic .rfc-x{position:absolute;top:10px;right:14px;background:none;border:0;color:var(--mute);font-size:28px;cursor:pointer;line-height:1}",
+    "#rf-classic .rfc-mt{font-size:clamp(1.625rem,3.5vw,2.125rem);font-weight:600;letter-spacing:-0.02em;line-height:1.05;margin-top:4px}",
+    "#rf-classic .rfc-mt:focus{outline:none}",
+    "#rf-classic .rfc-chips{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px}",
+    "#rf-classic .rfc-chips li{border:1px solid var(--rule);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--soft)}",
+    "#rf-classic .rfc-occ{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}",
+    "#rf-classic .rfc-opt{font:inherit;font-size:14px;padding:11px 6px;background:none;color:#fff;border:1px solid rgba(255,255,255,.2);cursor:pointer}",
+    "#rf-classic .rfc-opt[aria-pressed='true']{background:var(--red);border-color:var(--red)}",
+    "#rf-classic .rfc-lbl{color:var(--mute);font-size:13px;margin-top:20px}",
+    "#rf-classic .rfc-ln{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:15px}",
+    "#rf-classic .rfc-ln span:first-child{color:var(--mute)}",
+    "#rf-classic .rfc-ln.rfc-sub span{color:#fff}",
+    "#rf-classic .rfc-net{font-size:clamp(2.375rem,5vw,3.125rem);letter-spacing:-0.03em;line-height:1;margin-top:18px;font-weight:500}",
+    "#rf-classic .rfc-netl{color:var(--soft);margin-top:4px}",
+    "#rf-classic .rfc-back{color:var(--mute);font-size:14px}",
+    "#rf-classic .rfc-fx{color:rgba(255,255,255,.5);font-size:12px;margin-top:10px}",
+    "#rf-classic .rfc-swap{background:none;border:0;color:var(--mute);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:4px;cursor:pointer;margin-top:12px;padding:0}",
 
-    "@media(max-width:767.98px){#rf-classic .body{padding-bottom:6rem !important}}",
-    "@media(max-width:640px){#rf-classic .cs form{grid-template-columns:1fr}#rf-classic .ex{grid-template-columns:1fr;gap:0}#rf-classic .ex div{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.25)}#rf-classic .ex div:last-child{border:0}#rf-classic .ex b{font-size:22px}#rf-classic .hero .shade{background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.8) 42%,rgba(0,0,0,0) 66%)}}"
+    "@media(max-width:767.98px){#rf-classic .rfc-body{padding-bottom:6rem !important}}",
+    "@media(max-width:640px){#rf-classic .rfc-cs form{grid-template-columns:1fr}#rf-classic .rfc-ex{grid-template-columns:1fr;gap:0}#rf-classic .rfc-ex div{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.25)}#rf-classic .rfc-ex div:last-child{border:0}#rf-classic .rfc-ex b{font-size:22px}#rf-classic .rfc-hero .rfc-shade{background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.8) 42%,rgba(0,0,0,0) 66%)}}"
   ].join("\n");
 
   /* ---------------- MARKUP ---------------- */
   var HTML =
   '<section id="rf-classic" aria-labelledby="rfc-title">' +
-    '<div class="hero" data-r="hero">' +
-      '<canvas data-r="gl" aria-hidden="true"></canvas><div class="shade"></div>' +
-      '<div class="hc"><div class="w">' +
-        '<p class="k">Red Flag Outpost Classic</p>' +
-        '<h2 class="big" id="rfc-title"><span>Take home</span><span class="gold" data-r="big">\u20B91.16 lakh</span><span>a month.</span></h2>' +
-        '<p class="bigsub">From a 3-key villa you own, at 60% occupancy.* That\u2019s <b data-r="gain"></b> more than a tenant pays you \u2014 and we run everything.</p>' +
-        '<div class="launch" aria-live="polite"><div data-r="clock"></div>' +
-          '<p class="left"><b data-r="left">200</b> of <span data-r="total">200</span> founding allocations left in India. The first 200 keep 8% for life.</p></div>' +
+    '<div class="rfc-hero" data-r="hero">' +
+      '<canvas data-r="gl" aria-hidden="true"></canvas><div class="rfc-shade"></div>' +
+      '<div class="rfc-hc"><div class="rfc-w">' +
+        '<p class="rfc-k">Red Flag Outpost Classic</p>' +
+        '<h2 class="rfc-big" id="rfc-title"><span>Take home</span><span class="rfc-gold" data-r="big">\u20B91.16 lakh</span><span>a month.</span></h2>' +
+        '<p class="rfc-bigsub">From a 3-key villa you own, at 60% occupancy.* That\u2019s <b data-r="gain"></b> more than a tenant pays you \u2014 and we run everything.</p>' +
+        '<div class="rfc-launch" aria-live="polite"><div data-r="clock"></div>' +
+          '<p class="rfc-left"><b data-r="left">200</b> of <span data-r="total">200</span> founding allocations left in India. The first 200 keep 8% for life.</p></div>' +
       '</div></div>' +
     '</div>' +
 
-    '<div class="eb"><div class="w">' +
-      '<p class="k">The Earn-Back Promise</p>' +
+    '<div class="rfc-eb"><div class="rfc-w">' +
+      '<p class="rfc-k">The Earn-Back Promise</p>' +
       '<h3>Earn it back in 12 months. Or we pay the difference.</h3>' +
-      '<p class="b">If your Outpost\u2019s net operating profit in its first 12 months after going live is less than the programme fee you paid, we pay you the difference. No quibbles. Written terms. Paid within 30 days.</p>' +
-      '<div class="ex"><div><small>Your Outpost nets</small><b data-r="ex1"></b></div><div><small>Your fee was</small><b data-r="ex2"></b></div><div><small>We pay you</small><b data-r="ex3"></b></div></div>' +
-      '<p class="fine">Example over year one. <a data-r="terms" href="#">Read the Earn-Back terms</a></p>' +
+      '<p class="rfc-b">If your Outpost\u2019s net operating profit in its first 12 months after going live is less than the programme fee you paid, we pay you the difference. No quibbles. Written terms. Paid within 30 days.</p>' +
+      '<div class="rfc-ex"><div><small>Your Outpost nets</small><b data-r="ex1"></b></div><div><small>Your fee was</small><b data-r="ex2"></b></div><div><small>We pay you</small><b data-r="ex3"></b></div></div>' +
+      '<p class="rfc-fine">Example over year one. <a data-r="terms" href="#">Read the Earn-Back terms</a></p>' +
     '</div></div>' +
 
-    '<div class="body"><div class="w">' +
-      '<button type="button" class="path" data-open="own" aria-haspopup="dialog"><span>I own a property<small>No rent, no deposit. See your numbers.</small></span><i aria-hidden="true">+</i></button>' +
-      '<button type="button" class="path" data-open="lease" aria-haspopup="dialog"><span>I don\u2019t own one<small>We help you find and lease it. See your numbers.</small></span><i aria-hidden="true">+</i></button>' +
-      '<div class="price"><div><div class="pv" data-r="fee"></div><p class="pl">one time, plus GST<br><span data-r="split"></span> \u00B7 up to 2 keys</p></div>' +
-        '<div><div class="pv r">8%</div><p class="pl">or <span data-r="min"></span> a month,<br>whichever is higher</p></div></div>' +
-      '<a class="btn cta" href="#apply">Apply for allocation</a>' +
-      '<div class="cs" data-r="cs" aria-live="polite">' +
+    '<div class="rfc-body"><div class="rfc-w">' +
+      '<button type="button" class="rfc-path" data-open="own" aria-haspopup="dialog"><span>I own a property<small>No rent, no deposit. See your numbers.</small></span><i aria-hidden="true">+</i></button>' +
+      '<button type="button" class="rfc-path" data-open="lease" aria-haspopup="dialog"><span>I don\u2019t own one<small>We help you find and lease it. See your numbers.</small></span><i aria-hidden="true">+</i></button>' +
+      '<div class="rfc-price"><div><div class="rfc-pv" data-r="fee"></div><p class="rfc-pl">one time, plus GST<br><span data-r="split"></span> \u00B7 up to 2 keys</p></div>' +
+        '<div><div class="rfc-pv rfc-r">8%</div><p class="rfc-pl">or <span data-r="min"></span> a month,<br>whichever is higher</p></div></div>' +
+      '<a class="rfc-btn rfc-cta" href="#apply">Apply for allocation</a>' +
+      '<div class="rfc-cs" data-r="cs" aria-live="polite">' +
         '<h3>Outposts in <span data-r="cscity">London</span> are coming soon.</h3>' +
-        '<p class="s">Join the list and we\u2019ll contact you before allocations open. Own a property in India? You can <a href="#apply" style="color:#fff">apply today</a>.</p>' +
+        '<p class="rfc-s">Join the list and we\u2019ll contact you before allocations open. Own a property in India? You can <a href="#apply" style="color:#fff">apply today</a>.</p>' +
         '<form data-r="form" novalidate>' +
           '<label>Full name<input name="name" required autocomplete="name"></label>' +
           '<label>Email<input name="email" type="email" required autocomplete="email"></label>' +
           '<label>Phone / WhatsApp<input name="phone" type="tel" required autocomplete="tel"></label>' +
           '<label>City<select name="city" data-r="cssel"><option>London</option><option>Dubai</option><option>New York</option></select></label>' +
-          '<label class="chk full"><input type="checkbox" name="consent" required> I agree to Red Flag contacting me about Outposts and to the Privacy Policy.</label>' +
-          '<div class="full"><button class="btn" type="submit">Request early access</button></div>' +
-        '</form><p class="s" data-r="ok" hidden></p>' +
+          '<label class="rfc-chk rfc-full"><input type="checkbox" name="consent" required> I agree to Red Flag contacting me about Outposts and to the Privacy Policy.</label>' +
+          '<div class="rfc-full"><button class="rfc-btn" type="submit">Request early access</button></div>' +
+        '</form><p class="rfc-s" data-r="ok" hidden></p>' +
       '</div>' +
-      '<p class="legal" data-r="legal">*Illustrative: 3-key villa, \u20B99,000 average nightly rate, 60% occupancy, after 8% commission, cleaning, maintenance and utilities; compared with \u20B975,000 market rent. Returns are not guaranteed and a property can earn less than its costs. The Earn-Back Promise is subject to the Programme Terms. Prices plus applicable taxes.</p>' +
+      '<p class="rfc-legal" data-r="legal">*Illustrative: 3-key villa, \u20B99,000 average nightly rate, 60% occupancy, after 8% commission, cleaning, maintenance and utilities; compared with \u20B975,000 market rent. Returns are not guaranteed and a property can earn less than its costs. The Earn-Back Promise is subject to the Programme Terms. Prices plus applicable taxes.</p>' +
     '</div></div>' +
 
     '<dialog data-r="econ" aria-labelledby="rfc-et">' +
-      '<button class="x" type="button" data-close aria-label="Close">\u00D7</button>' +
-      '<p class="k" data-r="ek"></p><p class="mt" id="rfc-et" data-r="et" tabindex="-1" autofocus></p>' +
-      '<ul class="chips" data-r="chips"></ul>' +
-      '<p class="lbl">Occupancy</p><div class="occ" role="group" aria-label="Occupancy">' +
-        '<button type="button" class="opt" data-occ="45" aria-pressed="false">45%</button>' +
-        '<button type="button" class="opt" data-occ="55" aria-pressed="false">55%</button>' +
-        '<button type="button" class="opt" data-occ="60" aria-pressed="true">60%</button>' +
-        '<button type="button" class="opt" data-occ="65" aria-pressed="false">65%</button></div>' +
-      '<div aria-live="polite"><div class="net" data-r="net"></div><p class="netl" data-r="netl"></p><p class="back" data-r="back"></p></div>' +
+      '<button class="rfc-x" type="button" data-close aria-label="Close">\u00D7</button>' +
+      '<p class="rfc-k" data-r="ek"></p><p class="rfc-mt" id="rfc-et" data-r="et" tabindex="-1" autofocus></p>' +
+      '<ul class="rfc-chips" data-r="chips"></ul>' +
+      '<p class="rfc-lbl">Occupancy</p><div class="rfc-occ" role="group" aria-label="Occupancy">' +
+        '<button type="button" class="rfc-opt" data-occ="45" aria-pressed="false">45%</button>' +
+        '<button type="button" class="rfc-opt" data-occ="55" aria-pressed="false">55%</button>' +
+        '<button type="button" class="rfc-opt" data-occ="60" aria-pressed="true">60%</button>' +
+        '<button type="button" class="rfc-opt" data-occ="65" aria-pressed="false">65%</button></div>' +
+      '<div aria-live="polite"><div class="rfc-net" data-r="net"></div><p class="rfc-netl" data-r="netl"></p><p class="rfc-back" data-r="back"></p></div>' +
       '<div style="margin-top:16px">' +
-        '<div class="ln"><span>Gross bookings</span><span data-r="g"></span></div>' +
-        '<div class="ln"><span data-r="cl">Red Flag 8%</span><span data-r="c"></span></div>' +
-        '<div class="ln"><span>Cleaning &amp; maintenance, at cost</span><span data-r="kk"></span></div>' +
-        '<div class="ln sub"><span>Your payout</span><span data-r="p"></span></div>' +
-        '<div class="ln"><span>Electricity &amp; utilities</span><span data-r="u"></span></div>' +
-        '<div class="ln"><span data-r="bl"></span><span data-r="b"></span></div></div>' +
-      '<p class="fx" data-r="fx"></p>' +
-      '<div style="margin-top:18px"><a class="btn" style="width:100%" href="#apply" data-close>Apply for allocation</a></div>' +
-      '<button type="button" class="swap" data-r="swap"></button>' +
+        '<div class="rfc-ln"><span>Gross bookings</span><span data-r="g"></span></div>' +
+        '<div class="rfc-ln"><span data-r="cl">Red Flag 8%</span><span data-r="c"></span></div>' +
+        '<div class="rfc-ln"><span>Cleaning &amp; maintenance, at cost</span><span data-r="kk"></span></div>' +
+        '<div class="rfc-ln rfc-sub"><span>Your payout</span><span data-r="p"></span></div>' +
+        '<div class="rfc-ln"><span>Electricity &amp; utilities</span><span data-r="u"></span></div>' +
+        '<div class="rfc-ln"><span data-r="bl"></span><span data-r="b"></span></div></div>' +
+      '<p class="rfc-fx" data-r="fx"></p>' +
+      '<div style="margin-top:18px"><a class="rfc-btn" style="width:100%" href="#apply" data-close>Apply for allocation</a></div>' +
+      '<button type="button" class="rfc-swap" data-r="swap"></button>' +
     '</dialog>' +
   '</section>';
 
@@ -3277,8 +4578,17 @@ if (typeof window.rfClassicSetCurrency === 'function') {
     STATE.cur = code;
     instances.forEach(function (i) { i.render(); });
   }
+  window.__rfClassicLoaded = true;
   window.rfClassicSetCurrency = setCurrency;
   window.addEventListener("rf:currency", function (e) { setCurrency(e.detail); });
+
+  // On load, read localStorage rf_market, map IN->INR, GB->GBP, AE->AED, US->USD, and apply
+  try {
+    var rawStoredMarket = localStorage.getItem('rf_market');
+    var marketMap = { IN: 'INR', GB: 'GBP', AE: 'AED', US: 'USD' };
+    var initialClassicCode = (rawStoredMarket && marketMap[rawStoredMarket.toUpperCase()]) || 'INR';
+    if (initialClassicCode) setCurrency(initialClassicCode);
+  } catch (err) {}
 
   function outsideClassic(el) { return !(el && el.closest && el.closest("#rf-classic")); }
   document.addEventListener("click", function (e) {
@@ -3402,14 +4712,14 @@ if (typeof window.rfClassicSetCurrency === 'function') {
 
   function startGyre(hero, canvas) {
     var gl = canvas.getContext("webgl", { antialias: false, alpha: false, premultipliedAlpha: false, powerPreference: "high-performance" });
-    if (!gl) { hero.classList.add("nogl"); return function () {}; }
+    if (!gl) { hero.classList.add("rfc-nogl"); return function () {}; }
     function sh(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
       if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { throw new Error(gl.getShaderInfoLog(s)); } return s; }
     function prog(fs) { var p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs));
       gl.bindAttribLocation(p, 0, "aPos"); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; }
     var bakeP, mainP;
     try { bakeP = prog(BAKE_FS); mainP = prog(MAIN_FS); }
-    catch (err) { console.warn("[Red Flag Outpost] WebGL shader failed, using static background.", err); hero.classList.add("nogl"); return function () {}; }
+    catch (err) { console.warn("[Red Flag Outpost] WebGL shader failed, using static background.", err); hero.classList.add("rfc-nogl"); return function () {}; }
 
     var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -3553,7 +4863,7 @@ if (typeof window.rfClassicSetCurrency === 'function') {
     // launch clock
     var launchAt = new Date(SETTINGS.LAUNCH).getTime();
     function pad(n) { return (n < 10 ? "0" : "") + n; }
-    function unit(v, l) { return '<div class="u"><b>' + v + '</b><small>' + l + '</small></div>'; }
+    function unit(v, l) { return '<div class="rfc-u"><b>' + v + '</b><small>' + l + '</small></div>'; }
     function ago(s) {
       if (s < 60) return s + (s === 1 ? " second" : " seconds");
       var m = Math.floor(s / 60); if (m < 60) return m + (m === 1 ? " minute" : " minutes");
@@ -3564,10 +4874,10 @@ if (typeof window.rfClassicSetCurrency === 'function') {
       var diff = Math.floor((launchAt - Date.now()) / 1000), c = q("clock");
       if (diff > 0) {
         var d = Math.floor(diff / 86400), h = Math.floor(diff % 86400 / 3600), m = Math.floor(diff % 3600 / 60), s = diff % 60;
-        c.innerHTML = '<p class="clk-l">Allocations open 1 October</p><div class="clk">' + unit(d, "days") + unit(pad(h), "hrs") + unit(pad(m), "min") + unit(pad(s), "sec") + "</div>";
+        c.innerHTML = '<p class="rfc-clk-l">Allocations open 1 October</p><div class="rfc-clk">' + unit(d, "days") + unit(pad(h), "hrs") + unit(pad(m), "min") + unit(pad(s), "sec") + "</div>";
         q("left").textContent = SETTINGS.TOTAL;
       } else {
-        c.innerHTML = '<p class="clk-l">Allocations open</p><p class="live">Launched ' + ago(-diff) + " ago</p>";
+        c.innerHTML = '<p class="rfc-clk-l">Allocations open</p><p class="rfc-live">Launched ' + ago(-diff) + " ago</p>";
         q("left").textContent = SETTINGS.LEFT;
       }
     }
@@ -3589,7 +4899,7 @@ if (typeof window.rfClassicSetCurrency === 'function') {
       q("ex3").textContent = money(SETTINGS.FEE - 120000, cur);
 
       q("fee").textContent = money(SETTINGS.FEE, cur);
-      q("split").textContent = money(49999, cur) + " + " + money(95000, cur);
+      q("split").textContent = money(59999) + " + " + money(111111);
       q("min").textContent = money(SETTINGS.MIN, cur);
 
       var T = TXT[S.path], r = calc(S.occ, "INR"), n = r.gain;
@@ -3609,7 +4919,7 @@ if (typeof window.rfClassicSetCurrency === 'function') {
 
       q("fx").textContent = abroad ? "Shown in " + cur + " at an indicative rate for comparison. Programme contracts and fees in India are in INR." : "Illustrative: 3-key villa in India. Subject to Programme Terms.";
 
-      q("cs").classList.toggle("on", abroad);
+      q("cs").classList.toggle("rfc-on", abroad);
       if (abroad && SETTINGS.CITY[cur]) {
         q("cscity").textContent = SETTINGS.CITY[cur];
         if (q("cssel")) q("cssel").value = SETTINGS.CITY[cur];
@@ -3678,5 +4988,6 @@ if (typeof window.rfClassicSetCurrency === 'function') {
   }
 })();
 </script>
+<script src="/pwa-init.js" defer></script>
 </body>
 </html>
