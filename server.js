@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const fs = require('fs');
 const path = require('path');
 const { GoogleGenAI } = require('@google/genai');
 
@@ -140,7 +142,7 @@ app.post('/api/destination-intelligence', async (req, res) => {
 });
 
 
-app.get('/health', (req, res) => {
+app.get(['/health', '/healthz', '/_health', '/api/health'], (req, res) => {
   res.status(200).json({ status: 'ok', service: 'red-flag-homes-network' });
 });
 
@@ -160,18 +162,50 @@ app.get('/manifest.json', (req, res) => {
 
 app.use(express.static(__dirname));
 
-app.get('/franchise.html', (req, res) => {
+app.get(['/franchise', '/franchise.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'franchise.html'));
+});
+
+app.get(['/admin', '/admin.html'], (req, res) => {
+  if (fs.existsSync(path.join(__dirname, 'admin.html'))) {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+  } else {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  }
 });
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// The container environment uses an internal Nginx reverse proxy listening on port 8080
-// that routes all external traffic directly to localhost:3000.
-// The application must always listen on port 3000 in both development and production deployment.
-const PORT = 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server listening on port ${PORT}`);
+// Cloud Run requires the app to listen on the port specified by process.env.PORT (defaults to 8080).
+// In the local development container, an internal Nginx proxy listens on 8080 and routes to 3000.
+// We bind to both ports so the app works identically in development and production Cloud Run.
+const CLOUD_RUN_PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
+const DEV_PORT = 3000;
+
+// Listen on DEV_PORT (3000) for local development / iframe reverse proxy
+if (CLOUD_RUN_PORT !== DEV_PORT) {
+  const devServer = http.createServer(app);
+  devServer.on('error', (err) => {
+    if (err.code !== 'EADDRINUSE') {
+      console.error('Dev server error on port 3000:', err);
+    }
+  });
+  devServer.listen(DEV_PORT, '0.0.0.0', () => {
+    console.log(`Server listening on internal dev port ${DEV_PORT}`);
+  });
+}
+
+// Listen on CLOUD_RUN_PORT (e.g. 8080) for Cloud Run production health checks and traffic
+const mainServer = http.createServer(app);
+mainServer.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`Port ${CLOUD_RUN_PORT} in use by dev reverse proxy; serving via port ${DEV_PORT}.`);
+  } else {
+    console.error(`Server error on port ${CLOUD_RUN_PORT}:`, err);
+  }
+});
+mainServer.listen(CLOUD_RUN_PORT, '0.0.0.0', () => {
+  console.log(`Server listening on port ${CLOUD_RUN_PORT}`);
 });

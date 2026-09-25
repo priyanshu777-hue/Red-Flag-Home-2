@@ -4,6 +4,7 @@ const CACHE_NAME = 'rf-core-v1';
 // Core assets to pre-cache on install
 const CORE_ASSETS = [
   '/',
+  '/franchise',
   '/index.html',
   '/franchise.html',
   '/manifest.json',
@@ -141,7 +142,7 @@ self.addEventListener('fetch', (event) => {
           const cached = await caches.match(req);
           if (cached) return cached;
           if (url.pathname.includes('franchise')) {
-            return caches.match('/franchise.html');
+            return caches.match('/franchise') || caches.match('/franchise.html');
           }
           return caches.match('/') || caches.match('/index.html');
         })

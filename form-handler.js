@@ -18,7 +18,7 @@
    */
   async function submitToAppsScript(data) {
     var rfMarket = localStorage.getItem('rf_market') || 'IN';
-    var page = window.location.pathname || 'index.html';
+    var page = window.location.pathname || '/';
 
     var payload = Object.assign({}, data, {
       page: page,
