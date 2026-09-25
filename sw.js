@@ -1,5 +1,5 @@
 // Red Flag Homes Service Worker - Offline Core Cache
-const CACHE_NAME = 'rf-core-v1';
+const CACHE_NAME = 'rf-core-v2';
 
 // Core assets to pre-cache on install
 const CORE_ASSETS = [
@@ -84,8 +84,30 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Do not intercept AI or dynamic POST API endpoints
-  if (url.pathname.startsWith('/api/')) {
+  // Do not intercept AI or dynamic POST API endpoints, or Firebase system paths
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/__/')) {
+    return;
+  }
+
+  // NEVER intercept Firebase Auth, Google APIs, Google Identity, Firestore, or OAuth endpoints.
+  // Letting the browser execute them natively ensures popup, credentials, and cross-origin auth succeed.
+  if (
+    url.hostname.includes('firebase') ||
+    url.hostname.includes('googleapis.com') ||
+    url.hostname.includes('google.com') ||
+    url.hostname.includes('gstatic.com')
+  ) {
+    return;
+  }
+
+  // Only handle same-origin requests OR explicitly whitelisted asset CDNs
+  const isSameOrigin = url.origin === self.location.origin;
+  const isWhitelistedCdn = 
+    url.hostname === 'fonts.googleapis.com' ||
+    url.hostname === 'fonts.gstatic.com' ||
+    url.hostname === 'cdn.jsdelivr.net';
+
+  if (!isSameOrigin && !isWhitelistedCdn) {
     return;
   }
 
@@ -193,16 +215,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Default Stale-While-Revalidate
+  // Default Stale-While-Revalidate for same-origin resources
   event.respondWith(
     caches.match(req).then((cached) => {
-      const fetchPromise = fetch(req).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-        }
-        return networkResponse;
-      }).catch(() => cached);
+      const fetchPromise = fetch(req)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          if (cached) return cached;
+          return new Response('', { status: 504, statusText: 'Gateway Timeout / Offline' });
+        });
 
       return cached || fetchPromise;
     })

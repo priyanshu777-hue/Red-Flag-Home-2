@@ -1,11 +1,61 @@
 const express = require('express');
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const { Pool } = require('pg');
+const { getApps, initializeApp } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
 const { GoogleGenAI } = require('@google/genai');
+
+const firebaseConfig = require('./firebase-applet-config.json');
+
+// Initialize Firebase Admin for ID token verification
+if (!getApps().length) {
+  initializeApp({
+    projectId: firebaseConfig.projectId
+  });
+}
+const adminAuth = getAuth();
 
 const app = express();
 app.use(express.json());
+
+// Cloud SQL connection pool (Object Method) with lazy on-demand connection
+let sqlPool = null;
+function getSqlPool() {
+  if (!sqlPool && process.env.SQL_HOST) {
+    sqlPool = new Pool({
+      host: process.env.SQL_HOST,
+      user: process.env.SQL_USER,
+      password: process.env.SQL_PASSWORD,
+      database: process.env.SQL_DB_NAME,
+      max: 10,
+      connectionTimeoutMillis: 15000,
+    });
+    sqlPool.on('error', (err) => {
+      console.error('Unexpected error on idle SQL pool client:', err);
+    });
+  }
+  return sqlPool;
+}
+
+// Authentication middleware verifying Firebase Bearer ID tokens
+async function requireAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: Missing token' });
+  }
+  const token = authHeader.split('Bearer ')[1];
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.error('Error verifying Firebase ID token:', error);
+    return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+  }
+}
 
 // Initialize Gemini lazily to prevent startup crashes when API key is unconfigured
 let aiClient = null;
@@ -142,6 +192,127 @@ app.post('/api/destination-intelligence', async (req, res) => {
 });
 
 
+// Cloud SQL Relational Endpoints (PostgreSQL)
+
+// Sync user profile to Cloud SQL PostgreSQL
+app.post('/api/users/sync', requireAuth, async (req, res) => {
+  try {
+    const pool = getSqlPool();
+    if (!pool) return res.status(503).json({ error: 'Database service unavailable' });
+    const { email, displayName, photoURL } = req.body;
+    const userUid = req.user.uid;
+    const userEmail = email || req.user.email || '';
+    const name = displayName || req.user.name || null;
+    const photo = photoURL || req.user.picture || null;
+
+    const query = `
+      INSERT INTO users (uid, email, display_name, photo_url, last_login_at)
+      VALUES ($1, $2, $3, $4, NOW())
+      ON CONFLICT (uid)
+      DO UPDATE SET
+        email = EXCLUDED.email,
+        display_name = EXCLUDED.display_name,
+        photo_url = EXCLUDED.photo_url,
+        last_login_at = NOW()
+      RETURNING *;
+    `;
+    const result = await pool.query(query, [userUid, userEmail, name, photo]);
+    res.json({ success: true, user: result.rows[0] });
+  } catch (error) {
+    console.error('Failed to sync user to Cloud SQL:', error);
+    res.status(500).json({ error: 'Database operation failed' });
+  }
+});
+
+// Submit franchise allocation to Cloud SQL PostgreSQL
+app.post('/api/applications', requireAuth, async (req, res) => {
+  try {
+    const pool = getSqlPool();
+    if (!pool) return res.status(503).json({ error: 'Database service unavailable' });
+    const { tier, location, capital, notes, phone, userName } = req.body;
+    const userId = req.user.uid;
+    const userEmail = req.user.email || '';
+
+    const query = `
+      INSERT INTO applications (user_id, user_email, user_name, phone, tier, location, capital, notes, status, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Pending Review', NOW())
+      RETURNING *;
+    `;
+    const result = await pool.query(query, [
+      userId, 
+      userEmail, 
+      userName || null, 
+      phone || null, 
+      tier || 'Standard', 
+      location || null, 
+      capital || null, 
+      notes || null
+    ]);
+    res.json({ success: true, application: result.rows[0] });
+  } catch (error) {
+    console.error('Failed to create application in Cloud SQL:', error);
+    res.status(500).json({ error: 'Database operation failed' });
+  }
+});
+
+// Retrieve user's franchise applications from Cloud SQL
+app.get('/api/applications', requireAuth, async (req, res) => {
+  try {
+    const pool = getSqlPool();
+    if (!pool) return res.status(503).json({ error: 'Database service unavailable' });
+    const query = `
+      SELECT * FROM applications
+      WHERE user_id = $1
+      ORDER BY created_at DESC;
+    `;
+    const result = await pool.query(query, [req.user.uid]);
+    res.json({ applications: result.rows });
+  } catch (error) {
+    console.error('Failed to fetch applications from Cloud SQL:', error);
+    res.status(500).json({ error: 'Database operation failed' });
+  }
+});
+
+// Submit booking inquiry to Cloud SQL PostgreSQL
+app.post('/api/inquiries', requireAuth, async (req, res) => {
+  try {
+    const pool = getSqlPool();
+    if (!pool) return res.status(503).json({ error: 'Database service unavailable' });
+    const { destination, guests, dates } = req.body;
+    const userId = req.user.uid;
+    const userEmail = req.user.email || '';
+
+    const query = `
+      INSERT INTO inquiries (user_id, user_email, destination, guests, dates, status, created_at)
+      VALUES ($1, $2, $3, $4, $5, 'Inquiry Received', NOW())
+      RETURNING *;
+    `;
+    const result = await pool.query(query, [userId, userEmail, destination || null, guests || null, dates || null]);
+    res.json({ success: true, inquiry: result.rows[0] });
+  } catch (error) {
+    console.error('Failed to create inquiry in Cloud SQL:', error);
+    res.status(500).json({ error: 'Database operation failed' });
+  }
+});
+
+// Retrieve user's booking inquiries from Cloud SQL
+app.get('/api/inquiries', requireAuth, async (req, res) => {
+  try {
+    const pool = getSqlPool();
+    if (!pool) return res.status(503).json({ error: 'Database service unavailable' });
+    const query = `
+      SELECT * FROM inquiries
+      WHERE user_id = $1
+      ORDER BY created_at DESC;
+    `;
+    const result = await pool.query(query, [req.user.uid]);
+    res.json({ inquiries: result.rows });
+  } catch (error) {
+    console.error('Failed to fetch inquiries from Cloud SQL:', error);
+    res.status(500).json({ error: 'Database operation failed' });
+  }
+});
+
 app.get(['/health', '/healthz', '/_health', '/api/health'], (req, res) => {
   res.status(200).json({ status: 'ok', service: 'red-flag-homes-network' });
 });
@@ -158,6 +329,36 @@ app.get('/sw.js', (req, res) => {
 app.get('/manifest.json', (req, res) => {
   res.setHeader('Content-Type', 'application/manifest+json; charset=UTF-8');
   res.sendFile(path.join(__dirname, 'manifest.json'));
+});
+
+// Proxy Firebase Auth helper endpoints (/__/auth/*) to resolve cross-origin iframe storage issues
+app.use('/__/auth', (req, res) => {
+  const targetPath = '/__/auth' + req.url;
+  const options = {
+    hostname: 'plucky-block-8n96h.firebaseapp.com',
+    port: 443,
+    path: targetPath,
+    method: req.method,
+    headers: {
+      ...req.headers,
+      host: 'plucky-block-8n96h.firebaseapp.com',
+      'x-forwarded-host': req.headers.host || 'localhost'
+    }
+  };
+
+  const proxyReq = https.request(options, (proxyRes) => {
+    res.writeHead(proxyRes.statusCode, proxyRes.headers);
+    proxyRes.pipe(res);
+  });
+
+  proxyReq.on('error', (err) => {
+    console.error('Firebase Auth proxy error:', err.message);
+    if (!res.headersSent) {
+      res.status(502).send('Firebase Auth proxy error');
+    }
+  });
+
+  req.pipe(proxyReq);
 });
 
 app.use(express.static(__dirname));

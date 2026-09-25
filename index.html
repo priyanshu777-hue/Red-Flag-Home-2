@@ -3368,15 +3368,30 @@
   .mtb-tab svg {
     width: 1.375rem;
     height: 1.375rem;
-    transition: transform 260ms cubic-bezier(.34,1.56,.64,1);
+    transform-origin: center bottom;
+    will-change: transform;
+    transition: transform 280ms cubic-bezier(.34, 1.56, .64, 1), filter 280ms ease, color 200ms ease;
   }
   .mtb-tab.is-on { color: #fff; }
   .mtb-tab span { display: none; }
   .mtb-tab { width: 3rem; }
   .mtb-pip { width: 3rem; }
+
+  /* Subtle hover & tap animation: gently shifts upward and scales */
+  .mtb-tab:hover svg,
+  .mtb-tab:focus-visible svg,
   .mtb-tab:active svg,
-  .mtb-tab:active .mtb-avatar-img,
-  .mtb-tab:active .mtb-avatar-fallback { transform: scale(.88); }
+  .mtb-tab.is-touched svg {
+    transform: translateY(-2.5px) scale(1.12);
+    color: #ffffff;
+    filter: drop-shadow(0 3px 6px rgba(255, 255, 255, 0.28));
+  }
+
+  .mtb-tab:hover,
+  .mtb-tab:focus-visible,
+  .mtb-tab.is-touched {
+    color: #ffffff;
+  }
 
   /* User profile photo in tab bar */
   .mtb-avatar-img {
@@ -3387,7 +3402,9 @@
     border: 1.5px solid rgba(255, 255, 255, 0.45);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     display: block;
-    transition: transform 260ms cubic-bezier(.34,1.56,.64,1);
+    transform-origin: center bottom;
+    will-change: transform;
+    transition: transform 280ms cubic-bezier(.34, 1.56, .64, 1), box-shadow 280ms ease;
   }
   .mtb-avatar-fallback {
     width: 1.625rem;
@@ -3401,7 +3418,21 @@
     font-size: 0.75rem;
     font-weight: 600;
     border: 1px solid rgba(255, 255, 255, 0.4);
-    transition: transform 260ms cubic-bezier(.34,1.56,.64,1);
+    transform-origin: center bottom;
+    will-change: transform;
+    transition: transform 280ms cubic-bezier(.34, 1.56, .64, 1), box-shadow 280ms ease;
+  }
+
+  .mtb-tab:hover .mtb-avatar-img,
+  .mtb-tab:focus-visible .mtb-avatar-img,
+  .mtb-tab:active .mtb-avatar-img,
+  .mtb-tab.is-touched .mtb-avatar-img,
+  .mtb-tab:hover .mtb-avatar-fallback,
+  .mtb-tab:focus-visible .mtb-avatar-fallback,
+  .mtb-tab:active .mtb-avatar-fallback,
+  .mtb-tab.is-touched .mtb-avatar-fallback {
+    transform: translateY(-2.5px) scale(1.12);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), 0 0 10px rgba(255, 255, 255, 0.25);
   }
 
   /* keep content clear of the bar */
@@ -3416,7 +3447,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mtb, .mtb-pip, .mtb-tab svg { transition: none !important; }
+  .mtb, .mtb-pip, .mtb-tab svg, .mtb-avatar-img, .mtb-avatar-fallback {
+    transition: none !important;
+    transform: none !important;
+  }
 }
 @media (max-width: 767.98px) {
   #chat-trigger-btn {
@@ -3568,7 +3602,16 @@
   tabs.forEach(function (t, i) {
     t.addEventListener('mouseenter', function () { show(t, i); });
     t.addEventListener('mouseleave', hide);
-    t.addEventListener('touchstart', function () { show(t, i); }, { passive: true });
+    t.addEventListener('touchstart', function () {
+      t.classList.add('is-touched');
+      show(t, i);
+    }, { passive: true });
+    t.addEventListener('touchend', function () {
+      setTimeout(function () { t.classList.remove('is-touched'); }, 300);
+    }, { passive: true });
+    t.addEventListener('touchcancel', function () {
+      t.classList.remove('is-touched');
+    }, { passive: true });
   });
 
   addEventListener('scroll', hide, { passive: true });
@@ -5557,6 +5600,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           await signInWithGoogle();
         } catch (err) {
+          if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) {
+            // Dismissed by user - silent ignore
+            return;
+          }
           console.error('Google Sign-in failed:', err);
         }
       }

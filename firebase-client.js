@@ -82,12 +82,51 @@ export async function signInWithGoogle() {
   if (!auth) await initFirebase();
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
+
   try {
     const result = await signInWithPopup(auth, provider);
     currentUser = result.user;
-    await syncUserProfile(currentUser);
+    try {
+      await syncUserProfile(currentUser);
+    } catch (syncErr) {
+      console.warn('Profile sync postponed:', syncErr);
+    }
     return currentUser;
   } catch (err) {
+    // If the user deliberately closed or cancelled the popup, gracefully return null
+    if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+      console.info('Google sign-in popup dismissed by user.');
+      return null;
+    }
+
+    if (err.code === 'auth/popup-blocked') {
+      console.warn('Google sign-in popup blocked by browser.');
+      if (typeof window.showToast === 'function') {
+        window.showToast('Please allow pop-ups for this site to sign in with Google.', 'error');
+      }
+      throw err;
+    }
+
+    if (err.code === 'auth/network-request-failed') {
+      console.warn('Network request failed during Google sign-in. Retrying once...');
+      try {
+        const retryResult = await signInWithPopup(auth, provider);
+        currentUser = retryResult.user;
+        try {
+          await syncUserProfile(currentUser);
+        } catch (syncErr) {
+          console.warn('Profile sync postponed:', syncErr);
+        }
+        return currentUser;
+      } catch (retryErr) {
+        console.error('Google Sign-in failed after retry:', retryErr);
+        if (typeof window.showToast === 'function') {
+          window.showToast('Network issue during sign in. Please verify your connection or pop-up permissions.', 'error');
+        }
+        throw retryErr;
+      }
+    }
+
     console.error('Google Sign-in failed:', err);
     throw err;
   }
@@ -100,16 +139,44 @@ export async function signOutUser() {
 }
 
 export async function syncUserProfile(user) {
-  if (!db || !user) return;
-  const userRef = doc(db, 'users', user.uid);
-  const data = {
-    uid: user.uid,
-    email: user.email || '',
-    displayName: user.displayName || user.email?.split('@')[0] || 'Guest',
-    photoURL: user.photoURL || '',
-    lastLoginAt: new Date().toISOString()
-  };
-  await setDoc(userRef, data, { merge: true });
+  if (!user) return;
+
+  // 1. Sync to Cloud SQL (PostgreSQL relational database via backend proxy)
+  try {
+    const token = await user.getIdToken();
+    await fetch('/api/users/sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        uid: user.uid,
+        email: user.email || '',
+        displayName: user.displayName || user.email?.split('@')[0] || 'Guest',
+        photoURL: user.photoURL || '',
+      })
+    });
+  } catch (sqlErr) {
+    console.warn('Cloud SQL profile sync notice:', sqlErr);
+  }
+
+  // 2. Realtime sync to Cloud Firestore
+  if (db) {
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const data = {
+        uid: user.uid,
+        email: user.email || '',
+        displayName: user.displayName || user.email?.split('@')[0] || 'Guest',
+        photoURL: user.photoURL || '',
+        lastLoginAt: new Date().toISOString()
+      };
+      await setDoc(userRef, data, { merge: true });
+    } catch (e) {
+      console.warn('Firestore user sync notice:', e);
+    }
+  }
 }
 
 // PERSISTENCE: Franchise Allocation Applications
@@ -139,6 +206,28 @@ export async function submitAllocationApplication(formData) {
     status: 'Under Review',
     createdAt: new Date().toISOString()
   };
+
+  // Sync to Cloud SQL PostgreSQL
+  try {
+    const token = await currentUser.getIdToken();
+    await fetch('/api/applications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        tier: appData.tier,
+        location: appData.city,
+        capital: appData.capital,
+        notes: `Property: ${appData.propertyIntent}, Client: ${appData.existingClient}`,
+        phone: appData.phone,
+        userName: appData.userName
+      })
+    });
+  } catch (sqlErr) {
+    console.warn('Cloud SQL application save notice:', sqlErr);
+  }
 
   const docRef = await addDoc(collection(db, 'applications'), appData);
   return { id: docRef.id, ...appData };
@@ -195,6 +284,25 @@ export async function submitBookingInquiry(inquiryData) {
     status: 'Inquiry Received',
     createdAt: new Date().toISOString()
   };
+
+  // Sync to Cloud SQL PostgreSQL
+  try {
+    const token = await currentUser.getIdToken();
+    await fetch('/api/inquiries', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        destination: payload.destination,
+        guests: payload.guests,
+        dates: `${payload.checkin} to ${payload.checkout}`.trim()
+      })
+    });
+  } catch (sqlErr) {
+    console.warn('Cloud SQL inquiry save notice:', sqlErr);
+  }
 
   const docRef = await addDoc(collection(db, 'inquiries'), payload);
   return { id: docRef.id, ...payload };
