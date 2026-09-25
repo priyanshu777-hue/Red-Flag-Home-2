@@ -4172,6 +4172,7 @@
     </div>
     
     <form id="contact-form" class="book-card">
+      <input type="text" name="company" tabindex="-1" autocomplete="off" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;" aria-hidden="true" />
       <div class="book-fields-row">
         <div class="field-group">
           <label for="contact-name">Name</label>
@@ -4203,6 +4204,7 @@
         </div>
       </div>
       <button type="button" id="contact-submit-btn" class="book-submit-btn">Send Message</button>
+      <p id="contact-status" style="display: none; margin-top: 1rem; font-size: 0.95rem; text-align: center; font-family: var(--typeface-ui, sans-serif);"></p>
     </form>
 
     <div class="contact-direct">
@@ -4239,10 +4241,11 @@
       <div class="ft-tag"><span>NEWSLETTER</span></div>
       <p class="ft-news-body" id="ft-news-body">Stays, openings and the occasional good idea.</p>
       <form class="ft-news-form" id="footer-newsletter-form">
+        <input type="text" name="company" tabindex="-1" autocomplete="off" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;" aria-hidden="true" />
         <input type="email" id="newsletter-input" placeholder="Your e-mail" required />
         <button type="submit" id="newsletter-btn">Subscribe</button>
       </form>
-      <p id="ft-news-success" style="display: none; color: var(--raw-color-velvet-500); font-size: 0.95rem; margin-top: 1rem; font-weight: 500;">Welcome to the network.</p>
+      <p id="ft-news-success" style="display: none; color: var(--raw-color-velvet-500); font-size: 0.95rem; margin-top: 1rem; font-weight: 500;"></p>
     </section>
 
     
@@ -5207,6 +5210,7 @@ setTimeout(safeRenderExplore, 2000);
     <h2 class="nl-title">The Inner Circle</h2>
     <p class="nl-desc">Subscribe to receive exclusive access to unlisted properties and investment insights.</p>
     <form id="nl-form" class="nl-form">
+      <input type="text" name="company" tabindex="-1" autocomplete="off" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;" aria-hidden="true" />
       <input type="email" placeholder="Your email address" required class="book-input nl-input" />
       <button type="submit" class="btn-pill btn-fill interactive-btn nl-submit" style="width: 100%;">
         <span class="btn-dot"></span>
@@ -5214,7 +5218,7 @@ setTimeout(safeRenderExplore, 2000);
         <span class="btn-label-hover">Subscribe →</span>
       </button>
     </form>
-    <p id="nl-success" class="nl-success">Welcome to the network.</p>
+    <p id="nl-success" class="nl-success" style="display: none;"></p>
   </div>
 </div>
 
@@ -5274,33 +5278,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: true });
   if (closeBtn) closeBtn.addEventListener('click', closeModal);
   if (overlay) overlay.addEventListener('click', closeModal);
-  
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const input = form.querySelector('input[type="email"]');
-      if (input) input.value = '';
-      if (success) success.style.display = 'block';
-      setTimeout(closeModal, 2500);
-    });
-  }
-  
-  // Footer Newsletter Logic
-  const footerForm = document.getElementById('footer-newsletter-form');
-  const footerSuccess = document.getElementById('ft-news-success');
-  if (footerForm) {
-    footerForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const input = footerForm.querySelector('input[type="email"]');
-      if (input) input.value = '';
-      if (footerSuccess) {
-        footerSuccess.style.display = 'block';
-        setTimeout(() => {
-          footerSuccess.style.display = 'none';
-        }, 5000);
-      }
-    });
-  }
 });
 
 
@@ -5910,83 +5887,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }, true);
   }
-
-  // Intercept Contact form click to persist in Firestore
-  const contactBtn = document.getElementById('contact-submit-btn');
-  const contactFormEl = document.getElementById('contact-form');
-
-  if (contactFormEl) {
-    contactFormEl.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (contactBtn) contactBtn.click();
-    });
-  }
-
-  if (contactBtn) {
-    contactBtn.addEventListener('click', async () => {
-      const name = document.getElementById('contact-name')?.value.trim() || '';
-      const phone = document.getElementById('contact-phone')?.value.trim() || '';
-      const email = document.getElementById('contact-email')?.value.trim() || '';
-      const intent = document.getElementById('contact-intent')?.value || 'General Inquiry';
-      const message = document.getElementById('contact-message')?.value.trim() || '';
-
-      if (!name && !email && !message && !phone) {
-        if (typeof window.showToast === 'function') {
-          window.showToast({
-            title: 'Missing Details',
-            message: 'Please provide your name, contact information, or a message.',
-            type: 'warning',
-            duration: 3000
-          });
-        }
-        return;
-      }
-
-      contactBtn.disabled = true;
-      contactBtn.textContent = 'Recording Inquiry...';
-
-      try {
-        await submitBookingInquiry({
-          name,
-          phone,
-          email,
-          intent,
-          message,
-          destination: 'Concierge Inquiry'
-        });
-
-        if (typeof window.showToast === 'function') {
-          window.showToast({
-            title: 'Inquiry Sent',
-            message: 'Inquiry recorded in Cloud Firestore. Our team will contact you shortly.',
-            type: 'success',
-            duration: 3000
-          });
-        }
-        contactBtn.textContent = 'Inquiry Logged ✓';
-        if (contactFormEl) {
-          contactFormEl.reset();
-        }
-        setTimeout(() => {
-          contactBtn.disabled = false;
-          contactBtn.textContent = 'Send Message';
-        }, 3000);
-      } catch (err) {
-        console.warn('Contact message Firestore error:', err);
-        if (typeof window.showToast === 'function') {
-          window.showToast({
-            title: 'Inquiry Received',
-            message: 'Your inquiry has been received. Our team will reach out shortly.',
-            type: 'info',
-            duration: 3000
-          });
-        }
-        contactBtn.disabled = false;
-        contactBtn.textContent = 'Send Message';
-      }
-    });
-  }
 </script>
+<script src="/form-handler.js" defer></script>
 <script src="/pwa-init.js" defer></script>
 </body>
 </html>

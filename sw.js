@@ -8,6 +8,7 @@ const CORE_ASSETS = [
   '/franchise.html',
   '/manifest.json',
   '/transitions.js',
+  '/form-handler.js',
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',
