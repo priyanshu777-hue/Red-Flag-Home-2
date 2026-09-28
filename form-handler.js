@@ -384,6 +384,7 @@
     formEl.addEventListener('submit', async function (e) {
       e.preventDefault();
 
+      var progSelect = document.getElementById('f-prog') || formEl.querySelector('[name="programme"]');
       var nameInput = document.getElementById('f-name') || formEl.querySelector('[name="name"]');
       var emailInput = document.getElementById('f-email') || formEl.querySelector('[name="email"]');
       var phoneInput = document.getElementById('f-phone') || formEl.querySelector('[name="phone"]');
@@ -393,6 +394,7 @@
       var clientSelect = document.getElementById('f-client') || formEl.querySelector('[name="client"]');
       var companyInput = formEl.querySelector('[name="company"]');
 
+      var programme = progSelect ? progSelect.value : '';
       var name = nameInput ? nameInput.value.trim() : '';
       var email = emailInput ? emailInput.value.trim() : '';
       var phone = phoneInput ? phoneInput.value.trim() : '';
@@ -415,6 +417,7 @@
 
       var payload = {
         formType: 'franchise',
+        programme: programme,
         name: name,
         email: email,
         phone: phone,

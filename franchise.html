@@ -14,13 +14,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script type="importmap">
 { "imports": { 
   "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs",
   "d3": "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm"
 } }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <style>
 :root{
   --black:#000000; --white:#ffffff;
@@ -587,14 +587,11 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
   height:3px;
   border-radius:1px;
 }
-.growth-legend-swatch.swatch-villa{
+.growth-legend-swatch.swatch-classic{
   background:var(--accent);
 }
-.growth-legend-swatch.swatch-classic{
+.growth-legend-swatch.swatch-starter{
   background:#f59e0b;
-}
-.growth-legend-swatch.swatch-studio{
-  background:#94a3b8;
 }
 .growth-legend-swatch.swatch-trad{
   background:rgba(255,255,255,0.6);
@@ -622,14 +619,11 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
   stroke-dasharray:5 4;
   stroke-width:2;
 }
-.growth-line-villa{
+.growth-line-classic{
   stroke:var(--accent);
 }
-.growth-line-classic{
+.growth-line-starter{
   stroke:#f59e0b;
-}
-.growth-line-studio{
-  stroke:#94a3b8;
 }
 .growth-area{
   opacity:0.08;
@@ -1271,6 +1265,30 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   color: #93c5fd;
 }
 
+/* Suggested quick prompt chips */
+@keyframes appear {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#chat-suggestions,
+#chat-suggestions .chat-suggestions-list {
+  animation: appear 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #chat-suggestions,
+  #chat-suggestions .chat-suggestions-list {
+    animation: none !important;
+  }
+}
+
 .chat-suggestions-wrap {
   display: flex;
   flex-direction: column;
@@ -1436,6 +1454,27 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   <div class="rule"><b id="ruleFill"></b></div>
   <div class="num t-display"><span id="count">0%</span></div>
 </div>
+<script>
+// Fail-safe: force-hide loader after 5 seconds regardless of what happens
+setTimeout(function () {
+  try {
+    var p = document.getElementById("pre");
+    if (p) {
+      p.classList.add("out");
+      p.style.pointerEvents = "none";
+      setTimeout(function () {
+        try { if (p && p.parentNode) p.parentNode.removeChild(p); } catch (e) {}
+      }, 1600);
+    }
+    document.documentElement.classList.remove("locked");
+    if (window.lenis && typeof window.lenis.start === "function") {
+      window.lenis.start();
+    }
+  } catch (err) {
+    console.warn("Loader fail-safe caught error:", err);
+  }
+}, 5000);
+</script>
 
 <!-- SCENE -->
 <section id="scene" aria-label="Red Flag Outpost franchise programme">
@@ -1456,7 +1495,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 
     <!-- logo -->
     <a href="/" class="hero-logo" id="heroLogo" aria-label="Red Flag Homes Network — home">
-      <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/franchise-asset/logo.png" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png';" alt="Red Flag mark">
+      <img src="https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/logobg.png" alt="Red Flag mark">
     </a>
 
     <a class="alink plain t-caption" id="quoteCta" href="#apply">
@@ -1584,7 +1623,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
     <p class="eyebrow">The economics</p>
     <p class="figure" id="gross">₹1,62,000<span style="font-size:.4em;letter-spacing:0"> /mo</span></p>
     <p class="spread">≈ 2x yield spread</p>
-    <p class="illus">Capital deployed: deposit ₹4,50,000 + franchise ₹49,999 + setup ₹1,50,000 = ₹6,49,999 · ADR ₹9,000</p>
+    <p class="illus">Capital deployed: deposit ₹4,50,000 + franchise ₹59,999 + setup ₹1,11,111 = ₹6,21,110 · ADR ₹9,000</p>
 
     <div class="fx" role="group" aria-label="Market and currency">
       <span class="fx__label">Market</span>
@@ -1607,9 +1646,9 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
           <p class="occupancy-chart-note">Illustrative ramp based on managed portfolio averages. Your property's performance will differ.</p>
         </div>
         <div class="occupancy-chart-legend">
-          <span class="legend-item"><span class="legend-swatch-above"></span> Profitable (&gt;42%)</span>
+          <span class="legend-item"><span class="legend-swatch-above"></span> Profitable (&gt;41%)</span>
           <span class="legend-item"><span class="legend-swatch-ramp"></span> Ramp Phase</span>
-          <span class="legend-item"><span class="legend-line"></span> Breakeven (42%)</span>
+          <span class="legend-item"><span class="legend-line"></span> Breakeven (41%)</span>
         </div>
       </div>
       <div id="occupancy-d3-chart" class="occupancy-d3-chart"></div>
@@ -1630,17 +1669,13 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
         </div>
       </div>
       <div class="growth-chart-legend" id="growthLegend" aria-label="Toggle model series">
-        <button type="button" class="growth-legend-item" data-series="villa" aria-pressed="true">
-          <span class="growth-legend-swatch swatch-villa"></span>
-          <span>Red Flag Outpost (Villa)</span>
-        </button>
         <button type="button" class="growth-legend-item" data-series="classic" aria-pressed="true">
           <span class="growth-legend-swatch swatch-classic"></span>
           <span>Red Flag Outpost (Classic)</span>
         </button>
-        <button type="button" class="growth-legend-item" data-series="studio" aria-pressed="true">
-          <span class="growth-legend-swatch swatch-studio"></span>
-          <span>Red Flag Outpost (Studio)</span>
+        <button type="button" class="growth-legend-item" data-series="starter" aria-pressed="true">
+          <span class="growth-legend-swatch swatch-starter"></span>
+          <span>Red Flag Homes Starter</span>
         </button>
         <button type="button" class="growth-legend-item" data-series="trad" aria-pressed="true">
           <span class="growth-legend-swatch swatch-trad"></span>
@@ -1660,18 +1695,18 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
     <table class="fin">
       <tbody>
         <tr><td>Gross booking revenue</td><td id="r-gross">₹1,62,000</td></tr>
-        <tr><td>Less Red Flag 10.5%</td><td id="r-comm">₹17,010</td></tr>
+        <tr><td>Less Red Flag 8%</td><td id="r-comm">₹12,960</td></tr>
         <tr><td>Less cleaning &amp; maintenance</td><td id="r-clean">₹20,400</td></tr>
-        <tr class="tot"><td>= Your net payout</td><td id="r-payout">₹1,24,590</td></tr>
+        <tr class="tot"><td>= Your net payout</td><td id="r-payout">₹1,28,640</td></tr>
         <tr><td>Less rent</td><td id="r-rent">₹75,000</td></tr>
         <tr><td>Less electricity &amp; utilities</td><td id="r-util">₹12,000</td></tr>
-        <tr class="tot"><td>Net monthly to you</td><td id="r-net">₹37,590</td></tr>
-        <tr class="tot"><td>Return on capital</td><td id="r-roc">69%</td></tr>
+        <tr class="tot"><td>Net monthly to you</td><td id="r-net">₹41,640</td></tr>
+        <tr class="tot"><td>Return on capital</td><td id="r-roc">80%</td></tr>
       </tbody>
     </table>
 
     <div class="caveats">
-      <p>Breakeven is around 42% occupancy.</p>
+      <p>Breakeven is around 41% occupancy.</p>
       <p>A ten-point occupancy swing roughly doubles or halves your profit — which is why we operate the property ourselves.</p>
       <p>Performance-linked. We earn when you earn.</p>
     </div>
@@ -1688,7 +1723,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 <section class="sec" id="tiers">
   <div class="wrap">
     <p class="eyebrow">Choose your tier</p>
-    <h2 class="h-sec">Three ways in. One system.</h2>
+    <h2 class="h-sec">Two ways in. One way to buy.</h2>
   </div>
 
   <div class="deck-stage" id="deckStage">
@@ -1696,42 +1731,25 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 
     <div class="deck" id="deck">
 
-      <article class="tcard" data-tier="studio" data-i="0">
+      <article class="tcard" data-tier="starter" data-i="0">
         <div class="tcard__in">
           <header>
-            <span class="tcard__kind">Entry</span>
-            <h3>Red Flag Studio</h3>
-            <p class="tcard__sub">Studio or 1BHK &middot; single key</p>
+            <span class="tcard__kind">Starter</span>
+            <h3>Red Flag Homes Starter</h3>
+            <p class="tcard__sub">For hosts who just want us to run it</p>
           </header>
           <dl>
-            <div><dt>Franchise fee</dt><dd>&#8377;29,999</dd></div>
-            <div><dt>Setup &amp; procuring</dt><dd>&#8377;99,000</dd></div>
-            <div class="is-total"><dt>Total programme cost</dt><dd>&#8377;1,28,999</dd></div>
+            <div><dt>Onboarding fee</dt><dd><span class="starter-fee-onboarding">&#8377;1,999</span> <span class="starter-fee-unit" style="font-size:.8125rem;color:rgba(255,255,255,.55)">per room</span></dd></div>
           </dl>
-          <div class="tcard__rate"><b>12%</b><span>management commission</span></div>
-          <a class="tcard__cta" href="#apply">Apply for Studio</a>
+          <div class="tcard__rate-wrap">
+            <div class="tcard__rate"><b>10%</b><span>management commission</span></div>
+            <p class="tcard__min">or <span class="tcard__min-val starter-min-val">&#8377;3,999</span> per room per month, whichever is higher</p>
+          </div>
+          <a class="tcard__cta" href="#apply" data-prog="Red Flag Homes Starter">Apply for Starter</a>
         </div>
       </article>
 
-      <article class="tcard is-feat" data-tier="villa" data-i="1">
-        <div class="tcard__in">
-          <span class="tcard__flag">Most allocated</span>
-          <header>
-            <span class="tcard__kind">Core</span>
-            <h3>Red Flag Villa</h3>
-            <p class="tcard__sub">Villa or apartment &middot; 2&ndash;4 keys</p>
-          </header>
-          <dl>
-            <div><dt>Franchise fee</dt><dd>&#8377;49,999</dd></div>
-            <div><dt>Setup &amp; procuring</dt><dd>&#8377;1,50,000</dd></div>
-            <div class="is-total"><dt>Total programme cost</dt><dd>&#8377;1,99,999</dd></div>
-          </dl>
-          <div class="tcard__rate"><b>10.5%</b><span>management commission</span></div>
-          <a class="tcard__cta -solid" href="#apply">Apply for Villa</a>
-        </div>
-      </article>
-
-      <article class="tcard is-classic" data-tier="classic" data-i="2">
+      <article class="tcard is-classic" data-tier="classic" data-i="1">
         <div class="tcard__in">
           <span class="tcard__flag -exclusive">Exclusive</span>
           <header>
@@ -1740,13 +1758,13 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
             <p class="tcard__sub">Own or lease &middot; both welcome</p>
           </header>
           <dl>
-            <div><dt>Franchise fee</dt><dd>&#8377;59,999</dd></div>
-            <div><dt>Setup &amp; procuring</dt><dd>&#8377;1,11,111</dd></div>
-            <div class="is-total"><dt>Total programme cost</dt><dd>&#8377;1,71,110</dd></div>
+            <div><dt>Franchise fee</dt><dd class="classic-fee-franchise">&#8377;59,999</dd></div>
+            <div><dt>Setup &amp; procuring</dt><dd class="classic-fee-setup">&#8377;1,11,111</dd></div>
+            <div class="is-total"><dt>Total programme cost</dt><dd class="classic-fee-total">&#8377;1,71,110</dd></div>
           </dl>
           <div class="tcard__rate-wrap">
             <div class="tcard__rate"><b>8%</b><span>management commission</span></div>
-            <p class="tcard__min">minimum <span class="tcard__min-val">&#8377;4,999</span> a month</p>
+            <p class="tcard__min">minimum <span class="tcard__min-val classic-min-val">&#8377;4,999</span> a month</p>
           </div>
           <div class="tcard__eb">
             <div class="tcard__eb-head">
@@ -1755,25 +1773,52 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
             </div>
             <p class="tcard__eb-text">If your first 12 months' net profit is less than your programme fee, we pay you the difference. <a class="tcard__eb-link eb-terms-link" href="#">Terms &rarr;</a></p>
           </div>
-          <a class="tcard__cta -solid -classic-btn" href="#apply">Apply for Classic</a>
+          <a class="tcard__cta -solid -classic-btn" href="#apply" data-prog="Red Flag Outpost Classic">Apply for Classic</a>
         </div>
       </article>
 
-      <article class="tcard is-locked" data-tier="estate" data-i="3">
+      <article class="tcard" data-tier="drop" data-i="2">
         <div class="tcard__in">
-          <span class="tcard__flag -quiet">By invitation</span>
+          <div style="position:absolute;right:1.5rem;top:1.5rem;display:flex;align-items:center;gap:.4rem;">
+            <span class="tcard__flag -exclusive" style="position:static;">35% OFF</span>
+            <span class="tcard__flag -quiet" style="position:static;">Not managed</span>
+          </div>
           <header>
-            <span class="tcard__kind">Invitation</span>
-            <h3>Red Flag Estate</h3>
-            <p class="tcard__sub">5+ keys &middot; after two successful quarters</p>
+            <span class="tcard__kind">Buy it once</span>
+            <h3>Red Flag &mdash; The Drop</h3>
+            <p class="tcard__sub">A ready-to-run Airbnb, delivered and installed</p>
           </header>
-          <dl>
-            <div><dt>Franchise fee</dt><dd>&mdash;</dd></div>
-            <div><dt>Setup &amp; procuring</dt><dd>&mdash;</dd></div>
-            <div class="is-total"><dt>Total programme cost</dt><dd>On invitation</dd></div>
+          <p style="margin-top:.625rem;font-size:.8125rem;line-height:1.45;color:rgba(255,255,255,.7);">One room. One delivery. Guest-ready in fifteen days.</p>
+          <ul style="list-style:none;padding:0;margin:.75rem 0 0;display:flex;flex-direction:column;gap:.35rem;">
+            <li style="font-size:.78125rem;color:rgba(255,255,255,.45);text-decoration:line-through;display:flex;align-items:center;gap:.4rem;">
+              <span style="font-size:.75rem;color:rgba(255,255,255,.35);text-decoration:none;">&times;</span>
+              <span>No onboarding fee</span>
+            </li>
+            <li style="font-size:.78125rem;color:rgba(255,255,255,.45);text-decoration:line-through;display:flex;align-items:center;gap:.4rem;">
+              <span style="font-size:.75rem;color:rgba(255,255,255,.35);text-decoration:none;">&times;</span>
+              <span>No franchise fee</span>
+            </li>
+            <li style="font-size:.78125rem;color:rgba(255,255,255,.45);text-decoration:line-through;display:flex;align-items:center;gap:.4rem;">
+              <span style="font-size:.75rem;color:rgba(255,255,255,.35);text-decoration:none;">&times;</span>
+              <span>No management commission</span>
+            </li>
+          </ul>
+          <dl style="margin-top:.75rem;">
+            <div class="is-total">
+              <dt>Total</dt>
+              <dd style="display:flex;align-items:baseline;gap:.5rem;">
+                <span style="font-weight:500;">From &#8377;2,09,000</span>
+                <span style="font-size:.8125rem;color:rgba(255,255,255,.4);text-decoration:line-through;">&#8377;3,21,538</span>
+              </dd>
+            </div>
           </dl>
-          <div class="tcard__rate"><b>9%</b><span>management commission</span></div>
-          <p class="tcard__note">You don&rsquo;t apply for it. You earn it.</p>
+          <p style="font-size:.6875rem;color:rgba(255,255,255,.5);margin:.25rem 0 0;">plus GST &middot; studios up to 350 sq ft</p>
+          <div class="drop-geo-line" style="display:none;font-size:.75rem;color:var(--accent);margin-top:.2rem;font-weight:500;">India only</div>
+          <div class="tcard__rate-wrap">
+            <div class="tcard__rate"><b style="color:var(--accent);">&#8377;0</b><span>management commission</span></div>
+            <p class="tcard__min">you keep every rupee</p>
+          </div>
+          <a class="tcard__cta" href="/the-drop" target="_blank" rel="noopener">Know more</a>
         </div>
       </article>
 
@@ -1791,6 +1836,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   </div>
 
   <div class="wrap">
+    <p class="muted" style="margin-top:1.5rem;text-align:center;font-size:.875rem;line-height:1.5;">Starter and Classic are managed programmes. The Drop is a one-time purchase &mdash; we set the property up and hand it back.</p>
     <p class="note">Cleaning and maintenance &mdash; deducted from revenue, never from your pocket</p>
   </div>
 </section>
@@ -1886,8 +1932,10 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
   var cards=[].slice.call(deck.querySelectorAll(".tcard"));
   var dots=document.getElementById("deckDots");
   var stage=document.getElementById("deckStage");
-  var active=2;
+  var active = cards.findIndex(function(c){ return c.getAttribute("data-tier") === "classic"; });
+  if (active < 0) active = 0;
 
+  dots.innerHTML = "";
   cards.forEach(function(c,i){
     var b=document.createElement("button");
     b.type="button";
@@ -1896,6 +1944,16 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
     dots.appendChild(b);
     c.addEventListener("click",function(e){
       if(i!==active && !e.target.closest("a"))go(i);
+    });
+  });
+
+  document.querySelectorAll(".tcard__cta").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var prog = btn.getAttribute("data-prog");
+      var progSelect = document.getElementById("f-prog");
+      if (prog && progSelect) {
+        progSelect.value = prog;
+      }
     });
   });
 
@@ -2027,6 +2085,13 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
     <p class="limited">Limited allocation. Applications reviewed in order received.</p>
     <form id="applyForm">
       <input type="text" name="company" tabindex="-1" autocomplete="off" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;" aria-hidden="true">
+      <div><label for="f-prog">Programme</label>
+        <select id="f-prog" name="programme" required>
+          <option value="">Select programme</option>
+          <option value="Red Flag Outpost Classic">Red Flag Outpost Classic</option>
+          <option value="Red Flag Homes Starter">Red Flag Homes Starter</option>
+        </select>
+      </div>
       <div><label for="f-name">Full name</label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
       <div><label for="f-email">Email address</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
       <div><label for="f-phone">Contact number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
@@ -2426,7 +2491,7 @@ table.fin tr.tot td{font-weight:500;border-bottom-color:rgba(255,255,255,.35)}
 <div id="badge" aria-hidden="true"><b>Play</b></div>
 
 <script type="module">
-import Lenis from "lenis";
+import Lenis from "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs";
 
 /* ---------- root font size above 1440 ---------- */
 const FONT_BASE=16,BASE_W=1440,COEF=.6666;
@@ -2572,6 +2637,44 @@ window.addEventListener("load",()=>{setTimeout(triggerHeroAnim,600)});
 const pre=document.getElementById("pre"),countEl=document.getElementById("count"),ruleFill=document.getElementById("ruleFill");
 const numWrap=document.querySelector("#pre .num");
 let clockStart=performance.now(),exiting=false;
+
+function hidePreloader() {
+  try {
+    if (exiting) return;
+    exiting = true;
+    if (pre) {
+      pre.classList.add("out");
+      pre.style.pointerEvents = "none";
+    }
+    document.documentElement.classList.remove("locked");
+    if (window.lenis && typeof window.lenis.start === 'function') {
+      window.lenis.start();
+    }
+    if (typeof triggerHeroAnim === 'function') {
+      triggerHeroAnim();
+    }
+    setTimeout(() => {
+      try {
+        if (typeof triggerHeroAnim === 'function') triggerHeroAnim();
+        if (typeof engines !== 'undefined' && Array.isArray(engines)) {
+          engines.filter(e => e.el && e.el.closest("#h0")).forEach(e => setOn(e.letters, true));
+        }
+        const grid = document.getElementById("grid");
+        if (grid) grid.classList.add("on");
+      } catch (e) {}
+    }, 1200);
+    setTimeout(() => {
+      try { if (pre && pre.parentNode) pre.remove(); } catch (e) {}
+    }, 1600);
+  } catch (err) {
+    console.warn("Error in hidePreloader:", err);
+    try {
+      document.documentElement.classList.remove("locked");
+      if (pre) pre.style.display = "none";
+    } catch (e) {}
+  }
+}
+
 function preStep(t){
   if(exiting)return;
   const clock=easeOutQuart(clamp01((t-clockStart)/2800));
@@ -2581,21 +2684,20 @@ function preStep(t){
   countEl.style.left=pct+"%";countEl.style.transform="translateX(-"+pct+"%)";
   ruleFill.style.transform="scaleX("+v+")";
   if(clock>=1&&loadedRatio>=1){
-    exiting=true;pre.classList.add("out");
-    document.documentElement.classList.remove("locked");lenis.start();
-    triggerHeroAnim();
-    setTimeout(()=>{
-      triggerHeroAnim();
-      engines.filter(e=>e.el.closest("#h0")).forEach(e=>setOn(e.letters,true));
-      document.getElementById("grid").classList.add("on")},1200);
-    setTimeout(()=>pre.remove(),1600);
+    hidePreloader();
   }
 }
 subs.push(preStep);
 numWrap.style.position="absolute";countEl.style.position="absolute";countEl.style.bottom="0";
 
-/* fail-safe: never stick */
-setTimeout(()=>{if(!exiting){loadedRatio=1;clockStart=0}},8000);
+/* fail-safe: force-hide after 5 seconds regardless of what happens */
+setTimeout(() => {
+  try {
+    hidePreloader();
+  } catch (err) {
+    console.warn("Loader fail-safe error:", err);
+  }
+}, 5000);
 
 /* ---------- scene driving ---------- */
 const scene=document.getElementById("scene");
@@ -2823,7 +2925,7 @@ addEventListener("keydown",e=>{if(e.key==="Escape"){menu?.classList.remove("open
 })();
 
 /* ---------- ticker ---------- */
-const TICK=["9–12% commission","Cleaning handled","Maintenance handled","Zero staff","Creator-led marketing","AI-run operations"];
+const TICK=["8% Outpost Classic commission","10% Starter management","Cleaning handled","Maintenance handled","Zero staff","Creator-led marketing","AI-run operations"];
 const row=document.getElementById("tickRow");
 for(let r=0;r<2;r++){
   const ebSpan=document.createElement("span");
@@ -2835,15 +2937,15 @@ for(let r=0;r<2;r++){
 
 /* ---------- economics toggle & D3.js occupancy trends ---------- */
 const DATA={
-  45:{gross:121500,comm:12758,clean:16500,payout:92242,net:5242,roc:"10%"},
-  55:{gross:148500,comm:15593,clean:18500,payout:114407,net:27407,roc:"51%"},
-  60:{gross:162000,comm:17010,clean:20400,payout:124590,net:37590,roc:"69%"},
-  65:{gross:175500,comm:18428,clean:22300,payout:134772,net:47772,roc:"88%"}
+  45:{gross:121500,comm:9720,clean:16500,payout:95280,net:8280,roc:"16%"},
+  55:{gross:148500,comm:11880,clean:18500,payout:118120,net:31120,roc:"60%"},
+  60:{gross:162000,comm:12960,clean:20400,payout:128640,net:41640,roc:"80%"},
+  65:{gross:175500,comm:14040,clean:22300,payout:139160,net:52160,roc:"101%"}
 };
 const inr=n=>"₹"+n.toLocaleString("en-IN");
 
 const ADR=9000;
-const BREAKEVEN_OCC=42;
+const BREAKEVEN_OCC=41;
 
 const OCC_TRENDS={
   45:[
@@ -2979,7 +3081,7 @@ function initOccupancyChart(){
     .attr("x", width - margin.right)
     .attr("y", breakevenY - 6)
     .attr("text-anchor", "end")
-    .text(`42% Breakeven (${fmtMoney(beGross, activeM)})`);
+    .text(`${BREAKEVEN_OCC}% Breakeven (${fmtMoney(beGross, activeM)})`);
 
   // X Axis
   const xAxis = d3.axisBottom(xScale).tickSize(0).tickPadding(10);
@@ -3111,7 +3213,7 @@ function updateOccupancyChart(tier){
   const fmtMoney = (val, m) => (window.formatMarketMoney ? window.formatMarketMoney(val, m) : ("₹" + Math.round(val).toLocaleString("en-IN")));
   const activeM = getActiveM();
   const beGross = Math.round(activeM.adr * 30 * (BREAKEVEN_OCC / 100));
-  svg.select(".d3-breakeven-badge").text(`42% Breakeven (${fmtMoney(beGross, activeM)})`);
+  svg.select(".d3-breakeven-badge").text(`${BREAKEVEN_OCC}% Breakeven (${fmtMoney(beGross, activeM)})`);
 
   const rect = container.getBoundingClientRect();
   const width = Math.max(280, rect.width || container.clientWidth || 600);
@@ -3166,7 +3268,7 @@ function setOcc(o){
   document.getElementById("r-net").textContent=inr(d.net);
   document.getElementById("r-roc").textContent=d.roc;
   document.querySelectorAll(".occ button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.o===String(o))));
-  document.querySelector(".illus").textContent="Illustrative, 3-key Villa at "+o+"% occupancy · ADR ₹9,000 · capital deployed ₹6,49,999";
+  document.querySelector(".illus").textContent="Illustrative, 3-key property at "+o+"% occupancy · ADR ₹9,000 · capital deployed ₹6,21,110";
   updateOccupancyChart(o);
 }
 document.querySelectorAll(".occ button").forEach(b=>b.addEventListener("click",()=>setOcc(b.dataset.o)));
@@ -3202,41 +3304,30 @@ if(chartContainer && typeof ResizeObserver !== "undefined"){
 /* ---------- 6-Month Projected Growth Differences (D3.js Multi-Line Chart) ---------- */
 let growthViewMode = "monthly"; // "monthly" | "cumulative"
 const growthSeriesState = {
-  villa: true,
   classic: true,
-  studio: true,
+  starter: true,
   trad: true
 };
 
 const GROWTH_SERIES_CONFIG = {
-  villa: {
-    id: "villa",
-    name: "Red Flag Outpost (Villa)",
-    shortName: "Outpost Villa",
-    color: "#E5231B",
-    strokeColor: "#E5231B",
-    areaColor: "rgba(229,35,27,0.14)",
-    className: "growth-line-villa",
-    dash: null
-  },
   classic: {
     id: "classic",
     name: "Red Flag Outpost (Classic)",
     shortName: "Outpost Classic",
-    color: "#f59e0b",
-    strokeColor: "#f59e0b",
-    areaColor: "rgba(245,158,11,0.08)",
+    color: "#E5231B",
+    strokeColor: "#E5231B",
+    areaColor: "rgba(229,35,27,0.14)",
     className: "growth-line-classic",
     dash: null
   },
-  studio: {
-    id: "studio",
-    name: "Red Flag Outpost (Studio)",
-    shortName: "Outpost Studio",
-    color: "#94a3b8",
-    strokeColor: "#94a3b8",
-    areaColor: "rgba(148,163,184,0.06)",
-    className: "growth-line-studio",
+  starter: {
+    id: "starter",
+    name: "Red Flag Homes Starter",
+    shortName: "Homes Starter",
+    color: "#f59e0b",
+    strokeColor: "#f59e0b",
+    areaColor: "rgba(245,158,11,0.08)",
+    className: "growth-line-starter",
     dash: null
   },
   trad: {
@@ -3266,9 +3357,8 @@ function calculateGrowthSeries(market, occTier) {
   const trends = (typeof OCC_TRENDS !== "undefined" && OCC_TRENDS[occTier]) ? OCC_TRENDS[occTier] : (typeof OCC_TRENDS !== "undefined" && OCC_TRENDS[60] ? OCC_TRENDS[60] : []);
   
   let cumTrad = 0;
-  let cumVilla = 0;
   let cumClassic = 0;
-  let cumStudio = 0;
+  let cumStarter = 0;
 
   const points = (trends.length ? trends : [
     { month: "Month 1", short: "M1", stage: "Creator Drop", occ: 42 },
@@ -3283,26 +3373,21 @@ function calculateGrowthSeries(market, occTier) {
     const tradMonthly = m.rent;
     cumTrad += tradMonthly;
 
-    // 2. Red Flag Outpost (Villa Model - 10.5% commission)
-    const villaGross = m.adr * 30 * (occ / 100);
-    const villaComm = villaGross * 0.105;
-    const villaClean = getCleaningSchedule(occ, villaGross, m.code);
-    const villaMonthly = Math.round(villaGross - villaComm - villaClean);
-    cumVilla += villaMonthly;
-
-    // 3. Red Flag Outpost (Classic Model - 8.0% commission with Earn-Back Promise)
-    const classicGross = villaGross;
-    const classicComm = classicGross * 0.08;
-    const classicClean = villaClean;
+    // 2. Red Flag Outpost (Classic Model - 8.0% commission with Earn-Back Promise)
+    const classicGross = m.adr * 30 * (occ / 100);
+    const classicMin = (m.code === "INR" ? 4999 : (m.code === "GBP" ? 49 : (m.code === "AED" ? 229 : 59)));
+    const classicComm = Math.max(classicMin, classicGross * 0.08);
+    const classicClean = getCleaningSchedule(occ, classicGross, m.code);
     const classicMonthly = Math.round(classicGross - classicComm - classicClean);
     cumClassic += classicMonthly;
 
-    // 4. Red Flag Outpost (Studio Model - 60% scale ADR, 12% commission)
-    const studioGross = (m.adr * 0.60) * 30 * (occ / 100);
-    const studioComm = studioGross * 0.12;
-    const studioClean = Math.round(studioGross * 0.14);
-    const studioMonthly = Math.round(studioGross - studioComm - studioClean);
-    cumStudio += studioMonthly;
+    // 3. Red Flag Homes Starter (Starter Model - 10% commission)
+    const starterGross = classicGross;
+    const starterMin = (m.code === "INR" ? 3999 : (m.code === "GBP" ? 39 : (m.code === "AED" ? 189 : 49))) * 3;
+    const starterComm = Math.max(starterMin, starterGross * 0.10);
+    const starterClean = classicClean;
+    const starterMonthly = Math.round(starterGross - starterComm - starterClean);
+    cumStarter += starterMonthly;
 
     return {
       index: idx,
@@ -3312,15 +3397,13 @@ function calculateGrowthSeries(market, occTier) {
       occ: occ,
       monthly: {
         trad: tradMonthly,
-        villa: villaMonthly,
         classic: classicMonthly,
-        studio: studioMonthly
+        starter: starterMonthly
       },
       cumulative: {
         trad: cumTrad,
-        villa: cumVilla,
         classic: cumClassic,
-        studio: cumStudio
+        starter: cumStarter
       }
     };
   });
@@ -3385,19 +3468,12 @@ function initGrowthChart() {
   const defs = svg.append("defs");
 
   // Gradients for area fills
-  const gradVilla = defs.append("linearGradient")
-    .attr("id", "growthAreaVilla")
-    .attr("x1", "0%").attr("y1", "0%")
-    .attr("x2", "0%").attr("y2", "100%");
-  gradVilla.append("stop").attr("offset", "0%").attr("stop-color", "#E5231B").attr("stop-opacity", "0.22");
-  gradVilla.append("stop").attr("offset", "100%").attr("stop-color", "#E5231B").attr("stop-opacity", "0.0");
-
   const gradClassic = defs.append("linearGradient")
     .attr("id", "growthAreaClassic")
     .attr("x1", "0%").attr("y1", "0%")
     .attr("x2", "0%").attr("y2", "100%");
-  gradClassic.append("stop").attr("offset", "0%").attr("stop-color", "#f59e0b").attr("stop-opacity", "0.15");
-  gradClassic.append("stop").attr("offset", "100%").attr("stop-color", "#f59e0b").attr("stop-opacity", "0.0");
+  gradClassic.append("stop").attr("offset", "0%").attr("stop-color", "#E5231B").attr("stop-opacity", "0.22");
+  gradClassic.append("stop").attr("offset", "100%").attr("stop-color", "#E5231B").attr("stop-opacity", "0.0");
 
   // Scales
   const xScale = d3.scalePoint()
@@ -3450,17 +3526,17 @@ function initGrowthChart() {
     .y1(d => yScale(d[mode][key]))
     .curve(d3.curveMonotoneX);
 
-  // Render Area under Villa
-  if (growthSeriesState.villa) {
+  // Render Area under Classic
+  if (growthSeriesState.classic) {
     svg.append("path")
       .datum(points)
       .attr("class", "growth-area")
-      .attr("d", areaGen("villa"))
-      .attr("fill", "url(#growthAreaVilla)");
+      .attr("d", areaGen("classic"))
+      .attr("fill", "url(#growthAreaClassic)");
   }
 
-  // Draw Lines in ordered sequence: trad, studio, classic, villa
-  const drawOrder = ["trad", "studio", "classic", "villa"];
+  // Draw Lines in ordered sequence: trad, starter, classic
+  const drawOrder = ["trad", "starter", "classic"];
   const linesGroup = svg.append("g").attr("class", "growth-lines-group");
 
   drawOrder.forEach(key => {
@@ -3502,13 +3578,13 @@ function initGrowthChart() {
 
   // End of Month 6 Spread Badge Annotation
   const m6Point = points[points.length - 1];
-  if (growthSeriesState.villa && growthSeriesState.trad) {
-    const villaVal = m6Point[mode].villa;
+  if (growthSeriesState.classic && growthSeriesState.trad) {
+    const classicVal = m6Point[mode].classic;
     const tradVal = m6Point[mode].trad;
-    const spreadMult = (villaVal / Math.max(1, tradVal)).toFixed(1);
+    const spreadMult = (classicVal / Math.max(1, tradVal)).toFixed(1);
     const badgeText = `${spreadMult}x Spread`;
     const m6X = xScale(isMobile ? m6Point.short : m6Point.month);
-    const m6Y = yScale(villaVal);
+    const m6Y = yScale(classicVal);
 
     const badgeG = svg.append("g")
       .attr("class", "growth-spread-group")
@@ -3525,14 +3601,14 @@ function initGrowthChart() {
   // Update Callout Footer Text
   const calloutSpreadEl = document.getElementById("growthSpreadText");
   if (calloutSpreadEl) {
-    const v6 = m6Point[mode].villa;
+    const c6 = m6Point[mode].classic;
     const t6 = m6Point[mode].trad;
-    const mult = (v6 / Math.max(1, t6)).toFixed(1);
+    const mult = (c6 / Math.max(1, t6)).toFixed(1);
     if (mode === "monthly") {
-      const diff = v6 - t6;
+      const diff = c6 - t6;
       calloutSpreadEl.textContent = `≈ ${mult}x yield spread (${fmtMoney(diff, activeM)}/mo extra) over traditional let at Month 6 run-rate`;
     } else {
-      const cumDiff = v6 - t6;
+      const cumDiff = c6 - t6;
       calloutSpreadEl.textContent = `≈ ${mult}x 6-month cumulative payout (${fmtMoney(cumDiff, activeM)} total advantage over traditional lease)`;
     }
   }
@@ -3581,13 +3657,12 @@ function initGrowthChart() {
 
     // Populate Tooltip
     const tradVal = closest[mode].trad;
-    const villaVal = closest[mode].villa;
     const classicVal = closest[mode].classic;
-    const studioVal = closest[mode].studio;
+    const starterVal = closest[mode].starter;
 
-    const vSpread = Math.round(((villaVal - tradVal) / tradVal) * 100);
     const cSpread = Math.round(((classicVal - tradVal) / tradVal) * 100);
-    const vMult = (villaVal / Math.max(1, tradVal)).toFixed(1);
+    const sSpread = Math.round(((starterVal - tradVal) / tradVal) * 100);
+    const cMult = (classicVal / Math.max(1, tradVal)).toFixed(1);
 
     tooltip.innerHTML = `
       <div class="d3-tooltip-month">
@@ -3597,23 +3672,16 @@ function initGrowthChart() {
       <div class="d3-tooltip-row">
         <span style="color:#ffffff;display:inline-flex;align-items:center;gap:5px">
           <span style="width:8px;height:8px;border-radius:2px;background:#E5231B;display:inline-block"></span>
-          Red Flag Outpost (Villa):
+          Red Flag Outpost (Classic):
         </span>
-        <b>${fmtMoney(villaVal, activeM)} <span style="color:#4ade80;font-size:11px">(${vSpread >= 0 ? '+' + vSpread + '%' : vSpread + '%'} · ${vMult}x)</span></b>
+        <b>${fmtMoney(classicVal, activeM)} <span style="color:#4ade80;font-size:11px">(${cSpread >= 0 ? '+' + cSpread + '%' : cSpread + '%'} · ${cMult}x)</span></b>
       </div>
       <div class="d3-tooltip-row">
         <span style="color:rgba(255,255,255,0.85);display:inline-flex;align-items:center;gap:5px">
           <span style="width:8px;height:8px;border-radius:2px;background:#f59e0b;display:inline-block"></span>
-          Red Flag Outpost (Classic):
+          Red Flag Homes Starter:
         </span>
-        <b>${fmtMoney(classicVal, activeM)} <span style="color:#f59e0b;font-size:11px">(${cSpread >= 0 ? '+' + cSpread + '%' : cSpread + '%'})</span></b>
-      </div>
-      <div class="d3-tooltip-row">
-        <span style="color:rgba(255,255,255,0.7);display:inline-flex;align-items:center;gap:5px">
-          <span style="width:8px;height:8px;border-radius:2px;background:#94a3b8;display:inline-block"></span>
-          Red Flag Outpost (Studio):
-        </span>
-        <b>${fmtMoney(studioVal, activeM)}</b>
+        <b>${fmtMoney(starterVal, activeM)} <span style="color:#f59e0b;font-size:11px">(${sSpread >= 0 ? '+' + sSpread + '%' : sSpread + '%'})</span></b>
       </div>
       <div class="d3-tooltip-row" style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px">
         <span style="color:rgba(255,255,255,0.6);display:inline-flex;align-items:center;gap:5px">
@@ -3624,12 +3692,12 @@ function initGrowthChart() {
       </div>
       <div class="d3-tooltip-row" style="margin-top:4px;color:var(--accent);font-size:11px;font-weight:600">
         <span>Spread Advantage:</span>
-        <span>+${fmtMoney(villaVal - tradVal, activeM)} ${mode === 'monthly' ? '/ month' : 'cumulative'}</span>
+        <span>+${fmtMoney(classicVal - tradVal, activeM)} ${mode === 'monthly' ? '/ month' : 'cumulative'}</span>
       </div>
     `;
 
     const tooltipX = cx;
-    const tooltipY = Math.min(yScale(villaVal), yScale(classicVal));
+    const tooltipY = Math.min(yScale(classicVal), yScale(starterVal));
     tooltip.style.left = tooltipX + "px";
     tooltip.style.top = Math.max(margin.top + 10, tooltipY) + "px";
     tooltip.classList.add("visible");
@@ -3818,7 +3886,15 @@ window.showToast = function(options) {
     const isShown = chatContainer.style.display === 'flex';
     chatContainer.style.display = isShown ? 'none' : 'flex';
     if (overlay) overlay.style.display = isShown ? 'none' : 'block';
-    if (!isShown && chatInput) chatInput.focus();
+    if (!isShown) {
+      if (chatInput) chatInput.focus();
+      const suggestionsEl = document.getElementById('chat-suggestions');
+      if (suggestionsEl) {
+        suggestionsEl.style.animation = 'none';
+        suggestionsEl.offsetHeight; /* trigger reflow */
+        suggestionsEl.style.animation = '';
+      }
+    }
   }
 
   triggerBtn.addEventListener('click', toggleChat);
@@ -4061,7 +4137,7 @@ window.showToast = function(options) {
         <p>Inquire about local luxury hospitality yields, current occupancy benchmarks, state homestay regulations, or regional seasonal dynamics.</p>
       </div>
     </div>
-    <div class="chat-suggestions-wrap">
+    <div class="chat-suggestions-wrap" id="chat-suggestions">
       <div class="chat-suggestions-title">
         <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"/></svg>
         Live Market Search Queries
@@ -4146,8 +4222,8 @@ const MARKETS = {
     rent: 75000,
     util: 12000,
     deposit: 450000,
-    franchise: { studio: 29999, villa: 49999, classic: 59999 },
-    setup: { studio: 99000, villa: 150000, classic: 111111 }
+    franchise: { classic: 59999 },
+    setup: { classic: 111111 }
   },
   GBP: {
     name: "UK",
@@ -4159,8 +4235,8 @@ const MARKETS = {
     rent: 2200,
     util: 340,
     deposit: 13200,
-    franchise: { studio: 2600, villa: 4400, classic: 5300 },
-    setup: { studio: 8700, villa: 13200, classic: 9800 }
+    franchise: { classic: 549 },
+    setup: { classic: 950 }
   },
   AED: {
     name: "UAE",
@@ -4172,8 +4248,8 @@ const MARKETS = {
     rent: 11000,
     util: 1700,
     deposit: 66000,
-    franchise: { studio: 11800, villa: 19700, classic: 23600 },
-    setup: { studio: 39000, villa: 59000, classic: 43700 }
+    franchise: { classic: 2999 },
+    setup: { classic: 4500 }
   },
   USD: {
     name: "US",
@@ -4185,10 +4261,34 @@ const MARKETS = {
     rent: 2900,
     util: 450,
     deposit: 17400,
-    franchise: { studio: 3800, villa: 6400, classic: 7600 },
-    setup: { studio: 12600, villa: 19100, classic: 14100 }
+    franchise: { classic: 749 },
+    setup: { classic: 1250 }
   }
 };
+
+/* Fixed round prices per market (Requirement 10) - never calculated from an exchange rate */
+const TIER_PRICING = {
+  IN: {
+    starter: { onboarding: "₹1,999", monthlyMin: "₹3,999", monthlyMinNum: 3999 },
+    classic: { franchise: "₹59,999", setup: "₹1,11,111", total: "₹1,71,110", monthlyMin: "₹4,999", franchiseNum: 59999, setupNum: 111111, totalNum: 171110, monthlyMinNum: 4999 }
+  },
+  GB: {
+    starter: { onboarding: "£19", monthlyMin: "£39", monthlyMinNum: 39 },
+    classic: { franchise: "£549", setup: "£950", total: "£1,499", monthlyMin: "£49", franchiseNum: 549, setupNum: 950, totalNum: 1499, monthlyMinNum: 49 }
+  },
+  AE: {
+    starter: { onboarding: "AED 99", monthlyMin: "AED 189", monthlyMinNum: 189 },
+    classic: { franchise: "AED 2,999", setup: "AED 4,500", total: "AED 7,499", monthlyMin: "AED 229", franchiseNum: 2999, setupNum: 4500, totalNum: 7499, monthlyMinNum: 229 }
+  },
+  US: {
+    starter: { onboarding: "$25", monthlyMin: "$49", monthlyMinNum: 49 },
+    classic: { franchise: "$749", setup: "$1,250", total: "$1,999", monthlyMin: "$59", franchiseNum: 749, setupNum: 1250, totalNum: 1999, monthlyMinNum: 59 }
+  }
+};
+TIER_PRICING.INR = TIER_PRICING.IN;
+TIER_PRICING.GBP = TIER_PRICING.GB;
+TIER_PRICING.AED = TIER_PRICING.AE;
+TIER_PRICING.USD = TIER_PRICING.US;
 
 const CAPITAL_BANDS = {
   INR: {
@@ -4220,7 +4320,7 @@ const INDIA_CLEANING = {
   65: 22300
 };
 
-const BREAKEVEN_OCC = 42;
+const BREAKEVEN_OCC = 41;
 
 let currentMarketKey = "INR";
 let currentOcc = 60;
@@ -4270,7 +4370,7 @@ function updateChartBreakeven(m) {
   const beFmt = formatMarketMoney(beGross, m);
   const badge = document.querySelector(".d3-breakeven-badge");
   if (badge) {
-    badge.textContent = `42% Breakeven (${beFmt})`;
+    badge.textContent = `${BREAKEVEN_OCC}% Breakeven (${beFmt})`;
   }
 }
 
@@ -4314,15 +4414,17 @@ function render(newOcc, newMarketKey) {
   const m = MARKETS[currentMarketKey];
   if (!m) return;
 
+  const prices = TIER_PRICING[currentMarketKey] || TIER_PRICING.IN;
   const occ = currentOcc;
   const gross = m.adr * 30 * (occ / 100);
-  const comm = gross * 0.105;
+  const minComm = prices.classic.monthlyMinNum || 4999;
+  const comm = Math.max(minComm, gross * 0.08);
   const clean = currentMarketKey === "INR"
     ? (INDIA_CLEANING[occ] !== undefined ? INDIA_CLEANING[occ] : gross * 0.126)
     : gross * 0.126;
   const payout = gross - comm - clean;
   const net = payout - m.rent - m.util;
-  const capital = m.deposit + m.franchise.villa + m.setup.villa;
+  const capital = m.deposit + (prices.classic.totalNum || (m.franchise.classic + m.setup.classic));
   const roc = (net * 12) / capital;
 
   // 1. #gross (with the " /mo" suffix)
@@ -4331,7 +4433,7 @@ function render(newOcc, newMarketKey) {
     grossEl.innerHTML = formatMarketMoney(gross, m) + '<span style="font-size:.4em;letter-spacing:0"> /mo</span>';
   }
 
-  // 2. Breakdown table cells
+  // 2. Breakdown table cells (8% economics)
   const setCell = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.textContent = val;
@@ -4348,7 +4450,7 @@ function render(newOcc, newMarketKey) {
   // 3. .illus assumptions line
   const illusEl = document.querySelector(".illus");
   if (illusEl) {
-    illusEl.textContent = `Capital deployed: deposit ${formatMarketMoney(m.deposit, m)} + franchise ${formatMarketMoney(m.franchise.villa, m)} + setup ${formatMarketMoney(m.setup.villa, m)} = ${formatMarketMoney(capital, m)} · ADR ${formatMarketMoney(m.adr, m)}`;
+    illusEl.textContent = `Capital deployed: deposit ${formatMarketMoney(m.deposit, m)} + franchise ${prices.classic.franchise} + setup ${prices.classic.setup} = ${formatMarketMoney(capital, m)} · ADR ${formatMarketMoney(m.adr, m)}`;
   }
 
   // 4. #echoPanel .mid p sentence
@@ -4357,48 +4459,47 @@ function render(newOcc, newMarketKey) {
     echoPEl.textContent = `${formatMarketMoney(gross, m)} gross monthly revenue at ${occ}% occupancy. Approximately 2x the yield spread of a traditional let. Full workings below.`;
   }
 
-  // 5. The three <dd> cells on each #deck .tcard card (found by data-tier)
-  const studioCard = document.querySelector('#deck .tcard[data-tier="studio"]');
-  if (studioCard) {
-    const studioDds = studioCard.querySelectorAll("dd");
-    if (studioDds.length >= 3 && m.franchise && m.franchise.studio !== undefined) {
-      studioDds[0].textContent = formatMarketMoney(m.franchise.studio, m);
-      studioDds[1].textContent = formatMarketMoney(m.setup.studio, m);
-      studioDds[2].textContent = formatMarketMoney(m.franchise.studio + m.setup.studio, m);
-    }
-  }
-
-  const villaCard = document.querySelector('#deck .tcard[data-tier="villa"]');
-  if (villaCard) {
-    const villaDds = villaCard.querySelectorAll("dd");
-    if (villaDds.length >= 3 && m.franchise && m.franchise.villa !== undefined) {
-      villaDds[0].textContent = formatMarketMoney(m.franchise.villa, m);
-      villaDds[1].textContent = formatMarketMoney(m.setup.villa, m);
-      villaDds[2].textContent = formatMarketMoney(m.franchise.villa + m.setup.villa, m);
-    }
-  }
-
+  // 5. Update Classic card by data-tier="classic"
   const classicCard = document.querySelector('#deck .tcard[data-tier="classic"]');
   if (classicCard) {
-    const classicDds = classicCard.querySelectorAll("dd");
-    if (classicDds.length >= 3 && m.franchise && m.franchise.classic !== undefined) {
-      classicDds[0].textContent = formatMarketMoney(m.franchise.classic, m);
-      classicDds[1].textContent = formatMarketMoney(m.setup.classic, m);
-      classicDds[2].textContent = formatMarketMoney(m.franchise.classic + m.setup.classic, m);
-    }
-    const minValEl = classicCard.querySelector(".tcard__min-val");
-    if (minValEl) {
-      const minInr = 4999;
-      const rate = m.code === "INR" ? 1 : (m.code === "GBP" ? 110 : (m.code === "AED" ? 22.8 : 84));
-      const minConverted = Math.round(minInr / rate);
-      minValEl.textContent = formatMarketMoney(minConverted, m);
+    const feeFranchiseEl = classicCard.querySelector(".classic-fee-franchise");
+    const feeSetupEl = classicCard.querySelector(".classic-fee-setup");
+    const feeTotalEl = classicCard.querySelector(".classic-fee-total");
+    if (feeFranchiseEl) feeFranchiseEl.textContent = prices.classic.franchise;
+    if (feeSetupEl) feeSetupEl.textContent = prices.classic.setup;
+    if (feeTotalEl) feeTotalEl.textContent = prices.classic.total;
+    const minValEl = classicCard.querySelector(".classic-min-val");
+    if (minValEl) minValEl.textContent = prices.classic.monthlyMin;
+  }
+
+  // 6. Update Starter card by data-tier="starter"
+  const starterCard = document.querySelector('#deck .tcard[data-tier="starter"]');
+  if (starterCard) {
+    const feeOnboardingEl = starterCard.querySelector(".starter-fee-onboarding");
+    if (feeOnboardingEl) feeOnboardingEl.textContent = prices.starter.onboarding;
+    const minValEl = starterCard.querySelector(".starter-min-val");
+    if (minValEl) minValEl.textContent = prices.starter.monthlyMin;
+  }
+
+  // 7. Update The Drop card by data-tier="drop" (India-only, keeps rupee prices and shows "India only" in non-IN markets)
+  const dropCard = document.querySelector('#deck .tcard[data-tier="drop"]');
+  if (dropCard) {
+    const dropGeo = dropCard.querySelector(".drop-geo-line");
+    if (dropGeo) {
+      if (currentMarketKey !== "IN") {
+        dropGeo.textContent = "India only";
+        dropGeo.style.display = "block";
+      } else {
+        dropGeo.textContent = "";
+        dropGeo.style.display = "none";
+      }
     }
   }
 
-  // 6. Deployable capital dropdown in apply form
+  // 7. Deployable capital dropdown in apply form
   updateCapitalDropdown(currentMarketKey);
 
-  // 7. Projected 6-month occupancy chart breakeven annotation
+  // 8. Projected 6-month occupancy chart breakeven annotation
   updateChartBreakeven(m);
 
   // Update aria-pressed on occupancy buttons
@@ -4485,7 +4586,7 @@ if (typeof window.rfClassicSetCurrency === 'function') {
 (function () {
   /* ===================== SETTINGS ===================== */
   var SETTINGS = {
-    LAUNCH: "2026-10-01T00:00:00+05:30", // allocations open (India time)
+    LAUNCH: "2026-10-12T00:00:00+05:30", // allocations open (India time)
     TOTAL: 200,                          // founding allocations in India
     LEFT: 200,                           // lower this as partners sign
     ADR: 9000,                           // nightly rate for illustrative villa (INR)
@@ -5028,7 +5129,7 @@ if (typeof window.rfClassicSetCurrency === 'function') {
       var diff = Math.floor((launchAt - Date.now()) / 1000), c = q("clock");
       if (diff > 0) {
         var d = Math.floor(diff / 86400), h = Math.floor(diff % 86400 / 3600), m = Math.floor(diff % 3600 / 60), s = diff % 60;
-        c.innerHTML = '<p class="rfc-clk-l">Allocations open 1 October</p><div class="rfc-clk">' + unit(d, "days") + unit(pad(h), "hrs") + unit(pad(m), "min") + unit(pad(s), "sec") + "</div>";
+        c.innerHTML = '<p class="rfc-clk-l">Allocation opens from 12th October</p><div class="rfc-clk">' + unit(d, "days") + unit(pad(h), "hrs") + unit(pad(m), "min") + unit(pad(s), "sec") + "</div>";
         q("left").textContent = SETTINGS.TOTAL;
       } else {
         c.innerHTML = '<p class="rfc-clk-l">Allocations open</p><p class="rfc-live">Launched ' + ago(-diff) + " ago</p>";

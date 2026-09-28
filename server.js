@@ -511,6 +511,9 @@ app.get(['/admin', '/admin.html'], (req, res) => {
 });
 
 app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/') || path.extname(req.path)) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

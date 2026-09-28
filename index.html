@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +13,9 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
   <link rel="stylesheet" href="/pwa.css">
+  <script type="importmap">
+  { "imports": { "lenis": "https://unpkg.com/lenis@1.3.19/dist/lenis.mjs" } }
+  </script>
 
   <script>
   // Performance: Video Lazy Loading & Play/Pause
@@ -105,9 +105,6 @@
   };
   </script>
 
-  <script type="importmap">
-  { "imports": { "lenis": "https://unpkg.com/lenis@1.3.19/dist/lenis.mjs" } }
-</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@500&family=Michroma&display=swap" rel="stylesheet">
@@ -1184,6 +1181,29 @@
     }
 
     /* Suggested quick prompt chips */
+    @keyframes appear {
+      0% {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #chat-suggestions,
+    #chat-suggestions .chat-suggestions-list {
+      animation: appear 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #chat-suggestions,
+      #chat-suggestions .chat-suggestions-list {
+        animation: none !important;
+      }
+    }
+
     .chat-suggestions-wrap {
       display: flex;
       flex-direction: column;
@@ -4995,6 +5015,12 @@
         chatContainer.style.display = 'flex';
         chatOverlay.style.display = 'block';
         if (typeof chatInput !== 'undefined') chatInput.focus();
+        const suggestionsEl = document.getElementById('chat-suggestions');
+        if (suggestionsEl) {
+          suggestionsEl.style.animation = 'none';
+          suggestionsEl.offsetHeight; /* trigger reflow */
+          suggestionsEl.style.animation = '';
+        }
       }
     }
 
@@ -5756,7 +5782,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
-<script src="transitions.js"></script>
+<script src="/transitions.js"></script>
 <script type="module">
   import { 
     mountAuthNavigation, 
