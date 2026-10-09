@@ -11,6 +11,18 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    function isRfAdmin() {
+      return request.auth != null
+        && (request.auth.token.email_verified == true || request.auth.token.firebase.sign_in_provider == 'password')
+        && request.auth.token.email in ['priyanshu@redflaghomes.in'];
+    }
+    match /applications/{id}  { allow read, update, delete: if isRfAdmin(); }
+    match /inquiries/{id}     { allow read, update, delete: if isRfAdmin(); }
+    match /users/{id}         { allow read: if isRfAdmin(); }
+    match /posts/{id}         { allow read: if resource.data.status == 'published' || isRfAdmin();
+                                allow create, update, delete: if isRfAdmin(); }
+    match /bellaPayments/{id} { allow read, update: if isRfAdmin(); }
+
     // User profile documents
     match /users/{userId} {
       allow read, write: if isOwner(userId);

@@ -5,6 +5,8 @@ const CACHE_NAME = 'rf-core-v2';
 const CORE_ASSETS = [
   '/',
   '/franchise',
+  '/bella',
+  '/bella/',
   '/index.html',
   '/franchise.html',
   '/manifest.json',
@@ -165,6 +167,9 @@ self.addEventListener('fetch', (event) => {
           if (cached) return cached;
           if (url.pathname.includes('franchise')) {
             return caches.match('/franchise') || caches.match('/franchise.html');
+          }
+          if (url.pathname.includes('bella')) {
+            return caches.match('/bella') || caches.match('/bella/');
           }
           return caches.match('/') || caches.match('/index.html');
         })
