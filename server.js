@@ -496,6 +496,11 @@ app.use('/__/auth', (req, res) => {
   req.pipe(proxyReq);
 });
 
+app.get(['/bella', '/bella/', '/bella/index.html', '/bella.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'bella', 'index.html'));
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname));
 
 app.get(['/franchise', '/franchise.html'], (req, res) => {
