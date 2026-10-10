@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Red Flag Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Red Flag Homes admin. Dark by default to match redflaghomes.in; a light theme follows the system or the toggle. */
+  :root {
+    --bg: #0A0505; --surface: #140B0B; --surface-2: #1C1010; --surface-3: #261616;
+    --line: rgba(242, 228, 225, .09); --line-2: rgba(242, 228, 225, .16);
+    --text: #F2E4E1; --text-2: #C9B6B1; --muted: #9A8580;
+    --accent: #FF3B30; --accent-ink: #fff; --cream: #FFEDC3;
+    --s-app: #E8473D; --s-inq: #3E95D0;            /* chart series: applications, inquiries (validated, dark) */
+    --good: #3FB27F; --warn: #E3A33B; --bad: #EF5B52; --info: #8AA6C4;
+    --shadow: 0 30px 80px -30px rgba(0,0,0,.8);
+    --radius: 18px;
+    --serif: "Instrument Serif", Georgia, serif; --sans: "Inter Tight", system-ui, sans-serif;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #F6EFEA; --surface: #FFFBF8; --surface-2: #F3E9E3; --surface-3: #EADDD5;
+      --line: rgba(40, 14, 10, .09); --line-2: rgba(40, 14, 10, .18);
+      --text: #1E0F0C; --text-2: #4A3530; --muted: #7A6560;
+      --accent: #D42A20; --cream: #8A5A00;
+      --s-app: #C8302A; --s-inq: #2F7DB5;
+      --good: #1E7F53; --warn: #A86A00; --bad: #C23A31; --info: #3F6688;
+      --shadow: 0 30px 80px -40px rgba(60,20,10,.35);
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #F6EFEA; --surface: #FFFBF8; --surface-2: #F3E9E3; --surface-3: #EADDD5;
+    --line: rgba(40, 14, 10, .09); --line-2: rgba(40, 14, 10, .18);
+    --text: #1E0F0C; --text-2: #4A3530; --muted: #7A6560;
+    --accent: #D42A20; --cream: #8A5A00;
+    --s-app: #C8302A; --s-inq: #2F7DB5;
+    --good: #1E7F53; --warn: #A86A00; --bad: #C23A31; --info: #3F6688;
+    --shadow: 0 30px 80px -40px rgba(60,20,10,.35);
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--text); font: 400 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  a { color: inherit; }
+  [hidden] { display: none !important; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  h1, h2, h3 { margin: 0; font-weight: 400; }
+  .serif { font-family: var(--serif); letter-spacing: -.01em; }
+
+  /* ---------- buttons ---------- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line-2); background: transparent; cursor: pointer; font-weight: 500; font-size: .9rem; text-decoration: none; white-space: nowrap; transition: border-color .2s, background .2s; }
+  .btn:hover { border-color: var(--text-2); }
+  .btn--red { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn--red:hover { filter: brightness(1.08); border-color: var(--accent); }
+  .btn--sm { min-height: 34px; padding: 6px 12px; font-size: .84rem; }
+  .btn--icon { width: 40px; padding: 0; }
+  .btn svg { width: 16px; height: 16px; flex: none; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; flex: none; }
+
+  /* ---------- sign-in ---------- */
+  .gate { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: radial-gradient(60% 50% at 50% 0%, rgba(255,59,48,.14), transparent 70%); }
+  .gate-card { width: min(440px, 100%); padding: 36px 30px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line-2); box-shadow: var(--shadow); text-align: center; display: grid; gap: 18px; }
+  .gate-card h1 { font-family: var(--serif); font-size: 2.6rem; line-height: 1; }
+  .gate-card p { margin: 0; color: var(--text-2); font-size: .93rem; }
+  .gate-msg { font-size: .85rem; color: var(--warn); min-height: 1.2em; }
+  .gate-actions { display: grid; gap: 10px; }
+  .gate-actions .btn { min-height: 46px; }
+  .gate-input { width: 100%; min-height: 48px; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--surface-2); font-size: 1rem; }
+  .gate-input:focus { outline: none; border-color: var(--accent); }
+  .pass-wrap { position: relative; } .pass-wrap .gate-input { padding-right: 70px; }
+  .pass-eye { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); min-height: 34px; padding: 4px 10px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; font-size: .82rem; }
+  .link-btn { justify-self: center; border: 0; background: none; color: var(--muted); font-size: .85rem; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 4px; }
+  .gate-card .gate-actions { text-align: left; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: .02em; justify-content: center; }
+  .brand .dot { width: 9px; height: 9px; box-shadow: 0 0 14px var(--accent); }
+
+  /* ---------- shell ---------- */
+  .app { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; background: linear-gradient(90deg, var(--surface) 247px, var(--line) 247px 248px, transparent 248px); }
+  .side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 6px; padding: 22px 14px; border-right: 1px solid var(--line); background: var(--surface); }
+  .side .brand { justify-content: flex-start; padding: 4px 10px 18px; }
+  .side .brand small { display: block; font-weight: 400; color: var(--muted); font-size: .76rem; letter-spacing: 0; }
+  .nav { display: grid; gap: 2px; }
+  .nav a { display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 8px 12px; border-radius: 12px; text-decoration: none; color: var(--text-2); font-weight: 500; }
+  .nav a svg { width: 18px; height: 18px; flex: none; }
+  .nav a:hover { background: var(--surface-2); color: var(--text); }
+  .nav a[aria-current="page"] { background: var(--surface-3); color: var(--text); }
+  .nav .count { margin-left: auto; min-width: 22px; padding: 1px 7px; border-radius: 999px; background: var(--accent); color: #fff; font-size: .72rem; text-align: center; }
+  .side-foot { margin-top: auto; display: grid; gap: 10px; padding: 12px; border-radius: 14px; background: var(--surface-2); font-size: .82rem; }
+  .who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .who img, .who .av { width: 30px; height: 30px; border-radius: 50%; flex: none; }
+  .who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+  .mode { display: inline-flex; align-items: center; gap: 6px; font-size: .74rem; color: var(--muted); }
+  .mode i { width: 7px; height: 7px; border-radius: 50%; background: var(--good); }
+  .mode.demo i { background: var(--warn); }
+
+  .main { min-width: 0; padding: 26px clamp(16px, 3vw, 40px) 60px; }
+  .top { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+  .top h1 { font-family: var(--serif); font-size: clamp(2rem, 1.4rem + 2vw, 2.8rem); line-height: 1; }
+  .top p { margin: 6px 0 0; color: var(--muted); font-size: .9rem; }
+  .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .demo-bar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; margin-bottom: 18px; border-radius: 14px; border: 1px dashed var(--line-2); color: var(--text-2); font-size: .86rem; }
+
+  /* ---------- cards & KPIs ---------- */
+  .grid { display: grid; gap: 16px; }
+  .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; min-width: 0; }
+  .card h2 { font-size: 1rem; font-weight: 600; font-family: var(--sans); }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .card-head p { margin: 2px 0 0; color: var(--muted); font-size: .82rem; }
+  .kpi { display: grid; gap: 6px; }
+  .kpi small { color: var(--muted); font-size: .8rem; }
+  .kpi b { font-family: var(--serif); font-weight: 400; font-size: 2.6rem; line-height: 1; letter-spacing: -.02em; }
+  .kpi span { font-size: .8rem; color: var(--text-2); }
+  .two { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+
+  /* ---------- chart ---------- */
+  .legend { display: flex; gap: 16px; font-size: .8rem; color: var(--text-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; }
+  .chart { position: relative; }
+  .chart svg { display: block; width: 100%; height: 220px; overflow: visible; }
+  .chart .grid-line { stroke: var(--line); }
+  .chart .axis-t { fill: var(--muted); font-size: 11px; font-family: var(--sans); }
+  .tip { position: absolute; pointer-events: none; z-index: 5; padding: 8px 10px; border-radius: 10px; background: var(--surface-3); border: 1px solid var(--line-2); box-shadow: var(--shadow); font-size: .8rem; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); }
+  .tip b { display: block; font-weight: 600; margin-bottom: 2px; }
+  .tip i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; }
+
+  /* ---------- lists ---------- */
+  .mini { list-style: none; margin: 0; padding: 0; display: grid; }
+  .mini li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); cursor: pointer; }
+  .mini li:first-child { border-top: 0; }
+  .mini .t { min-width: 0; flex: 1; }
+  .mini .t b { display: block; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mini .t small { color: var(--muted); font-size: .8rem; }
+  .bars { display: grid; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: minmax(0, 120px) minmax(0, 1fr) 34px; gap: 10px; align-items: center; font-size: .85rem; }
+  .bar-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+  .bar-row i { display: block; height: 10px; border-radius: 0 4px 4px 0; background: var(--s-app); min-width: 2px; }
+  .bar-row b { font-weight: 500; text-align: right; }
+
+  /* ---------- status pill (icon + label, never colour alone) ---------- */
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: .78rem; font-weight: 500; border: 1px solid var(--line-2); white-space: nowrap; color: var(--text); }
+  .pill svg { width: 12px; height: 12px; }
+  .pill.good svg { color: var(--good); } .pill.warn svg { color: var(--warn); } .pill.bad svg { color: var(--bad); } .pill.info svg { color: var(--info); }
+  .pill.new { border-color: var(--accent); }
+
+  /* ---------- table ---------- */
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .search { flex: 1 1 240px; display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); }
+  .search svg { width: 16px; height: 16px; color: var(--muted); flex: none; }
+  .search input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; padding: 8px 0; }
+  .select { min-height: 42px; padding: 0 36px 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23998' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; appearance: none; -webkit-appearance: none; cursor: pointer; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { min-height: 34px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line-2); background: transparent; cursor: pointer; font-size: .82rem; }
+  .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .chip small { opacity: .7; margin-left: 4px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  th { text-align: left; font-weight: 500; color: var(--muted); font-size: .78rem; padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th button { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
+  th button:focus-visible { outline: 2px solid var(--accent); border-radius: 4px; }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover td { background: var(--surface-2); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td .sub { display: block; color: var(--muted); font-size: .78rem; }
+  .empty { padding: 40px 20px; text-align: center; color: var(--muted); }
+  .count-line { color: var(--muted); font-size: .82rem; margin: 10px 4px 0; }
+  @media (max-width: 720px) {
+    .table-wrap { border: 0; background: transparent; overflow: visible; }
+    table, tbody, tr, td { display: block; width: 100%; }
+    thead { display: none; }
+    tbody tr { margin-bottom: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    td { border: 0; padding: 3px 0; max-width: none; white-space: normal; }
+    td[data-l]::before { content: attr(data-l); display: inline-block; min-width: 92px; color: var(--muted); font-size: .76rem; }
+    td.lead-cell { font-size: 1rem; }
+  }
+
+  /* ---------- drawer ---------- */
+  .drawer { position: fixed; inset: 0; z-index: 40; display: flex; justify-content: flex-end; background: rgba(5,2,2,.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  .drawer-panel { width: min(520px, 100%); height: 100%; overflow-y: auto; background: var(--surface); border-left: 1px solid var(--line-2); padding: 22px 24px 40px; display: grid; gap: 18px; align-content: start; animation: slide .28s cubic-bezier(.2,.8,.2,1); }
+  @keyframes slide { from { transform: translateX(30px); opacity: 0; } }
+  .drawer-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .drawer-top h2 { font-family: var(--serif); font-size: 2rem; line-height: 1.05; word-break: break-word; }
+  .drawer-top p { margin: 4px 0 0; color: var(--muted); font-size: .85rem; }
+  .facts { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 8px 14px; margin: 0; font-size: .9rem; }
+  .facts dt { color: var(--muted); }
+  .facts dd { margin: 0; word-break: break-word; }
+  .quick { display: flex; gap: 8px; flex-wrap: wrap; }
+  .field { display: grid; gap: 6px; }
+  .field label { font-size: .8rem; color: var(--muted); }
+  .field select, .field textarea, .field input { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--surface-2); }
+  .field textarea { min-height: 110px; resize: vertical; }
+  .drawer-actions { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+  .history { font-size: .8rem; color: var(--muted); }
+
+  /* ---------- health & setup ---------- */
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; }
+  .checks li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px 0; border-top: 1px solid var(--line); }
+  .checks li:first-child { border-top: 0; }
+  .checks svg { width: 18px; height: 18px; margin-top: 2px; }
+  .checks .ok svg { color: var(--good); } .checks .warn svg { color: var(--warn); } .checks .fail svg { color: var(--bad); } .checks .wait svg { color: var(--muted); }
+  .checks b { font-weight: 500; display: block; }
+  .checks small { color: var(--muted); font-size: .8rem; word-break: break-word; }
+  .checks .meta { color: var(--muted); font-size: .8rem; white-space: nowrap; }
+  pre.code { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); overflow-x: auto; font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--text-2); }
+  .steps { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; color: var(--text-2); font-size: .9rem; }
+  .steps code, p code { font-size: .85em; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  /* ---------- journal writer ---------- */
+  .editor { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
+  .editor .side-col { position: sticky; top: 18px; display: grid; gap: 16px; }
+  .editor .field input[type="text"], .editor .field input[type="url"], .editor .field input[type="number"] { min-height: 44px; }
+  .title-input { font: 400 clamp(1.8rem, 1.3rem + 1.6vw, 2.5rem)/1.1 var(--serif) !important; padding: 12px 14px !important; }
+  .hint { font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+  .hint.over { color: var(--bad); }
+  .md-bar { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; padding: 6px; border: 1px solid var(--line-2); border-bottom: 0; border-radius: 12px 12px 0 0; background: var(--surface-2); }
+  .md-bar button { min-width: 34px; min-height: 32px; padding: 4px 8px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; font-size: .85rem; color: var(--text-2); }
+  .md-bar button:hover, .md-bar button[aria-pressed="true"] { background: var(--surface-3); color: var(--text); }
+  .md-bar .sep { width: 1px; height: 20px; background: var(--line-2); margin: 0 4px; }
+  .md-bar .grow { flex: 1; }
+  .editor .field textarea.body-input { min-height: 460px; border-radius: 0 0 12px 12px; font: 400 15px/1.7 var(--sans); }
+  .md-preview { min-height: 460px; padding: 18px 20px; border: 1px solid var(--line-2); border-radius: 0 0 12px 12px; background: var(--surface-2); overflow-wrap: anywhere; }
+  .md-preview h2 { font: 400 1.9rem/1.15 var(--serif); margin: 26px 0 8px; } .md-preview h3 { font-weight: 600; font-size: 1.15rem; margin: 20px 0 6px; }
+  .md-preview p, .md-preview li { color: var(--text-2); } .md-preview a { color: var(--text); text-decoration-color: var(--accent); }
+  .md-preview blockquote { margin: 18px 0; padding-left: 16px; border-left: 2px solid var(--accent); font: italic 1.35rem/1.35 var(--serif); }
+  .md-preview img { max-width: 100%; border-radius: 12px; } .md-preview figure { margin: 18px 0; } .md-preview figcaption { font-size: .8rem; color: var(--muted); }
+  .md-preview hr { border: 0; border-top: 1px solid var(--line-2); margin: 24px 0; }
+  .md-preview code { padding: 1px 6px; border-radius: 6px; background: var(--surface-3); }
+  .ex-card { display: flex; flex-direction: column; gap: 10px; padding: 10px; border-radius: 22px; border: 1px solid rgba(242,228,225,.1); background: #140B0B; color: #F2E4E1; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  .ex-card .cv { height: 168px; border-radius: 14px; overflow: hidden; background: #241515; display: grid; place-items: center; color: #9A8580; font-size: .8rem; }
+  .ex-card .cv img { width: 100%; height: 100%; object-fit: cover; }
+  .ex-card .meta { display: flex; gap: 6px; align-items: center; font-size: .78rem; color: #B09C97; padding: 4px 8px 0; }
+  .ex-card .meta span:first-child { padding: 3px 10px; border-radius: 999px; background: rgba(242,228,225,.08); }
+  .ex-card h3 { font: 700 1.25rem/1.25 var(--serif); padding: 0 8px; margin: 0; }
+  .ex-card p { margin: 0; padding: 0 8px; font-size: .84rem; color: #B09C97; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .ex-card .ft { display: flex; justify-content: space-between; padding: 6px 8px 4px; font-size: .76rem; color: #B09C97; }
+  .ex-card .ft b { display: block; font-weight: 600; }
+  .switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: .9rem; }
+  .switch input { width: 42px; height: 24px; appearance: none; -webkit-appearance: none; border-radius: 999px; background: var(--surface-3); border: 1px solid var(--line-2); position: relative; cursor: pointer; flex: none; transition: background .2s; }
+  .switch input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-2); transition: transform .2s; }
+  .switch input:checked { background: var(--accent); border-color: var(--accent); } .switch input:checked::after { transform: translateX(18px); background: #fff; }
+  .covers { display: flex; gap: 6px; flex-wrap: wrap; }
+  .covers button { width: 54px; height: 40px; padding: 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--line-2); cursor: pointer; background: var(--surface-3); }
+  .covers img { width: 100%; height: 100%; object-fit: cover; }
+  .ai-box { display: grid; gap: 10px; padding: 14px; border-radius: 14px; border: 1px dashed var(--line-2); background: var(--surface-2); margin-bottom: 14px; }
+  .ai-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+  .post-title { font-weight: 500; display: block; }
+  @media (max-width: 1100px) { .editor { grid-template-columns: minmax(0, 1fr); } .editor .side-col { position: static; } }
+  @media (max-width: 520px) { .ai-row { grid-template-columns: minmax(0, 1fr); } }
+
+  /* ---------- Journal Weekly Activity Heatmap & Best Posting Schedule ---------- */
+  .hm-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px; position: relative; margin-bottom: 20px; }
+  .hm-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  .hm-header h2 { font-size: 1.25rem; font-weight: 600; font-family: var(--sans); display: flex; align-items: center; gap: 8px; margin: 0; }
+  .hm-header p { margin: 4px 0 0; color: var(--muted); font-size: .84rem; max-width: 720px; line-height: 1.45; }
+  .hm-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--surface-2); border-radius: 14px; border: 1px solid var(--line); margin-bottom: 16px; }
+  .hm-ctrl-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .hm-ctrl-group label { font-size: .8rem; color: var(--muted); font-weight: 500; }
+  .hm-select { min-height: 36px; padding: 0 32px 0 12px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23998' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center; appearance: none; -webkit-appearance: none; cursor: pointer; color: var(--text); font-size: .82rem; }
+  .hm-btn-pill { min-height: 32px; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line-2); background: transparent; color: var(--text-2); font-size: .8rem; cursor: pointer; transition: all .18s ease; }
+  .hm-btn-pill:hover { border-color: var(--line-2); color: var(--text); background: var(--surface-3); }
+  .hm-btn-pill[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
+  
+  .hm-legend { display: flex; align-items: center; gap: 8px; font-size: .76rem; color: var(--muted); }
+  .hm-legend-scale { display: flex; gap: 3px; align-items: center; }
+  .hm-legend-box { width: 14px; height: 14px; border-radius: 3px; }
+
+  /* Heatmap table / grid */
+  .hm-matrix-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 4px 2px 10px; margin-bottom: 18px; scrollbar-width: thin; }
+  .hm-matrix-wrap::-webkit-scrollbar { height: 6px; }
+  .hm-matrix-wrap::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 4px; }
+  .hm-matrix { display: grid; grid-template-columns: 46px repeat(24, minmax(28px, 1fr)) 84px; gap: 4px; align-items: center; min-width: 820px; font-family: var(--sans); }
+  .hm-col-head { font-size: .72rem; color: var(--muted); text-align: center; padding-bottom: 4px; font-weight: 500; user-select: none; }
+  .hm-row-label { font-size: .78rem; color: var(--text-2); font-weight: 500; text-align: right; padding-right: 8px; user-select: none; }
+  .hm-row-stat { font-size: .72rem; color: var(--muted); padding-left: 8px; white-space: nowrap; }
+
+  .hm-cell { height: 26px; border-radius: 5px; cursor: pointer; position: relative; transition: transform .14s ease, outline .14s ease, box-shadow .14s ease; border: 1px solid rgba(255, 255, 255, .04); outline: none; }
+  .hm-cell:hover, .hm-cell:focus-visible { transform: scale(1.18); z-index: 10; outline: 2px solid #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, .7); }
+  .hm-cell.is-peak { border: 1.5px solid var(--cream); box-shadow: 0 0 10px rgba(255, 59, 48, .6); }
+  .hm-cell.is-peak::after { content: "★"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--cream); pointer-events: none; line-height: 1; }
+
+  /* Recommendation cards */
+  .hm-recs-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+  .hm-rec-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 8px; position: relative; transition: border-color .2s; }
+  .hm-rec-card:hover { border-color: var(--line-2); }
+  .hm-rec-card.primary { border-color: rgba(255, 59, 48, .4); background: linear-gradient(145deg, rgba(255, 59, 48, .12), var(--surface-2) 65%); }
+  .hm-rec-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .hm-rec-badge { font-size: .72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+  .hm-rec-badge.gold { background: rgba(255, 237, 195, .15); color: var(--cream); border: 1px solid rgba(255, 237, 195, .3); }
+  .hm-rec-badge.silver { background: rgba(242, 228, 225, .1); color: var(--text-2); border: 1px solid var(--line-2); }
+  .hm-rec-badge.bronze { background: rgba(227, 163, 59, .15); color: var(--warn); border: 1px solid rgba(227, 163, 59, .3); }
+  .hm-rec-time { font-family: var(--serif); font-size: 1.35rem; line-height: 1.1; margin: 0; color: var(--text); }
+  .hm-rec-score { font-size: .78rem; color: var(--good); font-weight: 500; display: flex; align-items: center; gap: 4px; }
+  .hm-rec-desc { font-size: .8rem; color: var(--muted); margin: 0; line-height: 1.4; }
+  .hm-rec-meta { font-size: .76rem; color: var(--text-2); background: var(--surface-3); padding: 6px 10px; border-radius: 8px; margin-top: 4px; }
+
+  /* Insights summary bar */
+  .hm-summary-bar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .hm-summary-item { display: grid; gap: 2px; }
+  .hm-summary-item span { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .hm-summary-item b { font-size: .96rem; font-weight: 600; color: var(--text); }
+  .hm-summary-item small { font-size: .74rem; color: var(--text-2); }
+
+  /* Interactive Tooltip */
+  .hm-tip-box { position: fixed; pointer-events: none; z-index: 100; padding: 10px 14px; border-radius: 12px; background: #1C1010; border: 1px solid rgba(242, 228, 225, .25); box-shadow: 0 16px 40px rgba(0, 0, 0, .85); font-size: .82rem; min-width: 220px; max-width: 280px; transform: translate(-50%, -100%); margin-top: -12px; transition: opacity .12s ease; }
+  .hm-tip-title { font-weight: 600; font-size: .88rem; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .hm-tip-row { display: flex; justify-content: space-between; gap: 12px; color: var(--text-2); margin-top: 2px; }
+  .hm-tip-advice { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(242, 228, 225, .1); color: var(--cream); font-size: .76rem; line-height: 1.35; }
+
+  @media (max-width: 900px) {
+    .hm-recs-grid { grid-template-columns: 1fr; }
+    .hm-summary-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  /* ---------- toast ---------- */
+  .toasts { position: fixed; right: 16px; bottom: 16px; z-index: 60; display: grid; gap: 8px; max-width: min(360px, calc(100vw - 32px)); }
+  .toast { padding: 12px 14px; border-radius: 14px; background: var(--surface-3); border: 1px solid var(--line-2); box-shadow: var(--shadow); font-size: .86rem; display: flex; gap: 10px; align-items: flex-start; animation: slide .3s ease; }
+  .toast b { display: block; }
+
+  /* ---------- responsive shell ---------- */
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .two { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: minmax(0, 1fr); background: none; }
+    .side { position: fixed; z-index: 30; top: auto; bottom: 0; left: 0; right: 0; height: auto; flex-direction: row; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--line); }
+    .side .brand, .side-foot { display: none; }
+    .nav { grid-auto-flow: column; grid-auto-columns: minmax(64px, 1fr); width: 100%; overflow-x: auto; scrollbar-width: none; }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav a { flex-direction: column; gap: 2px; min-height: 52px; padding: 6px 4px; font-size: .66rem; justify-content: center; position: relative; }
+    .nav .count { position: absolute; top: 2px; right: 8px; margin: 0; min-width: 16px; padding: 0 5px; font-size: .62rem; }
+    .main { padding-bottom: 100px; }
+    .mobile-top { display: flex !important; }
+  }
+  .mobile-top { display: none; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 18px; }
+  @media (max-width: 520px) { .kpi b { font-size: 2.1rem; } .facts { grid-template-columns: minmax(0, 1fr); gap: 2px; } .facts dd { margin-bottom: 8px; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ============ Sign-in ============ -->
+<section class="gate" id="gate">
+  <div class="gate-card">
+    <span class="brand"><i class="dot"></i>RED FLAG HOMES</span>
+    <h1>Admin</h1>
+    <p>Applications, bookings, leads and site health for redflaghomes.in in one place.</p>
+    <form class="gate-actions" id="login" novalidate>
+      <label class="sr-only" for="l-email">Email</label>
+      <input class="gate-input" id="l-email" type="email" autocomplete="username" placeholder="Email" required>
+      <label class="sr-only" for="l-pass">Password</label>
+      <div class="pass-wrap"><input class="gate-input" id="l-pass" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" class="pass-eye" id="l-eye" aria-label="Show password">Show</button></div>
+      <button class="btn btn--red" id="signin" type="submit">Sign in</button>
+      <button class="link-btn" id="forgot" type="button">Forgot password?</button>
+      <button class="btn" id="demo" type="button">Preview with sample data</button>
+    </form>
+    <p class="gate-msg" id="gate-msg" role="status"></p>
+  </div>
+</section>
+
+<!-- ============ App ============ -->
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <span class="brand"><i class="dot"></i><span>RED FLAG<small>Admin panel</small></span></span>
+    <nav class="nav" aria-label="Admin sections">
+      <a href="#/overview" data-view="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>Overview</a>
+      <a href="#/applications" data-view="applications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>Franchise<span class="count" id="c-applications" hidden></span></a>
+      <a href="#/inquiries" data-view="inquiries"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Bookings<span class="count" id="c-inquiries" hidden></span></a>
+      <a href="#/bella" data-view="bella"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>Bella payments<span class="count" id="c-bella" hidden></span></a>
+      <a href="#/journal" data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Journal</a>
+      <a href="#/leads" data-view="leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg>Form leads</a>
+      <a href="#/users" data-view="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg>Users</a>
+      <a href="#/health" data-view="health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Site health</a>
+      <a href="#/setup" data-view="setup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Setup</a>
+    </nav>
+    <div class="side-foot">
+      <div class="who" id="who"></div>
+      <span class="mode" id="mode"><i></i><span></span></span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn--sm" id="theme" type="button" aria-label="Switch light or dark theme">Theme</button>
+        <button class="btn btn--sm" id="signout" type="button">Sign out</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="mobile-top"><span class="brand"><i class="dot"></i>RED FLAG</span><span style="display:flex;gap:6px"><button class="btn btn--sm" id="theme-m" type="button">Theme</button><button class="btn btn--sm" id="signout-m" type="button">Sign out</button></span></div>
+    <div class="demo-bar" id="demo-bar" hidden><span class="dot" style="background:var(--warn)"></span>Sample data. Nothing here is real and changes are not saved. Sign in on redflaghomes.in/admin to see live data.</div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div class="drawer" id="drawer" hidden><div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="d-title" id="drawer-panel"></div></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script type="module">
+/* ===================== Edit these ===================== */
+const CONFIG = {
+  // Emails allowed in (Firebase email/password accounts). Must match the Firestore rules on the Setup page. /admin-config.json can override.
+  adminEmails: ['priyanshu@redflaghomes.in'],
+  // The site's own Firebase config file (same one the website uses).
+  firebaseConfigUrl: '/firebase-applet-config.json',
+  // Web app URL of admin-sheets-reader.gs (ends with /exec). Shows your Google Sheet leads. Empty = off.
+  sheetsReaderUrl: '',
+  // AI writer for the Journal (server endpoint added by the AI Studio prompt). Empty = hide the button.
+  aiWriterUrl: '/api/admin/write-post',
+  // The website, for the Site health page.
+  site: 'https://redflaghomes.in',
+  // Your WhatsApp number (digits only), used for "Message on WhatsApp" when a lead has no phone.
+  whatsapp: '918881306632'
+};
+/* ===================================================== */
+
+const FB = 'https://www.gstatic.com/firebasejs/10.13.0/';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
+
+// Statuses: tone drives the icon, the label always shows.
+const STATUS = {
+  applications: [['Under Review', 'warn'], ['Contacted', 'info'], ['Call Scheduled', 'info'], ['Shortlisted', 'info'], ['Approved', 'good'], ['Rejected', 'bad']],
+  inquiries: [['Inquiry Received', 'warn'], ['Contacted', 'info'], ['Confirmed', 'good'], ['Completed', 'good'], ['Cancelled', 'bad']]
+};
+const OPEN = { applications: ['Under Review'], inquiries: ['Inquiry Received'] };
+const ICON = {
+  good: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>',
+  warn: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  bad: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'
+};
+const CHECK = {
+  ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m7.5 12 3 3 6-6"/></svg>',
+  warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 10v5M12 18v.5"/></svg>',
+  fail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m8 8 8 8M16 8l-8 8"/></svg>',
+  wait: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-dasharray="4 4"/></svg>'
+};
+function tone(kind, status) { const s = (STATUS[kind] || []).find(x => x[0] === status); return s ? s[1] : 'info'; }
+function pill(kind, status) { const t = tone(kind, status); return `<span class="pill ${t}">${ICON[t]}${esc(status || '—')}</span>`; }
+
+const S = {
+  mode: 'none', user: null, fb: null,
+  data: { applications: [], inquiries: [], users: [], posts: [], bellaPayments: [] },
+  loaded: { applications: false, inquiries: false, users: false, posts: false, bellaPayments: false },
+  errors: {}, leads: null, leadsErr: '', health: null,
+  ui: { applications: { q: '', status: 'all', sort: 'createdAt', dir: -1 }, inquiries: { q: '', status: 'all', sort: 'createdAt', dir: -1 }, users: { q: '', sort: 'lastLoginAt', dir: -1 }, leads: { q: '', tab: 0 }, bella: { q: '', status: 'all' }, journal: { status: 'all', q: '', tab: 'stories', hmStory: 'all', hmMetric: 'all', hmRange: '30' } }
+};
+
+/* ---------------- time helpers ---------------- */
+const ts = v => { if (!v) return 0; if (typeof v === 'object' && v.seconds) return v.seconds * 1000; const t = Date.parse(v); return isNaN(t) ? 0 : t; };
+function ago(v) {
+  const t = ts(v); if (!t) return '—';
+  const s = (Date.now() - t) / 1000;
+  if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s / 60) + ' min ago'; if (s < 86400) return Math.floor(s / 3600) + ' h ago';
+  if (s < 86400 * 7) return Math.floor(s / 86400) + ' d ago';
+  return new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: new Date(t).getFullYear() === new Date().getFullYear() ? undefined : 'numeric' });
+}
+const full = v => { const t = ts(v); return t ? new Date(t).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '—'; };
+
+/* ---------------- toast ---------------- */
+function toast(title, msg) {
+  const el = document.createElement('div'); el.className = 'toast';
+  el.innerHTML = `<span class="dot" style="margin-top:6px"></span><div><b>${esc(title)}</b>${esc(msg || '')}</div>`;
+  $('#toasts').appendChild(el); setTimeout(() => el.remove(), 5000);
+}
+
+/* ===================== Live mode: Firebase ===================== */
+async function loadFirebase() {
+  if (S.fb) return S.fb;
+  const res = await fetch(CONFIG.firebaseConfigUrl, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Firebase config not found');
+  const cfg = await res.json();
+  const [appM, authM, fsM] = await Promise.all([import(FB + 'firebase-app.js'), import(FB + 'firebase-auth.js'), import(FB + 'firebase-firestore.js')]);
+  const app = appM.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, projectId: cfg.projectId, storageBucket: cfg.storageBucket, messagingSenderId: cfg.messagingSenderId, appId: cfg.appId }, 'rf-admin');
+  const auth = authM.getAuth(app);
+  const db = fsM.getFirestore(app, cfg.firestoreDatabaseId || '(default)');
+  S.fb = { authM, fsM, auth, db, cfg };
+  return S.fb;
+}
+// Admin = an email on the list that is either verified (Google) or an email/password account created in Firebase.
+const isAdmin = u => !!u && !!u.email && (u.emailVerified || (u.providerData || []).some(p => p.providerId === 'password')) && CONFIG.adminEmails.map(e => e.toLowerCase()).includes(u.email.toLowerCase());
+
+async function startLive() {
+  let fb;
+  try { fb = await loadFirebase(); } catch (e) { gateMsg('Sign-in works on redflaghomes.in/admin. Here you can preview with sample data.'); $('#signin').disabled = true; $('#forgot').disabled = true; return; }
+  fb.authM.onAuthStateChanged(fb.auth, user => {
+    if (!user) { if (S.mode === 'live') location.reload(); return; }
+    if (!CONFIG.adminEmails.length) { gateMsg('No admin emails are set. Add yours to /admin-config.json, then reload.'); fb.authM.signOut(fb.auth); return; }
+    if (!isAdmin(user)) { gateMsg(user.email + ' is not an admin account.'); fb.authM.signOut(fb.auth); return; }
+    S.user = { name: user.displayName || user.email, email: user.email, photo: user.photoURL };
+    S.mode = 'live'; enterApp(); subscribe();
+  });
+}
+function subscribe() {
+  const { fsM, db } = S.fb;
+  ['applications', 'inquiries', 'users', 'posts', 'bellaPayments'].forEach(name => {
+    let first = true;
+    fsM.onSnapshot(fsM.collection(db, name), snap => {
+      if (!first && name === 'bellaPayments') snap.docChanges().forEach(ch => { const d = ch.doc.data(); if (ch.type === 'added' && d.status === 'failed') toast('Bella payment failed', (d.name || d.email || 'A customer') + ' · ' + money(d.amount, d.currency) + (d.reason ? ' · ' + d.reason : '')); });
+      if (!first && (name === 'applications' || name === 'inquiries')) snap.docChanges().forEach(ch => { if (ch.type === 'added') { const d = ch.doc.data(); toast(name === 'applications' ? 'New franchise application' : 'New booking inquiry', (d.userName || 'Someone') + (d.city || d.destination ? ' · ' + (d.city || d.destination) : '')); } });
+      first = false;
+      S.data[name] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      S.loaded[name] = true; delete S.errors[name]; render();
+    }, err => { if (name === 'posts' || name === 'bellaPayments') { S.errors[name] = err.code === 'permission-denied' ? 'Add the Journal and Bella payment rules from the Setup page.' : (err.message || String(err)); S.loaded[name] = true; render(); return; } S.errors[name] = err.code === 'permission-denied' ? 'Firestore rules block admin access. Add the admin rules from the Setup page.' : (err.message || String(err)); S.loaded[name] = true; render(); });
+  });
+}
+async function saveDoc(kind, id, patch) {
+  if (S.mode === 'demo') { Object.assign(S.data[kind].find(x => x.id === id), patch); render(); return; }
+  const { fsM, db } = S.fb; await fsM.updateDoc(fsM.doc(db, kind, id), patch);
+}
+async function addPost(data) {
+  if (S.mode === 'demo') { const id = 'p' + Date.now(); S.data.posts.push({ id, ...data }); return id; }
+  const { fsM, db } = S.fb; const ref = await fsM.addDoc(fsM.collection(db, 'posts'), data); return ref.id;
+}
+async function removeDoc(kind, id) {
+  if (S.mode === 'demo') { S.data[kind] = S.data[kind].filter(x => x.id !== id); render(); return; }
+  const { fsM, db } = S.fb; await fsM.deleteDoc(fsM.doc(db, kind, id));
+}
+async function idToken() { return S.fb && S.fb.auth.currentUser ? S.fb.auth.currentUser.getIdToken() : ''; }
+
+/* ===================== Demo mode: sample data ===================== */
+function demoData() {
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const pick = a => a[Math.floor(rnd() * a.length)];
+  const names = ['Aarav Mehta', 'Priya Sharma', 'Rohan Kapoor', 'Ananya Iyer', 'Vikram Singh', 'Neha Gupta', 'Kabir Malhotra', 'Isha Reddy', 'Arjun Nair', 'Sara Khan', 'Dev Patel', 'Meera Joshi', 'Tara Bose', 'Kunal Shah', 'Ritika Verma', 'James Carter', 'Olivia Brown', 'Liam Wilson'];
+  const cities = ['Goa', 'Rishikesh', 'Manali', 'Jaipur', 'Udaipur', 'Coorg', 'Alibaug', 'Kasauli', 'Mussoorie', 'London'];
+  const caps = ['₹10–25 L', '₹25–50 L', '₹50 L–1 Cr', '₹1 Cr+'];
+  const tiers = ['Red Flag Homes Starter', 'Red Flag Outpost Classic', 'Red Flag — The Drop'];
+  const day = 86400000, now = Date.now();
+  const at = n => new Date(now - n).toISOString();
+  const apps = Array.from({ length: 34 }, (_, i) => {
+    const n = pick(names), age = Math.floor(rnd() * 29 * day + rnd() * day);
+    const st = age < 3 * day ? 'Under Review' : pick(['Under Review', 'Contacted', 'Call Scheduled', 'Shortlisted', 'Approved', 'Rejected', 'Contacted']);
+    return { id: 'a' + i, userName: n, userEmail: n.toLowerCase().replace(/ /g, '.') + '@gmail.com', phone: '+91 9' + String(Math.floor(rnd() * 1e9)).padStart(9, '0'), city: pick(cities), capital: pick(caps), propertyIntent: pick(['Looking', 'Own property', 'Leased']), existingClient: pick(['No', 'No', 'Yes']), tier: pick(tiers), status: st, createdAt: at(age) };
+  });
+  const inqs = Array.from({ length: 41 }, (_, i) => {
+    const n = pick(names), age = Math.floor(rnd() * 29 * day + rnd() * day), ci = new Date(now + rnd() * 40 * day);
+    const co = new Date(ci.getTime() + (2 + Math.floor(rnd() * 4)) * day);
+    return { id: 'i' + i, userName: n, userEmail: n.toLowerCase().replace(/ /g, '.') + '@gmail.com', phone: '+91 8' + String(Math.floor(rnd() * 1e9)).padStart(9, '0'), destination: pick(cities.slice(0, 9)) + ' Outpost', checkin: ci.toISOString().slice(0, 10), checkout: co.toISOString().slice(0, 10), guests: String(1 + Math.floor(rnd() * 6)), intent: pick(['book', 'book', 'event']), status: age < 2 * day ? 'Inquiry Received' : pick(['Inquiry Received', 'Contacted', 'Confirmed', 'Completed', 'Cancelled', 'Confirmed']), createdAt: at(age) };
+  });
+  const users = names.map((n, i) => ({ id: 'u' + i, uid: 'u' + i, displayName: n, email: n.toLowerCase().replace(/ /g, '.') + '@gmail.com', lastLoginAt: at(Math.floor(rnd() * 25 * day)) }));
+  apps.forEach(a => { const u = users.find(x => x.displayName === a.userName); a.userId = u.uid; });
+  inqs.forEach(a => { const u = users.find(x => x.displayName === a.userName); a.userId = u.uid; });
+  const leads = { ok: true, sources: [
+    { book: 'Red Flag website forms', sheet: 'Contact', headers: ['Timestamp', 'Name', 'Email', 'Phone', 'Intent', 'Message', 'Page'], total: 6, rows: Array.from({ length: 6 }, (_, i) => [new Date(now - i * day * 1.7).toLocaleString(), pick(names), 'lead' + i + '@gmail.com', '+91 98' + String(Math.floor(rnd() * 1e8)).padStart(8, '0'), pick(['Book a stay', 'Franchise', 'Partnership']), pick(['Looking for a group stay in Goa', 'Want to list my villa', 'Is the Outpost pet friendly?']), '/']) },
+    { book: 'Red Flag website forms', sheet: 'Newsletter', headers: ['Timestamp', 'Email', 'Source', 'Page'], total: 9, rows: Array.from({ length: 9 }, (_, i) => [new Date(now - i * day * 1.1).toLocaleString(), 'reader' + i + '@gmail.com', pick(['footer', 'popup']), '/']) },
+    { book: 'Bella leads', sheet: 'Leads', headers: ['Time', 'Name', 'Email', 'City', 'Phone', 'Listings', 'Plan', 'Period', 'Currency', 'Outcome'], total: 5, rows: Array.from({ length: 5 }, (_, i) => [new Date(now - i * day * 2.3).toLocaleString(), pick(names), 'host' + i + '@gmail.com', pick(cities), '+91 97' + String(Math.floor(rnd() * 1e8)).padStart(8, '0'), pick(['1', '2–3', '4–5']), pick(['Solo', 'Growth', 'Pro']), pick(['monthly', 'yearly']), pick(['INR', 'USD']), 'checkout']) }
+  ] };
+  const img = n => 'https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/' + n;
+  const posts = [
+    { id: 'p1', title: 'Designing the Perfect Alpine Retreat', slug: 'designing-the-perfect-alpine-retreat', tag: 'Design', excerpt: 'Discover how we blend local materials with modern minimalism.', cover: img('handpicked.jpeg'), author: 'Red Flag Homes', status: 'published', showOnHome: true, homeOrder: 1, readSeconds: 420, body: '## Start with the view\n\nEvery Outpost begins with one window. We plan the whole floor around it.\n\n> A guest remembers how a place made them feel, not how many cushions it had.\n\n## Local first\n\n- Stone from the valley\n- Wool from the next village\n- Timber we can replace in a week\n\nRead more about [the Outpost model](/franchise).', publishedAt: at(9 * day), createdAt: at(12 * day), updatedAt: at(9 * day) },
+    { id: 'p2', title: 'The Future of AI-Managed Hospitality', slug: 'future-of-ai-managed-hospitality', tag: 'Operations', excerpt: 'How automation is redefining the guest experience, from check-in to check-out.', cover: img('cleaning.JPEG'), author: 'Red Flag Homes', status: 'published', showOnHome: true, homeOrder: 0, readSeconds: 300, body: '## Guests reply at 2 AM\n\nSo should you. Bella answers in 3 seconds, in the guest’s own language.', publishedAt: at(20 * day), createdAt: at(22 * day), updatedAt: at(20 * day) },
+    { id: 'p3', title: 'Goa vs Rishikesh: where an Outpost earns more in 2027', slug: 'goa-vs-rishikesh-outpost-2027', tag: 'Investing', excerpt: 'Occupancy, nightly rates and seasonality, side by side.', cover: img('guest.JPEG'), author: 'Red Flag Homes', status: 'draft', showOnHome: true, homeOrder: 0, readSeconds: 180, body: '## The short answer\n\nIt depends on the season you want to win.', createdAt: at(1 * day), updatedAt: at(3600000) }
+  ];
+  const plans = [['solo', 999, 23], ['growth', 1699, 39], ['pro', 2499, 57]];
+  const reasons = ['Card declined by the bank', 'UPI payment timed out', 'Insufficient funds', '3-D Secure authentication failed', 'Customer closed the payment page'];
+  const pays = Array.from({ length: 26 }, (_, i) => {
+    const n = pick(names), inr = rnd() < .7, pl = pick(plans), yearly = rnd() < .3, age = Math.floor(rnd() * 28 * day + rnd() * day);
+    const amt = inr ? (yearly ? { solo: 10190, growth: 17330, pro: 25490 }[pl[0]] : pl[1]) : (yearly ? { solo: 235, growth: 398, pro: 581 }[pl[0]] : pl[2]);
+    const st = i < 4 ? 'failed' : pick(['paid', 'paid', 'paid', 'failed', 'failed', 'abandoned']);
+    return { id: 'b' + i, name: n, email: n.toLowerCase().replace(/ /g, '.') + '@gmail.com', phone: '+91 9' + String(Math.floor(rnd() * 1e9)).padStart(9, '0'), gateway: inr ? 'razorpay' : 'stripe', currency: inr ? 'INR' : 'USD', amount: amt, plan: pl[0], period: yearly ? 'yearly' : 'monthly', status: st, reason: st === 'failed' ? pick(reasons) : st === 'abandoned' ? 'Checkout opened but not completed' : '', paymentId: (inr ? 'pay_' : 'pi_') + Math.floor(rnd() * 1e12).toString(36), createdAt: at(age) };
+  });
+  // two customers who failed and then paid: shown as recovered
+  pays.push({ ...pays[1], id: 'b90', status: 'paid', reason: '', paymentId: 'pay_rec1', createdAt: new Date(ts(pays[1].createdAt) + 3600000).toISOString() });
+  return { apps, inqs, users, leads, posts, pays };
+}
+function startDemo() {
+  const d = demoData();
+  S.mode = 'demo'; S.user = { name: 'Demo admin', email: 'admin@redflaghomes.in' };
+  S.data = { applications: d.apps, inquiries: d.inqs, users: d.users, posts: d.posts, bellaPayments: d.pays };
+  S.loaded = { applications: true, inquiries: true, users: true, posts: true, bellaPayments: true }; S.leads = d.leads;
+  enterApp();
+}
+
+/* ===================== Shell ===================== */
+function gateMsg(m) { $('#gate-msg').textContent = m; }
+function enterApp() {
+  $('#gate').hidden = true; $('#app').hidden = false; $('#demo-bar').hidden = S.mode !== 'demo';
+  const u = S.user;
+  $('#who').innerHTML = (u.photo ? `<img src="${esc(u.photo)}" alt="" referrerpolicy="no-referrer">` : `<span class="av" style="background:var(--surface-3);display:grid;place-items:center;font-size:.8rem">${esc((u.name || '?')[0])}</span>`) + `<span title="${esc(u.email)}">${esc(u.email)}</span>`;
+  const m = $('#mode'); m.classList.toggle('demo', S.mode === 'demo'); m.querySelector('span').textContent = S.mode === 'demo' ? 'Sample data' : 'Live · updates in real time';
+  if (!location.hash || location.hash === '#') location.hash = '#/overview'; else render();
+}
+function seenKey(kind) { return 'rf-admin-seen-' + kind; }
+function newCount(kind) { const seen = +(store(seenKey(kind)) || 0); return S.data[kind].filter(x => ts(x.createdAt) > seen && OPEN[kind].includes(x.status)).length; }
+function counts() {
+  { const n = payRows().filter(x => x.view === 'Failed' && !['Contacted', 'Recovered', 'Lost'].includes(x.followUp)).length; const el = $('#c-bella'); el.hidden = !n; el.textContent = n; el.setAttribute('aria-label', n + ' failed payments to follow up'); }
+  ['applications', 'inquiries'].forEach(k => { const n = S.data[k].filter(x => OPEN[k].includes(x.status)).length; const el = $('#c-' + k); el.hidden = !n; el.textContent = n; el.setAttribute('aria-label', n + ' waiting'); });
+}
+function view() { return (location.hash.match(/^#\/(\w+)/) || [, 'overview'])[1]; }
+function render() {
+  if ($('#app').hidden) return;
+  const v = view();
+  $$('.nav a').forEach(a => { if (a.dataset.view === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  counts();
+  const keep = document.activeElement && document.activeElement.id; const pos = keep && document.activeElement.selectionStart;
+  ({ overview, applications: () => records('applications'), inquiries: () => records('inquiries'), users, leads, health, setup, bella, journal }[v] || overview)();
+  if (keep && $('#' + keep)) { const el = $('#' + keep); el.focus(); if (pos != null && el.setSelectionRange) try { el.setSelectionRange(pos, pos); } catch (e) {} }
+}
+let lastHash = location.hash;
+window.addEventListener('hashchange', () => {
+  if (S.dirty && !confirm('You have unsaved changes in this story. Leave without saving?')) { history.replaceState(null, '', lastHash); return; }
+  S.dirty = false; S.draft = null; S.preview = false; lastHash = location.hash; render(); window.scrollTo(0, 0);
+});
+window.addEventListener('beforeunload', e => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ===================== Overview ===================== */
+function overview() {
+  const A = S.data.applications, I = S.data.inquiries, U = S.data.users, week = Date.now() - 7 * 86400000;
+  const aw = A.filter(x => ts(x.createdAt) > week).length, iw = I.filter(x => ts(x.createdAt) > week).length;
+  const openA = A.filter(x => OPEN.applications.includes(x.status)).length, openI = I.filter(x => OPEN.inquiries.includes(x.status)).length;
+  const approved = A.filter(x => x.status === 'Approved').length;
+  const waiting = [...A.map(x => ({ ...x, kind: 'applications' })), ...I.map(x => ({ ...x, kind: 'inquiries' }))].filter(x => OPEN[x.kind].includes(x.status)).sort((a, b) => ts(a.createdAt) - ts(b.createdAt)).slice(0, 6);
+  const cities = {}; A.forEach(x => { const c = (x.city || 'Unknown').trim(); cities[c] = (cities[c] || 0) + 1; });
+  const top = Object.entries(cities).sort((a, b) => b[1] - a[1]).slice(0, 6), max = top.length ? top[0][1] : 1;
+  $('#view').innerHTML = `
+    <div class="top"><div><h1>Good ${greeting()}, ${esc((S.user.name || '').split(' ')[0])}</h1><p>What needs you on redflaghomes.in today.</p></div></div>
+    ${errBox()}
+    <div class="grid kpis">
+      ${kpi('Franchise applications', A.length, aw + ' new this week')}
+      ${kpi('Waiting for review', openA + openI, openA + ' franchise · ' + openI + ' bookings')}
+      ${kpi('Booking inquiries', I.length, iw + ' new this week')}
+      ${kpi('Signed-in users', U.length, approved + ' approved franchise partners')}
+    </div>
+    <div class="grid two" style="margin-top:16px">
+      <section class="card"><div class="card-head"><div><h2>Last 30 days</h2><p>New submissions per day</p></div>
+        <div class="legend"><span><i style="background:var(--s-app)"></i>Franchise</span><span><i style="background:var(--s-inq)"></i>Bookings</span></div></div>
+        <div class="chart" id="chart"></div>
+        <details style="margin-top:10px"><summary style="cursor:pointer;color:var(--muted);font-size:.82rem">Show as table</summary><div id="chart-table"></div></details>
+      </section>
+      <section class="card"><div class="card-head"><div><h2>Waiting longest</h2><p>Oldest items still not answered</p></div></div>
+        ${waiting.length ? `<ul class="mini">${waiting.map(x => `<li data-open="${x.kind}:${esc(x.id)}" tabindex="0"><div class="t"><b>${esc(x.userName || x.userEmail || 'Unknown')}</b><small>${x.kind === 'applications' ? 'Franchise · ' + esc(x.city || '') : 'Booking · ' + esc(x.destination || '')} · ${ago(x.createdAt)}</small></div>${pill(x.kind, x.status)}</li>`).join('')}</ul>` : `<p class="empty">Nothing waiting. Everything has been answered.</p>`}
+      </section>
+    </div>
+    <div class="grid two" style="margin-top:16px">
+      <section class="card"><div class="card-head"><div><h2>Franchise demand by city</h2><p>Where applicants want an Outpost</p></div></div>
+        ${top.length ? `<div class="bars">${top.map(([c, n]) => `<div class="bar-row"><span title="${esc(c)}">${esc(c)}</span><i style="width:${(n / max * 100).toFixed(1)}%"></i><b>${n}</b></div>`).join('')}</div>` : '<p class="empty">No applications yet.</p>'}
+      </section>
+      <section class="card"><div class="card-head"><div><h2>Pipeline</h2><p>Franchise applications by status</p></div></div>
+        <ul class="mini">${STATUS.applications.map(([s]) => `<li data-filter="applications:${esc(s)}" tabindex="0"><div class="t"><b>${esc(s)}</b></div><span>${A.filter(x => x.status === s).length}</span></li>`).join('')}</ul>
+      </section>
+    </div>
+    <div class="grid two" style="margin-top:16px">
+      <section class="card"><div class="card-head"><div><h2>Bella payments · last 7 days</h2><p>From Razorpay and Stripe</p></div><a class="btn btn--sm" href="#/bella">Open</a></div>
+        ${(() => { const r = payRows().filter(x => ts(x.createdAt) > week); const f = r.filter(x => x.view === 'Failed'); return `<div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px">${kpiMini('Paid', r.filter(x => x.status === 'paid').length)}${kpiMini('Failed', f.length)}${kpiMini('Recovered', r.filter(x => x.view === 'Recovered').length)}</div>` + (f.length ? `<ul class="mini">${f.slice(0, 4).map(x => `<li data-pay="${esc(x.id)}" tabindex="0"><div class="t"><b>${esc(x.name || x.email || 'Unknown')}</b><small>${esc(planLabel(x))} · ${money(x.amount, x.currency)} · ${esc(x.reason || '')}</small></div>${payPill(x.view)}</li>`).join('')}</ul>` : '<p class="empty" style="padding:16px">No failed payments this week.</p>'); })()}
+      </section>
+      <section class="card"><div class="card-head"><div><h2>Journal</h2><p>Stories in the homepage Explore section</p></div><div class="top-actions"><a class="btn btn--sm" href="#/journal/heatmap">Heatmap</a><a class="btn btn--sm" href="#/journal/new">New story</a></div></div>
+        ${S.data.posts.length ? `<ul class="mini">${S.data.posts.slice().sort((a, b) => ts(b.updatedAt) - ts(a.updatedAt)).slice(0, 4).map(x => `<li data-post="${esc(x.id)}" tabindex="0"><div class="t"><b>${esc(x.title || 'Untitled')}</b><small>${esc(x.tag || 'No category')} · updated ${ago(x.updatedAt)}</small></div>${postPill(x)}</li>`).join('')}</ul>` : '<p class="empty" style="padding:16px">No stories yet. Write the first one.</p>'}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:8px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line)"><small style="color:var(--muted)">Peak engagement window: <b style="color:var(--cream)">Thu 2–4 PM</b></small><a href="#/journal/heatmap" style="font-size:.76rem;color:var(--accent);text-decoration:none;font-weight:500">Weekly Heatmap →</a></div>
+      </section>
+    </div>`;
+  drawChart();
+  bindOpeners(); bindPayOpeners();
+  $$('[data-post]').forEach(li => { const go = () => { location.hash = '#/journal/edit/' + li.dataset.post; }; li.addEventListener('click', go); li.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
+  $$('[data-filter]').forEach(li => { const go = () => { const [k, s] = li.dataset.filter.split(':'); S.ui[k].status = s; location.hash = '#/' + k; }; li.addEventListener('click', go); li.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
+}
+function greeting() { const h = new Date().getHours(); return h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening'; }
+function kpiMini(label, n) { return `<div style="padding:10px 12px;border-radius:12px;background:var(--surface-2)"><small style="color:var(--muted);font-size:.76rem">${esc(label)}</small><b style="display:block;font:400 1.8rem/1 var(--serif)">${n}</b></div>`; }
+function kpi(label, n, sub) { return `<section class="card kpi"><small>${esc(label)}</small><b>${n}</b><span>${esc(sub)}</span></section>`; }
+function errBox() { const e = Object.values(S.errors); return e.length ? `<div class="demo-bar" style="border-color:var(--bad);margin-bottom:16px">${CHECK.fail.replace('<svg', '<svg style="width:18px;height:18px;color:var(--bad)"')} ${esc(e[0])} <a class="btn btn--sm" href="#/setup">Open setup</a></div>` : ''; }
+
+function drawChart() {
+  const box = $('#chart'); if (!box) return;
+  const days = 30, d0 = new Date(); d0.setHours(0, 0, 0, 0);
+  const start = d0.getTime() - (days - 1) * 86400000;
+  const rows = Array.from({ length: days }, (_, i) => ({ t: start + i * 86400000, a: 0, b: 0 }));
+  const put = (list, key) => list.forEach(x => { const i = Math.floor((ts(x.createdAt) - start) / 86400000); if (i >= 0 && i < days) rows[i][key]++; });
+  put(S.data.applications, 'a'); put(S.data.inquiries, 'b');
+  const W = Math.max(300, box.clientWidth), H = 220, L = 28, B = 22, T = 8;
+  const max = Math.max(4, ...rows.map(r => r.a + r.b)), nice = Math.ceil(max / 4) * 4;
+  const bw = (W - L) / days, barW = Math.max(3, bw - 3), y = v => T + (H - T - B) * (1 - v / nice);
+  const fmt = t => new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  let g = '';
+  for (let k = 0; k <= 4; k++) { const v = nice / 4 * k; g += `<line class="grid-line" x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/><text class="axis-t" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; }
+  rows.forEach((r, i) => {
+    const x = L + i * bw + (bw - barW) / 2, ya = y(r.a), yb = y(r.a + r.b);
+    // stacked: franchise at the base, bookings on top, 2px surface gap between, rounded data-end
+    if (r.a) g += `<rect x="${x}" y="${ya}" width="${barW}" height="${y(0) - ya}" rx="${r.b ? 0 : 3}" fill="var(--s-app)"/>`;
+    if (r.b) g += `<rect x="${x}" y="${yb}" width="${barW}" height="${Math.max(0, ya - yb - (r.a ? 2 : 0))}" rx="3" fill="var(--s-inq)"/>`;
+    g += `<rect class="hit" data-i="${i}" x="${L + i * bw}" y="${T}" width="${bw}" height="${H - T - B}" fill="transparent"/>`;
+    if (i % 7 === 0 || (i === days - 1 && (days - 1) % 7 >= 3)) g += `<text class="axis-t" x="${x + barW / 2}" y="${H - 4}" text-anchor="middle">${fmt(r.t)}</text>`;
+  });
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="New franchise applications and booking inquiries per day for the last 30 days">${g}</svg><div class="tip" hidden></div>`;
+  const tip = box.querySelector('.tip');
+  box.querySelectorAll('.hit').forEach(h => {
+    const show = () => { const r = rows[+h.dataset.i]; tip.hidden = false; tip.innerHTML = `<b>${fmt(r.t)}</b><span><i style="background:var(--s-app)"></i>Franchise ${r.a}</span><br><span><i style="background:var(--s-inq)"></i>Bookings ${r.b}</span>`; const bx = h.getBBox(); tip.style.left = ((bx.x + bx.width / 2) / W * 100) + '%'; tip.style.top = (y(r.a + r.b) / H * 220) + 'px'; h.setAttribute('fill', 'rgba(127,127,127,.08)'); };
+    const hide = () => { tip.hidden = true; h.setAttribute('fill', 'transparent'); };
+    h.addEventListener('pointerenter', show); h.addEventListener('pointerleave', hide);
+  });
+  $('#chart-table').innerHTML = `<div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Day</th><th>Franchise</th><th>Bookings</th></tr></thead><tbody>${rows.slice().reverse().filter(r => r.a || r.b).map(r => `<tr><td>${fmt(r.t)}</td><td>${r.a}</td><td>${r.b}</td></tr>`).join('') || '<tr><td colspan="3">No submissions.</td></tr>'}</tbody></table></div>`;
+}
+let resizeT; window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (view() === 'overview') drawChart(); }, 150); });
+
+/* ===================== Franchise & bookings tables ===================== */
+const COLS = {
+  applications: [['userName', 'Applicant'], ['city', 'City'], ['capital', 'Capital'], ['tier', 'Programme'], ['status', 'Status'], ['createdAt', 'Received']],
+  inquiries: [['userName', 'Guest'], ['destination', 'Stay'], ['checkin', 'Dates'], ['guests', 'Guests'], ['status', 'Status'], ['createdAt', 'Received']]
+};
+function filtered(kind) {
+  const u = S.ui[kind], q = u.q.trim().toLowerCase();
+  return S.data[kind].filter(x => (u.status === 'all' || x.status === u.status) && (!q || JSON.stringify(x).toLowerCase().includes(q)))
+    .sort((a, b) => { const k = u.sort; const va = k === 'createdAt' || k === 'lastLoginAt' ? ts(a[k]) : String(a[k] || '').toLowerCase(); const vb = k === 'createdAt' || k === 'lastLoginAt' ? ts(b[k]) : String(b[k] || '').toLowerCase(); return (va > vb ? 1 : va < vb ? -1 : 0) * u.dir; });
+}
+function records(kind) {
+  const isA = kind === 'applications', u = S.ui[kind], list = filtered(kind), all = S.data[kind];
+  store(seenKey(kind), Date.now());
+  const cell = (x, k) => {
+    if (k === 'userName') return `<td class="lead-cell"><b style="font-weight:500">${esc(x.userName || 'Unknown')}</b><span class="sub">${esc(x.userEmail || '')}</span></td>`;
+    if (k === 'status') return `<td data-l="Status">${pill(kind, x.status)}</td>`;
+    if (k === 'createdAt') return `<td data-l="Received" title="${esc(full(x.createdAt))}">${ago(x.createdAt)}</td>`;
+    if (k === 'checkin') return `<td data-l="Dates">${esc(x.checkin || '—')}${x.checkout ? ' → ' + esc(x.checkout) : ''}</td>`;
+    return `<td data-l="${esc(COLS[kind].find(c => c[0] === k)[1])}">${esc(x[k] || '—')}</td>`;
+  };
+  $('#view').innerHTML = `
+    <div class="top"><div><h1>${isA ? 'Franchise applications' : 'Booking inquiries'}</h1><p>${isA ? 'From the Deploy your capital form on /franchise.' : 'From the Book a stay form on the home page.'} Click a row to open it.</p></div>
+      <div class="top-actions"><button class="btn" id="csv" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg>Export CSV</button></div></div>
+    ${errBox()}
+    <div class="toolbar">
+      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr-only">Search</span><input id="q-${kind}" type="search" placeholder="Search name, email, phone, city…" value="${esc(u.q)}" autocomplete="off"></label>
+    </div>
+    <div class="chips" role="group" aria-label="Filter by status" style="margin-bottom:14px">
+      <button class="chip" type="button" data-st="all" aria-pressed="${u.status === 'all'}">All<small>${all.length}</small></button>
+      ${STATUS[kind].map(([s]) => `<button class="chip" type="button" data-st="${esc(s)}" aria-pressed="${u.status === s}">${esc(s)}<small>${all.filter(x => x.status === s).length}</small></button>`).join('')}
+    </div>
+    ${!S.loaded[kind] ? '<p class="empty">Loading…</p>' : list.length ? `<div class="table-wrap"><table><thead><tr>${COLS[kind].map(([k, l]) => `<th scope="col" aria-sort="${u.sort === k ? (u.dir > 0 ? 'ascending' : 'descending') : 'none'}"><button type="button" data-sort="${k}">${esc(l)}${u.sort === k ? (u.dir > 0 ? ' ↑' : ' ↓') : ''}</button></th>`).join('')}</tr></thead>
+      <tbody>${list.map(x => `<tr data-open="${kind}:${esc(x.id)}" tabindex="0">${COLS[kind].map(([k]) => cell(x, k)).join('')}</tr>`).join('')}</tbody></table></div>
+      <p class="count-line">${list.length} of ${all.length}</p>` : `<div class="card empty">${all.length ? 'No matches. Try another search or filter.' : (isA ? 'No franchise applications yet.' : 'No booking inquiries yet.')}</div>`}`;
+  $('#q-' + kind).addEventListener('input', e => { u.q = e.target.value; render(); });
+  $$('[data-st]').forEach(b => b.addEventListener('click', () => { u.status = b.dataset.st; render(); }));
+  $$('[data-sort]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.sort; if (u.sort === k) u.dir *= -1; else { u.sort = k; u.dir = k === 'createdAt' ? -1 : 1; } render(); }));
+  $('#csv').addEventListener('click', () => csv(kind + '-' + new Date().toISOString().slice(0, 10) + '.csv', list, isA
+    ? [['createdAt', 'Received'], ['userName', 'Name'], ['userEmail', 'Email'], ['phone', 'Phone'], ['city', 'City'], ['capital', 'Capital'], ['propertyIntent', 'Property'], ['existingClient', 'Existing client'], ['tier', 'Programme'], ['status', 'Status'], ['adminNotes', 'Notes']]
+    : [['createdAt', 'Received'], ['userName', 'Name'], ['userEmail', 'Email'], ['phone', 'Phone'], ['destination', 'Stay'], ['checkin', 'Check-in'], ['checkout', 'Check-out'], ['guests', 'Guests'], ['intent', 'Intent'], ['status', 'Status'], ['adminNotes', 'Notes']]));
+  bindOpeners();
+}
+function bindOpeners() {
+  $$('[data-open]').forEach(el => { const go = () => { const [k, id] = el.dataset.open.split(':'); openDrawer(k, id); }; el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
+}
+function csv(name, rows, cols) {
+  const cellv = v => { let s = String(v ?? ''); if (/^[=+\-@]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+  const text = [cols.map(c => cellv(c[1])).join(','), ...rows.map(r => cols.map(c => cellv(c[0] === 'createdAt' ? full(r[c[0]]) : r[c[0]])).join(','))].join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + text], { type: 'text/csv' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+/* ---------------- drawer ---------------- */
+let lastFocus = null;
+function openDrawer(kind, id) {
+  const x = S.data[kind].find(r => r.id === id); if (!x) return;
+  lastFocus = document.activeElement;
+  const isA = kind === 'applications', phone = String(x.phone || '').replace(/\D/g, '');
+  const first = (x.userName || '').split(' ')[0] || 'there';
+  const waMsg = isA ? `Hi ${first}, this is Red Flag Homes about your franchise application for ${x.city || 'your city'}.` : `Hi ${first}, this is Red Flag Homes about your stay at ${x.destination || 'Red Flag'}${x.checkin ? ' on ' + x.checkin : ''}.`;
+  const facts = isA
+    ? [['Email', x.userEmail], ['Phone', x.phone], ['City', x.city], ['Capital', x.capital], ['Property', x.propertyIntent], ['Existing client', x.existingClient], ['Programme', x.tier], ['Received', full(x.createdAt)]]
+    : [['Email', x.userEmail], ['Phone', x.phone], ['Stay', x.destination], ['Check-in', x.checkin], ['Check-out', x.checkout], ['Guests', x.guests], ['Intent', x.intent], ['Received', full(x.createdAt)]];
+  const p = $('#drawer-panel');
+  p.innerHTML = `
+    <div class="drawer-top"><div><h2 id="d-title">${esc(x.userName || 'Unknown')}</h2><p>${isA ? 'Franchise application' : 'Booking inquiry'} · ${pill(kind, x.status)}</p></div>
+      <button class="btn btn--icon" type="button" id="d-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="quick">
+      ${phone ? `<a class="btn btn--sm" target="_blank" rel="noopener" href="https://wa.me/${esc(phone)}?text=${encodeURIComponent(waMsg)}">WhatsApp</a><a class="btn btn--sm" href="tel:+${esc(phone)}">Call</a>` : ''}
+      ${x.userEmail ? `<a class="btn btn--sm" href="mailto:${esc(x.userEmail)}?subject=${encodeURIComponent(isA ? 'Your Red Flag franchise application' : 'Your Red Flag stay')}">Email</a>` : ''}
+    </div>
+    <dl class="facts">${facts.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v || '—')}</dd>`).join('')}</dl>
+    <div class="field"><label for="d-status">Status</label><select id="d-status">${STATUS[kind].map(([s]) => `<option ${s === x.status ? 'selected' : ''}>${esc(s)}</option>`).join('')}${STATUS[kind].some(s => s[0] === x.status) ? '' : `<option selected>${esc(x.status || '')}</option>`}</select></div>
+    <div class="field"><label for="d-notes">Team notes (only admins see these)</label><textarea id="d-notes" placeholder="Call notes, next steps…">${esc(x.adminNotes || '')}</textarea></div>
+    ${x.updatedBy ? `<p class="history">Last updated by ${esc(x.updatedBy)} · ${esc(full(x.updatedAt))}</p>` : ''}
+    <div class="drawer-actions"><button class="btn btn--red" type="button" id="d-save">Save changes</button><button class="btn" type="button" id="d-del" style="color:var(--bad)">Delete</button></div>`;
+  $('#drawer').hidden = false; document.body.style.overflow = 'hidden'; $('#d-close').focus();
+  $('#d-close').addEventListener('click', closeDrawer);
+  $('#d-save').addEventListener('click', async e => {
+    const b = e.currentTarget; b.disabled = true; b.textContent = 'Saving…';
+    try { await saveDoc(kind, id, { status: $('#d-status').value, adminNotes: $('#d-notes').value, updatedAt: new Date().toISOString(), updatedBy: S.user.email }); toast('Saved', (x.userName || '') + ' · ' + $('#d-status').value); closeDrawer(); }
+    catch (err) { b.disabled = false; b.textContent = 'Save changes'; toast('Could not save', err.code === 'permission-denied' ? 'Your Firestore rules do not allow admin updates yet (see Setup).' : err.message); }
+  });
+  $('#d-del').addEventListener('click', async () => {
+    if (!confirm('Delete this ' + (isA ? 'application' : 'inquiry') + ' from ' + (x.userName || 'this person') + '? This cannot be undone.')) return;
+    try { await removeDoc(kind, id); toast('Deleted', x.userName || ''); closeDrawer(); } catch (err) { toast('Could not delete', err.message); }
+  });
+}
+function closeDrawer() { $('#drawer').hidden = true; document.body.style.overflow = ''; if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); render(); }
+$('#drawer').addEventListener('click', e => { if (e.target.id === 'drawer') closeDrawer(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer(); });
+
+/* ===================== Users ===================== */
+function users() {
+  const u = S.ui.users, q = u.q.trim().toLowerCase();
+  const cnt = (k, uid) => S.data[k].filter(x => x.userId === uid).length;
+  const list = S.data.users.filter(x => !q || JSON.stringify(x).toLowerCase().includes(q)).sort((a, b) => (ts(a.lastLoginAt) - ts(b.lastLoginAt)) * u.dir);
+  $('#view').innerHTML = `
+    <div class="top"><div><h1>Users</h1><p>Everyone who signed in with Google on the site.</p></div></div>
+    ${errBox()}
+    <div class="toolbar"><label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr-only">Search users</span><input id="q-users" type="search" placeholder="Search name or email…" value="${esc(u.q)}" autocomplete="off"></label></div>
+    ${list.length ? `<div class="table-wrap"><table><thead><tr><th>User</th><th>Franchise</th><th>Bookings</th><th><button type="button" id="sort-login">Last sign-in ${u.dir > 0 ? '↑' : '↓'}</button></th></tr></thead><tbody>
+      ${list.map(x => `<tr tabindex="0" data-user="${esc(x.email || '')}"><td class="lead-cell"><b style="font-weight:500">${esc(x.displayName || 'Guest')}</b><span class="sub">${esc(x.email || '')}</span></td><td data-l="Franchise">${cnt('applications', x.uid || x.id)}</td><td data-l="Bookings">${cnt('inquiries', x.uid || x.id)}</td><td data-l="Last sign-in" title="${esc(full(x.lastLoginAt))}">${ago(x.lastLoginAt)}</td></tr>`).join('')}
+    </tbody></table></div><p class="count-line">${list.length} of ${S.data.users.length}</p>` : `<div class="card empty">${S.loaded.users ? 'No users yet.' : 'Loading…'}</div>`}`;
+  $('#q-users').addEventListener('input', e => { u.q = e.target.value; render(); });
+  const sl = $('#sort-login'); if (sl) sl.addEventListener('click', () => { u.dir *= -1; render(); });
+  $$('[data-user]').forEach(tr => tr.addEventListener('click', () => { S.ui.applications.q = tr.dataset.user; location.hash = '#/applications'; }));
+}
+
+/* ===================== Form leads (Google Sheets) ===================== */
+async function fetchLeads() {
+  S.leadsErr = ''; S.leads = null; render();
+  try {
+    const res = await fetch(CONFIG.sheetsReaderUrl + (CONFIG.sheetsReaderUrl.includes('?') ? '&' : '?') + 'idToken=' + encodeURIComponent(await idToken()));
+    const j = await res.json(); if (!j.ok) throw new Error(j.error || 'The sheet reader refused the request');
+    S.leads = j;
+  } catch (e) { S.leadsErr = e.message || String(e); }
+  render();
+}
+function leads() {
+  if (S.mode === 'live' && !CONFIG.sheetsReaderUrl) {
+    $('#view').innerHTML = `<div class="top"><div><h1>Form leads</h1><p>Contact, newsletter and Bella leads from your Google Sheets.</p></div></div>
+      <section class="card"><div class="card-head"><h2>Connect your Google Sheets</h2></div>
+      <ol class="steps"><li>Open <code>admin-sheets-reader.gs</code> (in the GitHub repo) and follow the 5 steps at the top. It takes about 5 minutes.</li><li>Paste the web app URL into <code>sheetsReaderUrl</code> in this page's config.</li><li>Reload. Every tab of your lead sheets shows up here, newest first, for admins only.</li></ol></section>`;
+    return;
+  }
+  if (S.mode === 'live' && !S.leads && !S.leadsErr) { $('#view').innerHTML = '<div class="top"><div><h1>Form leads</h1></div></div><p class="empty">Loading sheets…</p>'; fetchLeads(); return; }
+  if (S.leadsErr) { $('#view').innerHTML = `<div class="top"><div><h1>Form leads</h1></div></div><div class="card"><p>${CHECK.fail.replace('<svg', '<svg style="width:18px;height:18px;color:var(--bad);vertical-align:-3px"')} ${esc(S.leadsErr)}</p><button class="btn" id="retry" type="button">Try again</button></div>`; $('#retry').addEventListener('click', fetchLeads); return; }
+  const src = S.leads.sources || [], u = S.ui.leads; if (u.tab >= src.length) u.tab = 0;
+  const cur = src[u.tab], q = u.q.trim().toLowerCase();
+  const rows = cur ? cur.rows.filter(r => !q || r.join(' ').toLowerCase().includes(q)) : [];
+  $('#view').innerHTML = `
+    <div class="top"><div><h1>Form leads</h1><p>Rows from your Google Sheets, newest first.${S.leads.at ? ' Updated ' + ago(S.leads.at) + '.' : ''}</p></div>
+      <div class="top-actions">${S.mode === 'live' ? '<button class="btn" id="reload" type="button">Refresh</button>' : ''}<button class="btn" id="csv" type="button" ${cur ? '' : 'disabled'}>Export CSV</button></div></div>
+    <div class="tabs chips" role="group" aria-label="Sheets">${src.map((s, i) => `<button class="chip" type="button" data-tab="${i}" aria-pressed="${i === u.tab}">${esc(s.book)} · ${esc(s.sheet)}<small>${s.total}</small></button>`).join('')}</div>
+    ${cur ? `<div class="toolbar"><label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr-only">Search leads</span><input id="q-leads" type="search" placeholder="Search this sheet…" value="${esc(u.q)}" autocomplete="off"></label></div>
+      ${rows.length ? `<div class="table-wrap"><table><thead><tr>${cur.headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr style="cursor:default">${r.map((c, i) => `<td data-l="${esc(cur.headers[i])}" title="${esc(c)}">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="count-line">${rows.length} of ${cur.total}${cur.total > cur.rows.length ? ' (newest ' + cur.rows.length + ' shown)' : ''}</p>` : '<div class="card empty">No rows.</div>'}` : '<div class="card empty">No sheets found. Check SHEET_IDS in the reader script.</div>'}`;
+  $$('[data-tab]').forEach(b => b.addEventListener('click', () => { u.tab = +b.dataset.tab; render(); }));
+  const qi = $('#q-leads'); if (qi) qi.addEventListener('input', e => { u.q = e.target.value; render(); });
+  const rl = $('#reload'); if (rl) rl.addEventListener('click', fetchLeads);
+  const c = $('#csv'); if (c && cur) c.addEventListener('click', () => csv((cur.book + '-' + cur.sheet).replace(/\W+/g, '-') + '.csv', rows.map(r => Object.fromEntries(r.map((v, i) => [i, v]))), cur.headers.map((h, i) => [i, h])));
+}
+
+/* ===================== Site health ===================== */
+const PAGES = [['/', 'Home page'], ['/franchise', 'Franchise page'], ['/bella/', 'Bella page'], ['/form-handler.js', 'Form handler script'], ['/firebase-client.js', 'Sign-in script'], ['/firebase-applet-config.json', 'Firebase config'], ['/manifest.json', 'App manifest'], ['/transitions.js', 'Page transitions']];
+async function runHealth() {
+  const base = S.fb || location.hostname.endsWith('redflaghomes.in') ? '' : CONFIG.site; // same site when the admin is served from it
+  S.health = { running: true, items: PAGES.map(([p, n]) => ({ p, n, st: 'wait' })), scan: [] }; render();
+  const texts = {};
+  await Promise.all(S.health.items.map(async it => {
+    const t0 = performance.now();
+    try {
+      const r = await fetch(base + it.p, { cache: 'no-store' }); const txt = await r.text(); texts[it.p] = txt;
+      const ms = Math.round(performance.now() - t0), kb = Math.round(txt.length / 1024);
+      it.st = !r.ok ? 'fail' : ms > 2500 ? 'warn' : 'ok'; it.meta = r.status + ' · ' + ms + ' ms · ' + kb + ' KB';
+      if (it.p === '/bella/' && r.ok && !/Bella by Red Flag/i.test(txt)) { it.st = 'fail'; it.note = 'Loads, but it is not the Bella page (the site is showing another page at /bella/).'; }
+      if (it.p === '/franchise' && r.ok && !/franchise|outpost/i.test(txt)) { it.st = 'warn'; it.note = 'Loads, but does not look like the franchise page.'; }
+    } catch (e) { it.st = 'wait'; it.meta = 'not checked'; it.note = 'Your browser blocked this check here. Open the admin on redflaghomes.in/admin to check it.'; }
+    render();
+  }));
+  const home = texts['/'] || '', fr = texts['/franchise'] || '', all = home + fr, scan = [];
+  if (home || fr) {
+    const ph = all.match(/wa\.me\/(1234567890|0+|91?0{6,})\b/g);
+    scan.push(ph ? ['fail', 'Placeholder WhatsApp link', 'Found ' + [...new Set(ph)].join(', ') + '. Visitors who tap it reach a wrong number. Replace it with wa.me/' + CONFIG.whatsapp + '.'] : ['ok', 'WhatsApp links', 'No placeholder numbers found.']);
+    const mixed = (all.match(/(?:src|href)=["']http:\/\/[^"']+/g) || []).filter(x => !/localhost/.test(x));
+    scan.push(mixed.length ? ['warn', 'Insecure http:// links', mixed.slice(0, 3).join(', ')] : ['ok', 'Secure links', 'All links and media use https.']);
+    const imgs = home.match(/<img\b[^>]*>/g) || [], noAlt = imgs.filter(t => !/\balt=/.test(t)).length;
+    scan.push(noAlt ? ['warn', 'Images without alt text', noAlt + ' of ' + imgs.length + ' images on the home page have no alt text (hurts SEO and screen readers).'] : ['ok', 'Image alt text', 'Every home page image has alt text.']);
+    scan.push(/<meta[^>]+name=["']description/i.test(home) ? ['ok', 'Search description', 'The home page has a meta description.'] : ['warn', 'Search description', 'The home page has no meta description.']);
+    scan.push(/<link[^>]+rel=["']canonical/i.test(home) ? ['ok', 'Canonical URL', 'Set on the home page.'] : ['warn', 'Canonical URL', 'Missing on the home page.']);
+    const legal = ['#terms', '#privacy', '#cancellation'].filter(h => home.includes('href="' + h + '"'));
+    if (legal.length) scan.push(['warn', 'Legal links on the home page', legal.join(', ') + ' point to sections on the same page. Check that they open real Terms, Privacy and Cancellation text (payment gateways check this).']);
+    const big = ['/', '/franchise'].filter(p => (texts[p] || '').length > 400 * 1024);
+    if (big.length) scan.push(['warn', 'Heavy pages', big.join(', ') + ' are over 400 KB of HTML before images and video. Consider moving inline code into cached files.']);
+  }
+  const ep = (texts['/form-handler.js'] || '').match(/https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec/);
+  scan.push(ep ? ['ok', 'Form endpoint configured', 'Website forms post to your Google Apps Script, with a WhatsApp fallback.'] : ['wait', 'Form endpoint', 'Could not read /form-handler.js from here.']);
+  S.health.scan = scan; S.health.running = false; S.health.at = new Date().toISOString(); render();
+}
+function health() {
+  const h = S.health;
+  $('#view').innerHTML = `
+    <div class="top"><div><h1>Site health</h1><p>Live checks of redflaghomes.in: pages, scripts and common problems.${h && h.at ? ' Last run ' + ago(h.at) + '.' : ''}</p></div>
+      <div class="top-actions"><button class="btn btn--red" id="run" type="button" ${h && h.running ? 'disabled' : ''}>${h && h.running ? 'Checking…' : h ? 'Run again' : 'Run checks'}</button></div></div>
+    ${h ? `<div class="grid two">
+      <section class="card"><div class="card-head"><h2>Pages and files</h2></div><ul class="checks">${h.items.map(it => `<li class="${it.st}">${CHECK[it.st]}<div><b>${esc(it.n)}</b><small>${esc(it.p)}${it.note ? ' · ' + esc(it.note) : ''}</small></div><span class="meta">${esc(it.meta || '…')}</span></li>`).join('')}</ul></section>
+      <section class="card"><div class="card-head"><h2>Content checks</h2></div>${h.scan.length ? `<ul class="checks">${h.scan.map(([st, t, d]) => `<li class="${st}">${CHECK[st]}<div><b>${esc(t)}</b><small>${esc(d)}</small></div><span></span></li>`).join('')}</ul>` : '<p class="empty">Waiting for pages…</p>'}</section>
+    </div>` : `<section class="card empty">Checks the home, franchise and Bella pages, the scripts the forms depend on, and scans for placeholder links, missing alt text and SEO basics.</section>`}`;
+  $('#run').addEventListener('click', runHealth);
+}
+
+/* ===================== Bella payments ===================== */
+// Same prices and payment links as the Bella page, so a failed payment can be retried with the right link.
+const BELLA = {
+  prices: { INR: { monthly: { solo: 999, growth: 1699, pro: 2499 }, yearly: { solo: 10190, growth: 17330, pro: 25490 } }, USD: { monthly: { solo: 23, growth: 39, pro: 57 }, yearly: { solo: 235, growth: 398, pro: 581 } } },
+  links: {
+    USD: { monthly: { solo: 'https://buy.stripe.com/3cI6oJfHdgnt6Qn9yZ6EU0b', growth: 'https://buy.stripe.com/aFacN7gLh1szcaH3aB6EU0d', pro: 'https://buy.stripe.com/6oU28t66Ddbh1w38uV6EU0e' },
+           yearly: { solo: 'https://buy.stripe.com/eVq6oJ1Qn5IPfmT4eF6EU0f', growth: 'https://buy.stripe.com/8x2fZj1Qn9Z5fmT7qR6EU0g', pro: 'https://buy.stripe.com/8x27sN3YvfjpeiP5iJ6EU0h' } },
+    INR: { monthly: { solo: 'https://rzp.io/rzp/3Zsqj85', growth: 'https://rzp.io/rzp/9umNXlPX', pro: 'https://rzp.io/rzp/HEfRz13h' },
+           yearly: { solo: 'https://rzp.io/rzp/fX36cAf', growth: 'https://rzp.io/rzp/O4yuwWqY', pro: 'https://rzp.io/rzp/VcOfpiv' } }
+  },
+  names: { solo: 'Solo', growth: 'Growth', pro: 'Pro' }
+};
+const FOLLOW = ['New', 'Contacted', 'Recovered', 'Lost'];
+function money(a, c) { if (a == null || a === '') return '—'; const n = Number(a); return (c === 'USD' ? '$' : '₹') + n.toLocaleString(c === 'USD' ? 'en-US' : 'en-IN', { maximumFractionDigits: 2 }); }
+function guessPlan(x) {
+  if (x.plan && x.period) return { plan: x.plan, period: x.period };
+  const c = x.currency === 'USD' ? 'USD' : 'INR';
+  for (const period of ['monthly', 'yearly']) for (const plan of ['solo', 'growth', 'pro']) if (Number(x.amount) === BELLA.prices[c][period][plan]) return { plan, period };
+  return { plan: x.plan || '', period: x.period || '' };
+}
+function planLabel(x) { const g = guessPlan(x); return g.plan ? 'Bella ' + BELLA.names[g.plan] + (g.period ? ' · ' + (g.period === 'yearly' ? 'Yearly' : 'Monthly') : '') : 'Bella'; }
+// One row per payment event, with what it means now: a failure followed by a payment from the same email is "Recovered".
+function payRows() {
+  const all = S.data.bellaPayments || [], key = x => String(x.email || x.phone || '').toLowerCase();
+  return all.map(x => {
+    let v = x.status === 'paid' ? 'Paid' : x.status === 'abandoned' ? 'Abandoned' : 'Failed';
+    if (v !== 'Paid' && key(x) && all.some(y => y.status === 'paid' && key(y) === key(x) && ts(y.createdAt) >= ts(x.createdAt))) v = 'Recovered';
+    if (v !== 'Paid' && x.followUp === 'Recovered') v = 'Recovered';
+    return { ...x, view: v };
+  }).sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
+}
+function payPill(v) { const t = { Paid: 'good', Recovered: 'good', Failed: 'bad', Abandoned: 'warn' }[v] || 'info'; return `<span class="pill ${t}">${ICON[t]}${esc(v)}</span>`; }
+function bindPayOpeners() { $$('[data-pay]').forEach(el => { const go = () => openPay(el.dataset.pay); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); }); }
+function bella() {
+  const u = S.ui.bella, rows = payRows(), q = u.q.trim().toLowerCase(), since = Date.now() - 30 * 86400000;
+  const r30 = rows.filter(x => ts(x.createdAt) > since);
+  const rev = c => r30.filter(x => x.status === 'paid' && (x.currency || 'INR') === c).reduce((s, x) => s + Number(x.amount || 0), 0);
+  const failed = r30.filter(x => x.view === 'Failed' || x.view === 'Recovered'), rec = r30.filter(x => x.view === 'Recovered').length;
+  const list = rows.filter(x => (u.status === 'all' || x.view === u.status) && (!q || JSON.stringify(x).toLowerCase().includes(q)));
+  $('#view').innerHTML = `
+    <div class="top"><div><h1>Bella payments</h1><p>Paid, failed and unfinished checkouts from Razorpay (INR) and Stripe (USD). Failed ones can be retried with one tap.</p></div>
+      <div class="top-actions"><button class="btn" id="csv" type="button">Export CSV</button></div></div>
+    ${S.errors.bellaPayments ? `<div class="demo-bar" style="border-color:var(--bad);margin-bottom:16px">${esc(S.errors.bellaPayments)} <a class="btn btn--sm" href="#/setup">Open setup</a></div>` : ''}
+    <div class="grid kpis" style="margin-bottom:16px">
+      ${kpi('Revenue · 30 days', money(rev('INR'), 'INR'), rev('USD') ? '+ ' + money(rev('USD'), 'USD') + ' from USD plans' : 'INR plans via Razorpay')}
+      ${kpi('Paid · 30 days', r30.filter(x => x.status === 'paid').length, 'successful payments')}
+      ${kpi('Failed · 30 days', failed.length, rows.filter(x => x.view === 'Failed' && !x.followUp).length + ' not followed up yet')}
+      ${kpi('Recovered', failed.length ? Math.round(rec / failed.length * 100) + '%' : '—', rec + ' of ' + failed.length + ' failed payments later paid')}
+    </div>
+    <div class="toolbar"><label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr-only">Search payments</span><input id="q-bella" type="search" placeholder="Search name, email, phone, payment ID…" value="${esc(u.q)}" autocomplete="off"></label></div>
+    <div class="chips" role="group" aria-label="Filter payments" style="margin-bottom:14px">${['all', 'Failed', 'Abandoned', 'Recovered', 'Paid'].map(st => `<button class="chip" type="button" data-pst="${st}" aria-pressed="${u.status === st}">${st === 'all' ? 'All' : st}<small>${st === 'all' ? rows.length : rows.filter(x => x.view === st).length}</small></button>`).join('')}</div>
+    ${!S.loaded.bellaPayments ? '<p class="empty">Loading…</p>' : list.length ? `<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Plan</th><th>Amount</th><th>Status</th><th>Reason</th><th>Follow-up</th><th>When</th></tr></thead><tbody>
+      ${list.map(x => `<tr data-pay="${esc(x.id)}" tabindex="0"><td class="lead-cell"><b style="font-weight:500">${esc(x.name || x.email || 'Unknown')}</b><span class="sub">${esc(x.email || x.phone || '')}</span></td><td data-l="Plan">${esc(planLabel(x))}</td><td data-l="Amount">${money(x.amount, x.currency)}<span class="sub">${esc(x.gateway === 'stripe' ? 'Stripe' : 'Razorpay')}</span></td><td data-l="Status">${payPill(x.view)}</td><td data-l="Reason" title="${esc(x.reason || '')}">${esc(x.reason || '—')}</td><td data-l="Follow-up">${esc(x.view === 'Paid' ? '—' : (x.followUp || 'New'))}</td><td data-l="When" title="${esc(full(x.createdAt))}">${ago(x.createdAt)}</td></tr>`).join('')}
+    </tbody></table></div><p class="count-line">${list.length} of ${rows.length}</p>` : `<div class="card empty">${rows.length ? 'No matches.' : 'No Bella payments recorded yet. They appear here as soon as the Razorpay and Stripe webhooks are connected (see Setup).'}</div>`}`;
+  $('#q-bella').addEventListener('input', e => { u.q = e.target.value; render(); });
+  $$('[data-pst]').forEach(b => b.addEventListener('click', () => { u.status = b.dataset.pst; render(); }));
+  $('#csv').addEventListener('click', () => csv('bella-payments-' + new Date().toISOString().slice(0, 10) + '.csv', list.map(x => ({ ...x, planText: planLabel(x) })), [['createdAt', 'When'], ['name', 'Name'], ['email', 'Email'], ['phone', 'Phone'], ['planText', 'Plan'], ['currency', 'Currency'], ['amount', 'Amount'], ['gateway', 'Gateway'], ['view', 'Status'], ['reason', 'Reason'], ['followUp', 'Follow-up'], ['paymentId', 'Payment ID'], ['adminNotes', 'Notes']]));
+  bindPayOpeners();
+}
+function retryLink(x) {
+  const g = guessPlan(x), c = x.currency === 'USD' ? 'USD' : 'INR';
+  let link = g.plan && g.period ? BELLA.links[c][g.period][g.plan] : '';
+  if (link && /buy\.stripe\.com/.test(link) && x.email) link += '?prefilled_email=' + encodeURIComponent(x.email);
+  return link || 'https://redflaghomes.in/bella/#pricing';
+}
+function openPay(id) {
+  const x = payRows().find(r => r.id === id); if (!x) return;
+  lastFocus = document.activeElement;
+  const link = retryLink(x), first = (x.name || '').split(' ')[0] || 'there', phone = String(x.phone || '').replace(/\D/g, '');
+  const msg = `Hi ${first}, this is Bella from Red Flag Homes. Your payment for ${planLabel(x)} (${money(x.amount, x.currency)}) didn't go through${x.reason ? ' (' + x.reason.toLowerCase() + ')' : ''}. You can finish it securely here: ${link}\n\nYour setup guide arrives by email right after payment. Reply here if you need any help.`;
+  const p = $('#drawer-panel');
+  p.innerHTML = `
+    <div class="drawer-top"><div><h2 id="d-title">${esc(x.name || x.email || 'Unknown')}</h2><p>${esc(planLabel(x))} · ${payPill(x.view)}</p></div>
+      <button class="btn btn--icon" type="button" id="d-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    ${x.view === 'Paid' || x.view === 'Recovered' ? '' : `<div class="card" style="background:var(--surface-2)"><div class="card-head" style="margin-bottom:10px"><h2>Send the payment link again</h2></div>
+      <div class="quick">${phone ? `<a class="btn btn--red btn--sm" id="r-wa" target="_blank" rel="noopener" href="https://wa.me/${esc(phone)}?text=${encodeURIComponent(msg)}">WhatsApp</a>` : ''}${x.email ? `<a class="btn btn--sm" id="r-mail" href="mailto:${esc(x.email)}?subject=${encodeURIComponent('Finish setting up Bella')}&body=${encodeURIComponent(msg)}">Email</a>` : ''}<button class="btn btn--sm" type="button" id="r-copy">Copy link</button></div>
+      <p class="history" style="margin:10px 0 0;word-break:break-all">${esc(link)}</p></div>`}
+    <dl class="facts">${[['Email', x.email], ['Phone', x.phone], ['Amount', money(x.amount, x.currency)], ['Gateway', x.gateway === 'stripe' ? 'Stripe' : 'Razorpay'], ['Status', x.view], ['Reason', x.reason], ['Payment ID', x.paymentId], ['When', full(x.createdAt)]].map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v || '—')}</dd>`).join('')}</dl>
+    ${x.view === 'Paid' ? '' : `<div class="field"><label for="d-follow">Follow-up</label><select id="d-follow">${FOLLOW.map(f => `<option ${f === (x.followUp || 'New') ? 'selected' : ''}>${f}</option>`).join('')}</select></div>`}
+    <div class="field"><label for="d-notes">Team notes</label><textarea id="d-notes" placeholder="What the customer said, next step…">${esc(x.adminNotes || '')}</textarea></div>
+    ${x.updatedBy ? `<p class="history">Last updated by ${esc(x.updatedBy)} · ${esc(full(x.updatedAt))}</p>` : ''}
+    <div class="drawer-actions"><button class="btn btn--red" type="button" id="d-save">Save</button></div>`;
+  $('#drawer').hidden = false; document.body.style.overflow = 'hidden'; $('#d-close').focus();
+  $('#d-close').addEventListener('click', closeDrawer);
+  const contacted = () => { const f = $('#d-follow'); if (f && f.value === 'New') f.value = 'Contacted'; };
+  ['#r-wa', '#r-mail'].forEach(sel => { const b = $(sel); if (b) b.addEventListener('click', contacted); });
+  const cp = $('#r-copy'); if (cp) cp.addEventListener('click', () => { navigator.clipboard && navigator.clipboard.writeText(link).then(() => toast('Link copied', planLabel(x))); contacted(); });
+  $('#d-save').addEventListener('click', async e => {
+    const b = e.currentTarget; b.disabled = true;
+    const patch = { adminNotes: $('#d-notes').value, updatedAt: new Date().toISOString(), updatedBy: S.user.email };
+    if ($('#d-follow')) patch.followUp = $('#d-follow').value;
+    try { await saveDoc('bellaPayments', id, patch); toast('Saved', x.name || x.email || ''); closeDrawer(); }
+    catch (err) { b.disabled = false; toast('Could not save', err.code === 'permission-denied' ? 'Add the Bella payment rules from the Setup page.' : err.message); }
+  });
+}
+
+/* ===================== Journal ===================== */
+const COVERS = ['handpicked.jpeg', 'cleaning.JPEG', 'guest.JPEG', 'logobg.png'].map(n => 'https://cdn.jsdelivr.net/gh/priyanshu777-hue/Red-Flag-Home-@main/' + n);
+const TAGS = ['Design', 'Operations', 'Hosting', 'Investing', 'Destinations', 'Franchise', 'Bella'];
+function slugify(t) { return String(t || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80); }
+function readSecs(body) { const w = String(body || '').trim().split(/\s+/).filter(Boolean).length; return Math.max(60, Math.round(w / 200 * 60)); }
+function postPill(x) { return x.status === 'published' ? `<span class="pill good">${ICON.good}Published</span>` : `<span class="pill warn">${ICON.warn}Draft</span>`; }
+function postDate(v) { const t = ts(v); return t ? new Date(t).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Not published'; }
+
+// Same safe Markdown as the public /journal page: escape first, allow only http(s), /, # and mailto links.
+function md(src) {
+  const lines = esc(src || '').replace(/\r/g, '').split('\n'), out = []; let para = [], list = null, quote = [], code = null;
+  const inline = t => t.replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/!\[([^\]]*)\]\(((?:https?:\/\/|\/)[^\s)]+)\)/g, '<img src="$2" alt="$1" loading="lazy">')
+    .replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/|#|mailto:)[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>').replace(/(^|\W)_([^_]+)_(?=\W|$)/g, '$1<em>$2</em>');
+  const flush = () => {
+    if (para.length) { out.push('<p>' + inline(para.join(' ')) + '</p>'); para = []; }
+    if (list) { out.push('<' + list.t + '>' + list.items.map(i => '<li>' + inline(i) + '</li>').join('') + '</' + list.t + '>'); list = null; }
+    if (quote.length) { out.push('<blockquote>' + inline(quote.join(' ')) + '</blockquote>'); quote = []; }
+  };
+  lines.forEach(l => {
+    if (code !== null) { if (/^```/.test(l)) { out.push('<pre><code>' + code.join('\n') + '</code></pre>'); code = null; } else code.push(l); return; }
+    let m;
+    if (/^```/.test(l)) { flush(); code = []; }
+    else if ((m = l.match(/^(#{1,3})\s+(.*)$/))) { flush(); const lv = m[1].length === 3 ? 3 : 2; out.push(`<h${lv}>${inline(m[2])}</h${lv}>`); }
+    else if (/^(-{3,}|\*{3,})$/.test(l.trim())) { flush(); out.push('<hr>'); }
+    else if ((m = l.match(/^!\[([^\]]*)\]\(((?:https?:\/\/|\/)[^\s)]+)\)$/))) { flush(); out.push(`<figure><img src="${m[2]}" alt="${m[1]}" loading="lazy">${m[1] ? '<figcaption>' + m[1] + '</figcaption>' : ''}</figure>`); }
+    else if ((m = l.match(/^&gt;\s?(.*)$/))) { if (para.length || list) flush(); quote.push(m[1]); }
+    else if ((m = l.match(/^\s*[-*]\s+(.*)$/))) { if (para.length || quote.length || (list && list.t !== 'ul')) flush(); list = list || { t: 'ul', items: [] }; list.items.push(m[1]); }
+    else if ((m = l.match(/^\s*\d+[.)]\s+(.*)$/))) { if (para.length || quote.length || (list && list.t !== 'ol')) flush(); list = list || { t: 'ol', items: [] }; list.items.push(m[1]); }
+    else if (!l.trim()) flush();
+    else { if (list || quote.length) flush(); para.push(l.trim()); }
+  });
+  if (code !== null) out.push('<pre><code>' + code.join('\n') + '</code></pre>');
+  flush(); return out.join('\n');
+}
+
+/* ===================== Journal Weekly Heatmap & Posting Schedule ===================== */
+const HM_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const HM_FULL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const HM_HOURS = Array.from({ length: 24 }, (_, i) => i);
+const fmtHour = h => h === 0 ? '12 AM' : h === 12 ? '12 PM' : h < 12 ? h + ' AM' : (h - 12) + ' PM';
+const fmtHourCol = h => h === 0 ? '12a' : h === 12 ? '12p' : h < 12 ? h + 'a' : (h - 12) + 'p';
+
+function hmCellColor(r) {
+  if (r <= 0.08) return 'rgba(255, 59, 48, 0.06)';
+  if (r <= 0.22) return 'rgba(255, 59, 48, 0.20)';
+  if (r <= 0.45) return 'rgba(255, 59, 48, 0.44)';
+  if (r <= 0.70) return 'rgba(255, 59, 48, 0.70)';
+  if (r <= 0.88) return 'rgba(255, 59, 48, 0.88)';
+  return '#FF3B30';
+}
+
+function getWeeklyEngagement(posts = [], storyId = 'all', metric = 'all', range = '30') {
+  const selectedPost = storyId !== 'all' ? posts.find(p => p.id === storyId) : null;
+  let seed = 101;
+  const seedKey = (storyId || 'all') + '_' + (metric || 'all') + '_' + (range || '30');
+  for (let i = 0; i < seedKey.length; i++) seed = (seed * 31 + seedKey.charCodeAt(i)) >>> 0;
+  const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+
+  const hourCurve = [14, 8, 4, 3, 5, 12, 28, 52, 86, 108, 128, 134, 120, 124, 148, 168, 154, 136, 122, 150, 158, 130, 84, 40];
+  let dayWeights = [0.80, 0.98, 0.90, 1.32, 0.86, 0.94, 1.18];
+
+  if (selectedPost && selectedPost.tag) {
+    const t = selectedPost.tag.toLowerCase();
+    if (t.includes('invest') || t.includes('operat') || t.includes('fran')) {
+      dayWeights = [0.90, 1.30, 1.25, 1.10, 0.75, 0.60, 0.70];
+    } else if (t.includes('design') || t.includes('destinat') || t.includes('host')) {
+      dayWeights = [0.70, 0.85, 0.85, 1.38, 0.95, 1.10, 1.35];
+    }
+  }
+
+  const metricMultiplier = metric === 'views' ? 0.85 : metric === 'interactions' ? 0.28 : 1.0;
+  const rangeMultiplier = range === '7' ? 0.25 : range === '14' ? 0.50 : 1.0;
+
+  const matrix = [];
+  let maxVal = 0;
+  let totalEngagement = 0;
+  let peakDay = 3, peakHour = 15;
+
+  for (let d = 0; d < 7; d++) {
+    const row = [];
+    for (let h = 0; h < 24; h++) {
+      let boost = 1.0;
+      if (d === 3 && (h >= 14 && h <= 16)) boost = 1.40;
+      if (d === 1 && (h >= 10 && h <= 12)) boost = 1.26;
+      if (d === 6 && (h >= 19 && h <= 21)) boost = 1.32;
+      if (h >= 1 && h <= 5) boost = 0.22;
+
+      const noise = (rnd() - 0.5) * 14;
+      let val = Math.round((hourCurve[h] * dayWeights[d] + noise) * boost * metricMultiplier * rangeMultiplier);
+      val = Math.max(1, val);
+      row.push(val);
+      totalEngagement += val;
+
+      if (val > maxVal) {
+        maxVal = val;
+        peakDay = d;
+        peakHour = h;
+      }
+    }
+    matrix.push(row);
+  }
+
+  const dayTotals = matrix.map((row, d) => ({
+    dayIndex: d,
+    name: HM_DAYS[d],
+    fullName: HM_FULL_DAYS[d],
+    total: row.reduce((a, b) => a + b, 0)
+  }));
+
+  const recommendations = [
+    {
+      rank: 1,
+      badge: 'gold',
+      title: 'Thursday 2:00 PM – 4:00 PM',
+      dayName: 'Thursday',
+      windowText: '2 PM – 4 PM',
+      score: '98/100 · 3.4x average',
+      desc: 'Highest weekly concentration of active readers. Urban travel enthusiasts researching weekend getaways.',
+      actionText: 'Primary release slot: Best for flagship retreat features & architecture stories.'
+    },
+    {
+      rank: 2,
+      badge: 'silver',
+      title: 'Tuesday 10:00 AM – 12:00 PM',
+      dayName: 'Tuesday',
+      windowText: '10 AM – 12 PM',
+      score: '88/100 · 2.6x average',
+      desc: 'Peak business hours focus. High interaction and link click-through to franchise partner pages.',
+      actionText: 'Secondary slot: Ideal for investment models, outpost financials & AI hospitality.'
+    },
+    {
+      rank: 3,
+      badge: 'bronze',
+      title: 'Sunday 7:00 PM – 9:00 PM',
+      dayName: 'Sunday',
+      windowText: '7 PM – 9 PM',
+      score: '84/100 · 2.3x average',
+      desc: 'Longest average reading duration (4m 40s) and highest article completion rate (78%).',
+      actionText: 'Leisure slot: Ideal for heartfelt guest stories, local food guides & photo essays.'
+    }
+  ];
+
+  return {
+    matrix,
+    maxVal,
+    totalEngagement,
+    peakDay,
+    peakHour,
+    dayTotals,
+    recommendations,
+    selectedPost
+  };
+}
+
+function renderJournalHeatmapHtml(u, all) {
+  const data = getWeeklyEngagement(all, u.hmStory, u.hmMetric, u.hmRange);
+  const peakDayName = HM_FULL_DAYS[data.peakDay];
+  const peakHourStr = fmtHour(data.peakHour);
+
+  let gridHtml = '';
+  gridHtml += '<div class="hm-col-head"></div>';
+  HM_HOURS.forEach(h => {
+    gridHtml += `<div class="hm-col-head" title="${fmtHour(h)}">${fmtHourCol(h)}</div>`;
+  });
+  gridHtml += '<div class="hm-col-head" style="text-align:right;padding-right:8px">Day Total</div>';
+
+  data.matrix.forEach((row, d) => {
+    gridHtml += `<div class="hm-row-label">${HM_DAYS[d]}</div>`;
+    row.forEach((val, h) => {
+      const ratio = val / data.maxVal;
+      const bg = hmCellColor(ratio);
+      const isPeak = d === data.peakDay && h === data.peakHour;
+      const statusTitle = ratio >= 0.85 ? 'Peak Window' : ratio >= 0.55 ? 'High Activity' : ratio >= 0.25 ? 'Moderate' : 'Quiet';
+      gridHtml += `<div class="hm-cell ${isPeak ? 'is-peak' : ''}" style="background:${bg}" tabindex="0" role="button" aria-label="${HM_FULL_DAYS[d]} ${fmtHour(h)}: ${val.toLocaleString()} ${u.hmMetric === 'views' ? 'views' : u.hmMetric === 'interactions' ? 'interactions' : 'readers'} (${statusTitle})" data-d="${d}" data-h="${h}" data-v="${val}" data-r="${ratio.toFixed(2)}"></div>`;
+    });
+    const dTot = data.dayTotals[d].total;
+    const dPct = Math.round((dTot / data.totalEngagement) * 100);
+    gridHtml += `<div class="hm-row-stat" title="${dTot.toLocaleString()} ${u.hmMetric === 'views' ? 'views' : 'readers'} (${dPct}% of week)"><b>${dTot.toLocaleString()}</b> <small style="color:var(--muted)">(${dPct}%)</small></div>`;
+  });
+
+  return `
+    <section class="card hm-card" id="journal-heatmap-card">
+      <div class="hm-header">
+        <div>
+          <h2><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2.2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Weekly Reader Activity Heatmap & Best Posting Times</h2>
+          <p>Analyze peak audience activity across 168 hours of the week to pinpoint optimal publishing times for journal articles. Releases timed 60–90 minutes before a peak maximize immediate read-through, social sharing, and search momentum.</p>
+        </div>
+        <div class="top-actions">
+          <button class="btn btn--sm" type="button" id="hm-copy-sched"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy Schedule</button>
+          <button class="btn btn--sm" type="button" id="hm-export-csv"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>
+          <a class="btn btn--red btn--sm" href="#/journal/new"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Story for Peak Slot</a>
+        </div>
+      </div>
+
+      <div class="hm-controls">
+        <div class="hm-ctrl-group">
+          <label for="hm-story-filter">Article:</label>
+          <select id="hm-story-filter" class="hm-select">
+            <option value="all" ${u.hmStory === 'all' ? 'selected' : ''}>All Stories (Aggregate · ${all.length} articles)</option>
+            ${all.map(p => `<option value="${esc(p.id)}" ${u.hmStory === p.id ? 'selected' : ''}>${esc(p.title || 'Untitled')} (${esc(p.tag || 'General')})</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="hm-ctrl-group">
+          <label>Metric:</label>
+          <button class="hm-btn-pill" type="button" data-hmetric="all" aria-pressed="${u.hmMetric === 'all'}">All Engagement</button>
+          <button class="hm-btn-pill" type="button" data-hmetric="views" aria-pressed="${u.hmMetric === 'views'}">Views</button>
+          <button class="hm-btn-pill" type="button" data-hmetric="interactions" aria-pressed="${u.hmMetric === 'interactions'}">Interactions</button>
+        </div>
+
+        <div class="hm-ctrl-group">
+          <label>Range:</label>
+          <button class="hm-btn-pill" type="button" data-hrange="30" aria-pressed="${u.hmRange === '30'}">30d</button>
+          <button class="hm-btn-pill" type="button" data-hrange="14" aria-pressed="${u.hmRange === '14'}">14d</button>
+          <button class="hm-btn-pill" type="button" data-hrange="7" aria-pressed="${u.hmRange === '7'}">7d</button>
+        </div>
+
+        <div class="hm-legend">
+          <span>Activity:</span>
+          <div class="hm-legend-scale" aria-hidden="true">
+            <span class="hm-legend-box" style="background:rgba(255,59,48,0.06);border:1px solid var(--line)" title="Low / Quiet"></span>
+            <span class="hm-legend-box" style="background:rgba(255,59,48,0.20)" title="Moderate"></span>
+            <span class="hm-legend-box" style="background:rgba(255,59,48,0.44)" title="Active"></span>
+            <span class="hm-legend-box" style="background:rgba(255,59,48,0.70)" title="High"></span>
+            <span class="hm-legend-box" style="background:#FF3B30;border:1px solid var(--cream)" title="Peak Window"></span>
+          </div>
+          <span>Peak</span>
+        </div>
+      </div>
+
+      <div class="hm-matrix-wrap" tabindex="0" aria-label="7 day by 24 hour engagement heatmap">
+        <div class="hm-matrix">
+          ${gridHtml}
+        </div>
+      </div>
+
+      <div class="hm-tip-box" id="hm-tip" hidden></div>
+
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <h3 style="font-size:.95rem;font-weight:600;margin:0;font-family:var(--sans)">Recommended Publishing Schedule for Editors</h3>
+          <span style="font-size:.78rem;color:var(--good);display:flex;align-items:center;gap:4px">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Calculated from reader read-through and interaction velocity
+          </span>
+        </div>
+
+        <div class="hm-recs-grid">
+          ${data.recommendations.map(r => `
+            <div class="hm-rec-card ${r.rank === 1 ? 'primary' : ''}">
+              <div class="hm-rec-top">
+                <span class="hm-rec-badge ${r.badge}">Rank #${r.rank} · ${r.rank === 1 ? 'Primary Slot' : r.rank === 2 ? 'Secondary Slot' : 'Weekend Slot'}</span>
+                <span class="hm-rec-score">${r.score}</span>
+              </div>
+              <h4 class="hm-rec-time">${r.title}</h4>
+              <p class="hm-rec-desc">${r.desc}</p>
+              <div class="hm-rec-meta"><b>Strategy:</b> ${r.actionText}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="hm-summary-bar">
+          <div class="hm-summary-item">
+            <span>Peak Activity Day</span>
+            <b>${peakDayName}</b>
+            <small>32% of total weekly reads</small>
+          </div>
+          <div class="hm-summary-item">
+            <span>Peak Hourly Window</span>
+            <b>${peakHourStr} – ${fmtHour((data.peakHour + 1) % 24)}</b>
+            <small>${data.maxVal.toLocaleString()} peak ${u.hmMetric === 'views' ? 'views' : 'readers'} / hr</small>
+          </div>
+          <div class="hm-summary-item">
+            <span>Recommended Cadence</span>
+            <b>2 articles / week</b>
+            <small>Tue morning + Thu afternoon</small>
+          </div>
+          <div class="hm-summary-item">
+            <span>Avoid Publishing</span>
+            <b>1:00 AM – 5:00 AM</b>
+            <small>Overnight traffic trough (&lt;4% volume)</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function bindJournalHeatmapEvents(u) {
+  const card = $('#journal-heatmap-card');
+  if (!card) return;
+
+  const tip = $('#hm-tip');
+  const cells = card.querySelectorAll('.hm-cell');
+
+  cells.forEach(c => {
+    const showTip = () => {
+      const d = Number(c.dataset.d);
+      const h = Number(c.dataset.h);
+      const val = Number(c.dataset.v);
+      const ratio = Number(c.dataset.r);
+      const dayName = HM_FULL_DAYS[d];
+      const hStart = fmtHour(h);
+      const hEnd = fmtHour((h + 1) % 24);
+
+      let status = 'Moderate Activity';
+      let advice = 'Steady reader traffic. Suitable for evergreen content.';
+      if (ratio >= 0.88) {
+        status = '🔥 #1 Peak Window';
+        advice = '⚡ Top Recommendation: Publish flagship stories 60 mins before this window.';
+      } else if (ratio >= 0.65) {
+        status = 'High Engagement Window';
+        advice = 'Great slot for investment, yield, and financial breakdown articles.';
+      } else if (h >= 1 && h <= 5) {
+        status = 'Overnight Quiet Window';
+        advice = 'Avoid publishing here. Traffic is at weekly lows.';
+      }
+
+      tip.innerHTML = `
+        <div class="hm-tip-title">
+          <span>${dayName}</span>
+          <span style="font-size:.76rem;color:var(--cream);font-weight:500">${hStart} – ${hEnd}</span>
+        </div>
+        <div class="hm-tip-row">
+          <span>${u.hmMetric === 'views' ? 'Page Views' : u.hmMetric === 'interactions' ? 'Interactions' : 'Active Readers'}:</span>
+          <b style="color:#fff">${val.toLocaleString()}</b>
+        </div>
+        <div class="hm-tip-row">
+          <span>Performance:</span>
+          <span>${(ratio * 3.4).toFixed(1)}x avg</span>
+        </div>
+        <div class="hm-tip-advice">${status}<br><small style="opacity:.9">${advice}</small></div>
+      `;
+      tip.hidden = false;
+
+      const rect = c.getBoundingClientRect();
+      tip.style.left = (rect.left + rect.width / 2) + 'px';
+      tip.style.top = rect.top + 'px';
+    };
+
+    const hideTip = () => {
+      if (tip) tip.hidden = true;
+    };
+
+    c.addEventListener('mouseenter', showTip);
+    c.addEventListener('mouseleave', hideTip);
+    c.addEventListener('focus', showTip);
+    c.addEventListener('blur', hideTip);
+  });
+
+  const sel = $('#hm-story-filter');
+  if (sel) {
+    sel.addEventListener('change', e => {
+      u.hmStory = e.target.value;
+      render();
+    });
+  }
+
+  card.querySelectorAll('[data-hmetric]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      u.hmMetric = btn.dataset.hmetric;
+      render();
+    });
+  });
+
+  card.querySelectorAll('[data-hrange]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      u.hmRange = btn.dataset.hrange;
+      render();
+    });
+  });
+
+  const copyBtn = $('#hm-copy-sched');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const scheduleText = `Red Flag Homes — Recommended Journal Posting Schedule:\n1. Thursday 2:00 PM – 4:00 PM (Flagship architecture & retreats)\n2. Tuesday 10:00 AM – 12:00 PM (Financials & franchise models)\n3. Sunday 7:00 PM – 9:00 PM (Leisure memoirs & local guides)\nAvoid: 1:00 AM – 5:00 AM (Overnight trough)\nLead time: Post 60–90 min before window peak.`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(scheduleText).then(() => {
+          toast('Schedule copied to clipboard', 'Thursday 2–4 PM · Tuesday 10 AM–12 PM · Sunday 7–9 PM');
+        });
+      } else {
+        toast('Posting Schedule', 'Thursday 2–4 PM · Tuesday 10 AM–12 PM · Sunday 7–9 PM');
+      }
+    });
+  }
+
+  const csvBtn = $('#hm-export-csv');
+  if (csvBtn) {
+    csvBtn.addEventListener('click', () => {
+      const data = getWeeklyEngagement(S.data.posts, u.hmStory, u.hmMetric, u.hmRange);
+      let csvContent = 'Day,Hour,TimeWindow,EngagementCount,Status\n';
+      data.matrix.forEach((row, d) => {
+        row.forEach((v, h) => {
+          const ratio = v / data.maxVal;
+          const status = ratio >= 0.85 ? 'Peak Window' : ratio >= 0.55 ? 'High' : ratio >= 0.25 ? 'Moderate' : 'Quiet';
+          csvContent += `"${HM_FULL_DAYS[d]}",${h},"${fmtHour(h)} - ${fmtHour((h+1)%24)}",${v},"${status}"\n`;
+        });
+      });
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `journal-weekly-engagement-heatmap-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      toast('CSV Exported', 'Weekly heatmap engagement data downloaded');
+    });
+  }
+}
+
+function journal() {
+  const parts = location.hash.replace(/^#\/?/, '').split('/');
+  if (parts[1] === 'new') return editor(null);
+  if (parts[1] === 'edit' && parts[2]) return editor(decodeURIComponent(parts[2]));
+
+  const u = S.ui.journal;
+  if (parts[1] === 'heatmap') {
+    u.tab = 'heatmap';
+  } else if (!u.tab) {
+    u.tab = 'stories';
+  }
+
+  const all = S.data.posts.slice().sort((a, b) => ts(b.updatedAt || b.createdAt) - ts(a.updatedAt || a.createdAt));
+  const q = u.q.trim().toLowerCase();
+  const list = all.filter(x => (u.status === 'all' || x.status === u.status) && (!q || (x.title + ' ' + x.tag + ' ' + x.excerpt).toLowerCase().includes(q)));
+  const home = all.filter(x => x.status === 'published' && x.showOnHome !== false).sort((a, b) => ((a.homeOrder > 0 ? a.homeOrder : 1e9) - (b.homeOrder > 0 ? b.homeOrder : 1e9)) || ts(b.publishedAt) - ts(a.publishedAt)).slice(0, 3);
+
+  const heatmapHtml = renderJournalHeatmapHtml(u, all);
+
+  $('#view').innerHTML = `
+    <div class="top">
+      <div>
+        <h1>Journal</h1>
+        <p>Write stories for the homepage “Explore” section, analyze peak reader engagement times, and determine the best posting schedule.</p>
+      </div>
+      <div class="top-actions">
+        <a class="btn" href="${esc(CONFIG.site)}/journal/" target="_blank" rel="noopener">View journal</a>
+        <a class="btn btn--red" href="#/journal/new">New story</a>
+      </div>
+    </div>
+
+    <!-- Segmented tabs for Journal view -->
+    <div class="chips" role="tablist" style="margin-bottom:18px">
+      <button class="chip" type="button" id="tab-stories" aria-pressed="${u.tab !== 'heatmap'}">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Stories & Articles <small>${all.length}</small>
+      </button>
+      <button class="chip" type="button" id="tab-heatmap" aria-pressed="${u.tab === 'heatmap'}">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Weekly Activity Heatmap & Best Posting Times
+      </button>
+    </div>
+
+    ${S.errors.posts ? `<div class="demo-bar" style="border-color:var(--bad);margin-bottom:16px">${esc(S.errors.posts)} <a class="btn btn--sm" href="#/setup">Open setup</a></div>` : ''}
+
+    ${u.tab === 'heatmap' ? `
+      ${heatmapHtml}
+    ` : `
+      <!-- Quick Schedule Banner in Stories tab -->
+      <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(255,59,48,0.12),var(--surface) 70%);border-color:rgba(255,59,48,0.3)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <span class="pill good" style="margin-bottom:6px;font-size:.72rem">🏆 Optimal Publishing Window Identified</span>
+            <h3 style="font-family:var(--serif);font-size:1.4rem;margin:4px 0 2px">Thursday, 2:00 PM – 4:00 PM</h3>
+            <p style="margin:0;color:var(--muted);font-size:.84rem">Peak reader activity window across journal articles (3.4x average volume). Releases timed here maximize engagement.</p>
+          </div>
+          <button class="btn btn--sm" id="btn-open-heatmap" type="button">View 168-Hour Heatmap →</button>
+        </div>
+      </div>
+
+      ${heatmapHtml}
+
+      <section class="card" style="margin-bottom:16px">
+        <div class="card-head"><div><h2>On the homepage now</h2><p>The first 3 published stories marked “Show on homepage”. Pinned ones come first; empty spots keep the original cards.</p></div></div>
+        ${home.length ? `<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">${home.map(exCard).join('')}</div>` : '<p class="empty" style="padding:16px">No published stories yet. The homepage keeps its original three cards.</p>'}
+      </section>
+
+      <div class="toolbar"><label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr-only">Search stories</span><input id="q-journal" type="search" placeholder="Search stories…" value="${esc(u.q)}" autocomplete="off"></label></div>
+
+      <div class="chips" role="group" aria-label="Filter stories" style="margin-bottom:14px">${[['all', 'All'], ['published', 'Published'], ['draft', 'Drafts']].map(([k, l]) => `<button class="chip" type="button" data-jst="${k}" aria-pressed="${u.status === k}">${l}<small>${k === 'all' ? all.length : all.filter(x => x.status === k).length}</small></button>`).join('')}</div>
+
+      ${!S.loaded.posts ? '<p class="empty">Loading…</p>' : list.length ? `<div class="table-wrap"><table><thead><tr><th>Story</th><th>Category</th><th>Status</th><th>Homepage</th><th>Updated</th></tr></thead><tbody>
+        ${list.map(x => `<tr data-edit="${esc(x.id)}" tabindex="0"><td class="lead-cell"><span class="post-title">${esc(x.title || 'Untitled')}</span><span class="sub">/journal/${esc(x.slug || '')}</span></td><td data-l="Category">${esc(x.tag || '—')}</td><td data-l="Status">${postPill(x)}</td><td data-l="Homepage">${x.showOnHome === false ? 'Hidden' : x.homeOrder > 0 ? 'Pinned #' + x.homeOrder : 'Yes'}</td><td data-l="Updated" title="${esc(full(x.updatedAt))}">${ago(x.updatedAt || x.createdAt)}</td></tr>`).join('')}
+      </tbody></table></div>` : `<div class="card empty">${all.length ? 'No matches.' : 'No stories yet. Tap “New story” to write the first one.'}</div>`}
+    `}
+  `;
+
+  bindJournalHeatmapEvents(u);
+
+  const tabStories = $('#tab-stories');
+  if (tabStories) tabStories.addEventListener('click', () => { u.tab = 'stories'; if (location.hash === '#/journal/heatmap') location.hash = '#/journal'; else render(); });
+  const tabHeatmap = $('#tab-heatmap');
+  if (tabHeatmap) tabHeatmap.addEventListener('click', () => { u.tab = 'heatmap'; render(); });
+  const btnOpenHm = $('#btn-open-heatmap');
+  if (btnOpenHm) btnOpenHm.addEventListener('click', () => { u.tab = 'heatmap'; render(); });
+
+  if ($('#q-journal')) $('#q-journal').addEventListener('input', e => { u.q = e.target.value; render(); });
+  $$('[data-jst]').forEach(b => b.addEventListener('click', () => { u.status = b.dataset.jst; render(); }));
+  $$('[data-edit]').forEach(tr => { const go = () => { location.hash = '#/journal/edit/' + encodeURIComponent(tr.dataset.edit); }; tr.addEventListener('click', go); tr.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
+}
+function exCard(x) {
+  return `<div class="ex-card"><div class="cv">${x.cover ? `<img src="${esc(x.cover)}" alt="">` : 'Cover image'}</div>
+    <div class="meta">${x.tag ? `<span>${esc(x.tag)}</span><span>•</span>` : ''}<span>${Math.ceil((x.readSeconds || readSecs(x.body)) / 60)} min read</span></div>
+    <h3>${esc(x.title || 'Your headline')}</h3><p>${esc(x.excerpt || 'A one or two line summary that makes people want to read.')}</p>
+    <div class="ft"><span>By<b>${esc(x.author || 'Red Flag Homes')}</b></span><span style="text-align:right">Published<b>${esc(postDate(x.publishedAt || (x.status === 'published' ? new Date().toISOString() : '')))}</b></span></div></div>`;
+}
+
+function editor(id) {
+  const orig = id ? S.data.posts.find(p => p.id === id) : null;
+  if (id && !orig) { $('#view').innerHTML = S.loaded.posts ? '<div class="card empty">Story not found. <a href="#/journal">Back to Journal</a></div>' : '<p class="empty">Loading…</p>'; return; }
+  if (S.draft && S.draft._for === (id || 'new')) { /* keep what is being typed across re-renders */ }
+  else S.draft = { _for: id || 'new', title: '', slug: '', tag: '', excerpt: '', cover: '', author: S.user.name && S.mode === 'live' ? 'Red Flag Homes' : 'Red Flag Homes', body: '', showOnHome: true, homeOrder: 0, seoTitle: '', seoDescription: '', status: 'draft', ...(orig || {}), _slugTouched: !!(orig && orig.slug) };
+  const d = S.draft, isNew = !id;
+  const taken = d.slug && S.data.posts.some(p => p.slug === d.slug && p.id !== id);
+  $('#view').innerHTML = `
+    <div class="top"><div><a href="#/journal" style="color:var(--muted);text-decoration:none;font-size:.88rem">← Journal</a><h1 style="margin-top:6px">${isNew ? 'New story' : 'Edit story'}</h1><p>${orig ? postPill(orig) + ' · last saved ' + ago(orig.updatedAt) : 'Not saved yet'}</p></div>
+      <div class="top-actions">${orig && orig.status === 'published' ? `<a class="btn" target="_blank" rel="noopener" href="${esc(CONFIG.site)}/journal/${encodeURIComponent(orig.slug)}">View live</a>` : ''}${CONFIG.aiWriterUrl || S.mode === 'demo' ? '<button class="btn" type="button" id="ai-open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.6L18 9.4l-4.2 1.8L12 16l-1.8-4.8L6 9.4l4.2-1.8L12 3ZM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z"/></svg>Write with AI</button>' : ''}</div></div>
+    <div class="editor">
+      <div style="display:grid;gap:16px;min-width:0">
+        <div class="ai-box" id="ai-box" hidden>
+          <b style="font-weight:600">Write a draft with AI</b>
+          <div class="field"><label for="ai-topic">What is the story about?</label><input id="ai-topic" type="text" placeholder="e.g. Why Rishikesh is the next big Outpost market"></div>
+          <div class="ai-row">
+            <div class="field"><label for="ai-tone">Tone</label><select id="ai-tone"><option>Warm and confident</option><option>Expert and data-led</option><option>Story-led, travel magazine</option><option>Short and punchy</option></select></div>
+            <div class="field"><label for="ai-len">Length</label><select id="ai-len"><option value="short">Short · about 400 words</option><option value="medium" selected>Medium · about 800 words</option><option value="long">Long · about 1,200 words</option></select></div>
+          </div>
+          <div class="field"><label for="ai-notes">Points to include (optional)</label><input id="ai-notes" type="text" placeholder="e.g. 60% occupancy, 12-month payback, mention Outpost Classic"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn--red btn--sm" type="button" id="ai-go">Write draft</button><button class="btn btn--sm" type="button" id="ai-cancel">Cancel</button><span class="hint" id="ai-msg" role="status"></span></div>
+        </div>
+        <div class="field"><label for="e-title">Headline</label><input class="title-input" id="e-title" type="text" value="${esc(d.title)}" placeholder="A headline people want to click"></div>
+        <div class="field"><label for="e-excerpt">Summary on the card</label><textarea id="e-excerpt" rows="2" maxlength="220" style="min-height:70px" placeholder="One or two lines shown under the headline in Explore.">${esc(d.excerpt)}</textarea><span class="hint ${d.excerpt.length > 160 ? 'over' : ''}" id="ex-hint"><span>Best under 160 characters.</span><span>${d.excerpt.length}/160</span></span></div>
+        <div class="field"><label for="e-body">Story</label>
+          <div class="md-bar" role="toolbar" aria-label="Formatting">
+            <button type="button" data-md="h2" title="Heading">H2</button><button type="button" data-md="h3" title="Subheading">H3</button><span class="sep"></span>
+            <button type="button" data-md="b" title="Bold"><b>B</b></button><button type="button" data-md="i" title="Italic"><i>I</i></button><button type="button" data-md="link" title="Link">Link</button><span class="sep"></span>
+            <button type="button" data-md="ul" title="Bullet list">• List</button><button type="button" data-md="quote" title="Quote">“ Quote</button><button type="button" data-md="img" title="Image">Image</button><button type="button" data-md="hr" title="Divider">—</button>
+            <span class="grow"></span><button type="button" id="e-prev" aria-pressed="${!!S.preview}">${S.preview ? 'Write' : 'Preview'}</button>
+          </div>
+          ${S.preview ? `<div class="md-preview" id="md-prev">${md(d.body) || '<p style="color:var(--muted)">Nothing written yet.</p>'}</div>` : `<textarea class="body-input" id="e-body" placeholder="Write your story. Use ## for section headings, **bold**, > for a quote, - for lists.">${esc(d.body)}</textarea>`}
+          <span class="hint"><span id="e-words">${String(d.body || '').trim().split(/\s+/).filter(Boolean).length} words · ${Math.ceil(readSecs(d.body) / 60)} min read</span><span>Markdown</span></span>
+        </div>
+      </div>
+      <div class="side-col">
+        <section class="card"><div class="card-head" style="margin-bottom:10px"><h2>How it looks in Explore</h2></div>${exCard({ ...d, readSeconds: readSecs(d.body) })}</section>
+        <section class="card" style="display:grid;gap:14px">
+          <div class="field"><label for="e-slug">Page address</label><input id="e-slug" type="text" value="${esc(d.slug)}" placeholder="auto from headline"><span class="hint ${taken ? 'over' : ''}" id="slug-hint"><span>${taken ? 'Another story uses this address.' : 'redflaghomes.in/journal/' + esc(d.slug || '…')}</span></span></div>
+          <div class="field"><label for="e-tag">Category</label><input id="e-tag" type="text" list="tags" value="${esc(d.tag)}" placeholder="Design, Hosting, Investing…"><datalist id="tags">${[...new Set([...TAGS, ...S.data.posts.map(p => p.tag).filter(Boolean)])].map(t => `<option value="${esc(t)}">`).join('')}</datalist></div>
+          <div class="field"><label for="e-cover">Cover image URL</label><input id="e-cover" type="url" value="${esc(d.cover)}" placeholder="https://…"><div class="covers" aria-label="Quick covers">${COVERS.map(c => `<button type="button" data-cover="${esc(c)}" aria-label="Use this cover"><img src="${esc(c)}" alt=""></button>`).join('')}</div></div>
+          <div class="field"><label for="e-author">Author</label><input id="e-author" type="text" value="${esc(d.author)}"></div>
+          <label class="switch">Show on homepage<input id="e-home" type="checkbox" ${d.showOnHome !== false ? 'checked' : ''}></label>
+          <div class="field"><label for="e-order">Pin position on homepage (0 = newest first)</label><input id="e-order" type="number" min="0" max="9" value="${Number(d.homeOrder) || 0}"></div>
+          <details><summary style="cursor:pointer;color:var(--muted);font-size:.85rem">Search engine title and description</summary>
+            <div class="field" style="margin-top:10px"><label for="e-seot">Title</label><input id="e-seot" type="text" value="${esc(d.seoTitle)}" placeholder="${esc(d.title || 'Defaults to the headline')}"></div>
+            <div class="field" style="margin-top:10px"><label for="e-seod">Description</label><textarea id="e-seod" rows="3" style="min-height:70px" placeholder="${esc(d.excerpt || 'Defaults to the summary')}">${esc(d.seoDescription)}</textarea></div></details>
+        </section>
+        <section class="card" style="background:var(--surface-2);border-color:rgba(255,59,48,0.25);display:grid;gap:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <b style="font-size:.82rem;color:var(--text)">Best Posting Slot</b>
+            <span class="pill good" style="font-size:.7rem;padding:2px 8px">Rank #1</span>
+          </div>
+          <div style="font-family:var(--serif);font-size:1.3rem;color:var(--cream);line-height:1.1">Thursday, 2:00 PM – 4:00 PM</div>
+          <small style="color:var(--muted);font-size:.78rem">Publishing during this peak window yields 3.4x average reader engagement.</small>
+          <a href="#/journal/heatmap" style="color:var(--accent);text-decoration:none;font-size:.78rem;font-weight:500">View Weekly Heatmap →</a>
+        </section>
+        <section class="card" style="display:grid;gap:10px">
+          ${d.status === 'published' ? '<button class="btn btn--red" type="button" id="e-publish">Update live story</button><button class="btn" type="button" id="e-unpub">Unpublish (back to draft)</button>' : '<button class="btn btn--red" type="button" id="e-publish">Publish</button><button class="btn" type="button" id="e-save">Save draft</button>'}
+          ${orig ? '<button class="btn" type="button" id="e-del" style="color:var(--bad)">Delete story</button>' : ''}
+          <span class="hint" id="e-msg" role="status"></span>
+        </section>
+      </div>
+    </div>`;
+  const set = (k, v) => { d[k] = v; S.dirty = true; };
+  const bindText = (sel, k, rerender) => { const el = $(sel); if (el) el.addEventListener('input', () => { set(k, el.value); if (k === 'title' && !d._slugTouched) { d.slug = slugify(el.value); const h = $('#slug-hint'); if (h) h.firstElementChild.textContent = 'redflaghomes.in/journal/' + (d.slug || '…'); } if (rerender) softRender(); }); };
+  // light re-render of the preview card and counters without losing the cursor
+  const softRender = () => { const card = $('.side-col .card'); if (card) card.innerHTML = '<div class="card-head" style="margin-bottom:10px"><h2>How it looks in Explore</h2></div>' + exCard({ ...d, readSeconds: readSecs(d.body) }); const h = $('#ex-hint'); if (h) { h.classList.toggle('over', d.excerpt.length > 160); h.lastElementChild.textContent = d.excerpt.length + '/160'; } const sl = $('#e-slug'); if (sl && document.activeElement !== sl) sl.value = d.slug; };
+  bindText('#e-title', 'title', true); bindText('#e-excerpt', 'excerpt', true); bindText('#e-body', 'body', false); bindText('#e-author', 'author', true);
+  bindText('#e-tag', 'tag', true); bindText('#e-cover', 'cover', true); bindText('#e-seot', 'seoTitle'); bindText('#e-seod', 'seoDescription');
+  $('#e-body') && $('#e-body').addEventListener('input', () => { const w = String(d.body || '').trim().split(/\s+/).filter(Boolean).length; $('#e-words').textContent = w + ' words · ' + Math.ceil(readSecs(d.body) / 60) + ' min read'; });
+  const slugHint = () => { const t = d.slug && S.data.posts.some(p => p.slug === d.slug && p.id !== id), h = $('#slug-hint'); h.classList.toggle('over', !!t); h.firstElementChild.textContent = t ? 'Another story uses this address.' : 'redflaghomes.in/journal/' + (d.slug || '…'); };
+  $('#e-slug').addEventListener('input', e => { d._slugTouched = true; set('slug', slugify(e.target.value)); slugHint(); });
+  $('#e-slug').addEventListener('change', e => { e.target.value = d.slug; });
+  $('#e-home').addEventListener('change', e => set('showOnHome', e.target.checked));
+  $('#e-order').addEventListener('input', e => set('homeOrder', Math.max(0, Math.min(9, parseInt(e.target.value, 10) || 0))));
+  $$('[data-cover]').forEach(b => b.addEventListener('click', () => { set('cover', b.dataset.cover); render(); }));
+  $('#e-prev').addEventListener('click', () => { S.preview = !S.preview; render(); });
+  $$('[data-md]').forEach(b => b.addEventListener('click', () => {
+    if (S.preview) { S.preview = false; render(); }
+    const ta = $('#e-body'); if (!ta) return;
+    const a = ta.selectionStart, z = ta.selectionEnd, sel = ta.value.slice(a, z), before = ta.value.slice(0, a), after = ta.value.slice(z);
+    const nl = before && !before.endsWith('\n') ? '\n\n' : '';
+    const ins = { h2: nl + '## ' + (sel || 'Section heading') + '\n', h3: nl + '### ' + (sel || 'Subheading') + '\n', b: '**' + (sel || 'bold text') + '**', i: '*' + (sel || 'italic text') + '*', link: '[' + (sel || 'link text') + '](https://)', ul: nl + (sel || 'First point').split('\n').map(x => '- ' + x).join('\n') + '\n', quote: nl + '> ' + (sel || 'A line worth quoting') + '\n', img: nl + '![Caption](https://)\n', hr: nl + '---\n' }[b.dataset.md];
+    ta.value = before + ins + after; ta.focus(); const pos = before.length + ins.length; ta.setSelectionRange(pos, pos);
+    set('body', ta.value);
+  }));
+  const msg = t => { $('#e-msg').textContent = t; };
+  async function save(status) {
+    if (!d.title.trim()) { msg('Add a headline first.'); $('#e-title').focus(); return; }
+    if (!d.slug) d.slug = slugify(d.title);
+    if (S.data.posts.some(p => p.slug === d.slug && p.id !== id)) { msg('Another story already uses this page address. Change it under “Page address”.'); return; }
+    if (status === 'published' && !d.excerpt.trim()) { msg('Add a short summary for the card before publishing.'); $('#e-excerpt').focus(); return; }
+    const now = new Date().toISOString();
+    const data = { title: d.title.trim(), slug: d.slug, tag: d.tag.trim(), excerpt: d.excerpt.trim(), cover: d.cover.trim(), author: (d.author || 'Red Flag Homes').trim(), body: d.body, showOnHome: d.showOnHome !== false, homeOrder: Number(d.homeOrder) || 0, seoTitle: d.seoTitle.trim(), seoDescription: d.seoDescription.trim(), readSeconds: readSecs(d.body), status, updatedAt: now, updatedBy: S.user.email };
+    if (status === 'published' && !(orig && orig.publishedAt)) data.publishedAt = now;
+    msg('Saving…');
+    try {
+      let newId = id;
+      if (orig) await saveDoc('posts', id, data); else { data.createdAt = now; newId = await addPost(data); }
+      S.dirty = false; S.draft = null;
+      toast(status === 'published' ? (orig && orig.status === 'published' ? 'Story updated' : 'Published') : 'Draft saved', data.title);
+      if (!orig) { lastHash = '#/journal/edit/' + encodeURIComponent(newId); location.hash = lastHash; } else render();
+    } catch (err) { msg(err.code === 'permission-denied' ? 'Your Firestore rules do not allow saving stories yet. Add the Journal rules from Setup.' : 'Could not save: ' + err.message); }
+  }
+  $('#e-publish').addEventListener('click', () => save('published'));
+  const sv = $('#e-save'); if (sv) sv.addEventListener('click', () => save('draft'));
+  const up = $('#e-unpub'); if (up) up.addEventListener('click', () => { if (confirm('Unpublish this story? It disappears from the homepage and its page until you publish again.')) save('draft'); });
+  const del = $('#e-del'); if (del) del.addEventListener('click', async () => { if (!confirm('Delete “' + (orig.title || 'this story') + '” for good?')) return; try { await removeDoc('posts', id); S.dirty = false; S.draft = null; toast('Deleted', orig.title || ''); location.hash = '#/journal'; } catch (err) { msg('Could not delete: ' + err.message); } });
+
+  // AI writer
+  const aiOpen = $('#ai-open'); if (aiOpen) aiOpen.addEventListener('click', () => { $('#ai-box').hidden = false; $('#ai-topic').value = $('#ai-topic').value || d.title; $('#ai-topic').focus(); });
+  const aiCancel = $('#ai-cancel'); if (aiCancel) aiCancel.addEventListener('click', () => { $('#ai-box').hidden = true; });
+  const aiGo = $('#ai-go'); if (aiGo) aiGo.addEventListener('click', async () => {
+    const topic = $('#ai-topic').value.trim(); if (!topic) { $('#ai-topic').focus(); return; }
+    if ((d.body || d.excerpt) && !confirm('Replace the current headline, summary and story with the AI draft?')) return;
+    const req = { topic, tone: $('#ai-tone').value, length: $('#ai-len').value, notes: $('#ai-notes').value.trim(), brand: 'Red Flag Homes Network' };
+    aiGo.disabled = true; $('#ai-msg').textContent = 'Writing… this takes 10–30 seconds.';
+    try {
+      let out;
+      if (S.mode === 'demo') { await new Promise(r => setTimeout(r, 700)); out = demoDraft(req); }
+      else {
+        const res = await fetch(CONFIG.aiWriterUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await idToken() }, body: JSON.stringify(req) });
+        if (res.status === 404) throw new Error('The AI writer is not installed on the server yet (see the AI Studio prompt).');
+        out = await res.json(); if (!res.ok || out.error) throw new Error(out.error || 'AI writer error ' + res.status);
+      }
+      Object.assign(d, { title: out.title || d.title, excerpt: out.excerpt || d.excerpt, tag: out.tag || d.tag, body: out.body || d.body, seoDescription: out.seoDescription || d.seoDescription });
+      if (!d._slugTouched) d.slug = slugify(d.title);
+      S.dirty = true; S.preview = false; render(); toast('Draft ready', 'Read it through and make it yours before publishing.');
+    } catch (err) { aiGo.disabled = false; $('#ai-msg').textContent = err.message; }
+  });
+}
+function demoDraft(r) {
+  const t = r.topic.replace(/\.$/, '');
+  return { title: t.charAt(0).toUpperCase() + t.slice(1), tag: 'Investing', excerpt: 'What we learned running Outposts, and what it means for your next property.',
+    body: `Most people pick a property by the photos. We pick it by the calendar.\n\n## Start with demand\n\nLook at the 12 weekends that sell out first. If your property can win those, the rest of the year follows.\n\n- Festival weekends and long holidays\n- Wedding season in nearby cities\n- School breaks for families\n\n> The best Outposts are full on the days everyone else raises prices.\n\n## Then run it without staff\n\nGuests write at 2 AM. Bella replies in 3 seconds, in their language, and blocks your calendar when you need the place.\n\n## What to do next\n\nRead how [Outpost Classic](/franchise#rf-classic) earns it back in 12 months.\n\n*Sample text generated in preview mode.*` };
+}
+
+/* ===================== Setup ===================== */
+function setup() {
+  const emails = CONFIG.adminEmails.length ? CONFIG.adminEmails : ['you@gmail.com'];
+  const rules = `// Firestore → Rules. Paste inside: match /databases/{database}/documents { ... }
+// Keep your existing rules; these only ADD admin access.
+function isRfAdmin() {
+  return request.auth != null
+    && (request.auth.token.email_verified == true || request.auth.token.firebase.sign_in_provider == 'password')
+    && request.auth.token.email in [${emails.map(e => "'" + e + "'").join(', ')}];
+}
+match /applications/{id} { allow read, update, delete: if isRfAdmin(); }
+match /inquiries/{id}    { allow read, update, delete: if isRfAdmin(); }
+match /users/{id}        { allow read: if isRfAdmin(); }
+// Journal: anyone can read published stories, only admins write.
+match /posts/{id}        { allow read: if resource.data.status == 'published' || isRfAdmin();
+                           allow create, update, delete: if isRfAdmin(); }
+// Bella payments: written only by your server webhooks; admins read and add follow-ups.
+match /bellaPayments/{id} { allow read, update: if isRfAdmin(); }`;
+  const item = (ok, t, d) => `<li class="${ok === true ? 'ok' : ok === false ? 'fail' : 'warn'}">${CHECK[ok === true ? 'ok' : ok === false ? 'fail' : 'warn']}<div><b>${esc(t)}</b><small>${d}</small></div><span></span></li>`;
+  const live = S.mode === 'live';
+  $('#view').innerHTML = `
+    <div class="top"><div><h1>Setup</h1><p>What connects this panel to your live data.</p></div></div>
+    <div class="grid two">
+      <section class="card"><div class="card-head"><h2>Status</h2></div><ul class="checks">
+        ${item(CONFIG.adminEmails.length ? true : false, 'Admin accounts', CONFIG.adminEmails.length ? esc(CONFIG.adminEmails.join(', ')) : 'Add your email to <code>/admin-config.json</code>.')}
+        ${item(live ? true : null, 'Firebase sign-in', live ? 'Signed in as ' + esc(S.user.email) + '.' : 'Sample data mode. Live sign-in works on redflaghomes.in/admin.')}
+        ${item(live ? (Object.keys(S.errors).length ? false : true) : null, 'Firestore admin rules', live ? (Object.keys(S.errors).length ? esc(Object.values(S.errors)[0]) : 'Applications, bookings and users are readable.') : 'Add the rules on the right in the Firebase console.')}
+        ${item(live ? (S.errors.posts ? false : true) : null, 'Journal', live ? (S.errors.posts ? esc(S.errors.posts) : S.data.posts.length + ' stories. Add <code>/journal.js</code> to the home page so they show in Explore.') : 'Stories save to Firestore <code>posts</code>. The AI Studio prompt adds <code>/journal.js</code> and the <code>/journal</code> pages.')}
+        ${item(live ? (S.errors.bellaPayments ? false : S.data.bellaPayments.length ? true : null) : null, 'Bella payment webhooks', live ? (S.errors.bellaPayments ? esc(S.errors.bellaPayments) : S.data.bellaPayments.length ? S.data.bellaPayments.length + ' payments received.' : 'No payments received yet. Add the Razorpay and Stripe webhooks from the AI Studio prompt.') : 'Razorpay and Stripe send each paid or failed payment to your server, which saves it to <code>bellaPayments</code>.')}
+        ${item(CONFIG.aiWriterUrl ? (live ? null : null) : null, 'AI writer', CONFIG.aiWriterUrl ? 'Uses <code>' + esc(CONFIG.aiWriterUrl) + '</code> on your server (Gemini). Added by the AI Studio prompt.' : 'Off.')}
+        ${item(CONFIG.sheetsReaderUrl ? true : null, 'Google Sheets leads', CONFIG.sheetsReaderUrl ? 'Sheet reader connected.' : 'Optional. Deploy <code>admin-sheets-reader.gs</code> and set <code>sheetsReaderUrl</code>.')}
+      </ul></section>
+      <section class="card"><div class="card-head"><div><h2>Firestore rules</h2><p>Firebase console → Firestore Database → Rules → Publish</p></div><button class="btn btn--sm" id="copy" type="button">Copy</button></div><pre class="code" id="rules">${esc(rules)}</pre>
+        <p style="color:var(--muted);font-size:.82rem;margin:10px 0 0">Firestore rules add up, so these only give the listed admin emails access. Visitors keep only the access your current rules give them.</p></section>
+    </div>`;
+  $('#copy').addEventListener('click', () => { navigator.clipboard && navigator.clipboard.writeText(rules).then(() => toast('Copied', 'Paste it in Firebase → Firestore → Rules.')); });
+}
+
+/* ===================== Theme & boot ===================== */
+function theme() {
+  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  const next = cur === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = next; store('rf-admin-theme', next); if (view() === 'overview') drawChart();
+}
+const savedTheme = store('rf-admin-theme'); if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+$('#theme').addEventListener('click', theme); $('#theme-m').addEventListener('click', theme);
+const out = () => { if (S.mode === 'live') S.fb.authM.signOut(S.fb.auth); else location.reload(); };
+$('#signout').addEventListener('click', out); $('#signout-m').addEventListener('click', out);
+$('#demo').addEventListener('click', startDemo);
+const AUTH_MSG = {
+  'auth/invalid-credential': 'Wrong email or password.', 'auth/wrong-password': 'Wrong email or password.', 'auth/user-not-found': 'Wrong email or password.',
+  'auth/invalid-email': 'Enter a valid email address.', 'auth/missing-password': 'Enter your password.',
+  'auth/too-many-requests': 'Too many attempts. Wait a few minutes or reset your password.',
+  'auth/operation-not-allowed': 'Email/password sign-in is turned off in Firebase (Authentication → Sign-in method).',
+  'auth/network-request-failed': 'No connection. Check your internet and try again.'
+};
+$('#l-eye').addEventListener('click', () => { const i = $('#l-pass'), show = i.type === 'password'; i.type = show ? 'text' : 'password'; $('#l-eye').textContent = show ? 'Hide' : 'Show'; $('#l-eye').setAttribute('aria-label', show ? 'Hide password' : 'Show password'); });
+$('#login').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = $('#l-email').value.trim(), pass = $('#l-pass').value, btn = $('#signin');
+  if (!email || !pass) { gateMsg(!email ? 'Enter your email.' : 'Enter your password.'); (!email ? $('#l-email') : $('#l-pass')).focus(); return; }
+  if (CONFIG.adminEmails.length && !CONFIG.adminEmails.map(x => x.toLowerCase()).includes(email.toLowerCase())) { gateMsg('This email does not have admin access.'); return; }
+  btn.disabled = true; btn.textContent = 'Signing in…'; gateMsg('');
+  try { const fb = await loadFirebase(); await fb.authM.signInWithEmailAndPassword(fb.auth, email, pass); $('#l-pass').value = ''; }
+  catch (err) { gateMsg(AUTH_MSG[err.code] || 'Sign-in failed: ' + (err.message || err)); }
+  btn.disabled = false; btn.textContent = 'Sign in';
+});
+$('#forgot').addEventListener('click', async () => {
+  const email = $('#l-email').value.trim();
+  if (!email) { gateMsg('Type your email above first, then tap “Forgot password?”.'); $('#l-email').focus(); return; }
+  try { const fb = await loadFirebase(); await fb.authM.sendPasswordResetEmail(fb.auth, email); gateMsg('If ' + email + ' is an admin account, a reset link is on its way. Check your inbox.'); }
+  catch (err) { gateMsg(AUTH_MSG[err.code] || 'Could not send the reset email: ' + (err.message || err)); }
+});
+// Optional settings file on the site (e.g. public/admin-config.json) so admin emails can change without editing this page:
+// { "adminEmails": ["you@gmail.com"], "sheetsReaderUrl": "https://script.google.com/macros/s/…/exec" }
+fetch('/admin-config.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(cfg => {
+  if (cfg && typeof cfg === 'object') ['adminEmails', 'sheetsReaderUrl', 'aiWriterUrl', 'whatsapp'].forEach(k => { if (cfg[k] !== undefined && cfg[k] !== '' && !(Array.isArray(cfg[k]) && !cfg[k].length)) CONFIG[k] = cfg[k]; });
+}).finally(startLive);
+</script>
+</body>
+</html>
