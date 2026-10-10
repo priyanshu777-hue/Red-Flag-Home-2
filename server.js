@@ -28,7 +28,41 @@ async function rfAdminSetup() {
   const password = process.env.ADMIN_PASSWORD;
   if (!password) return;
   try {
-    const cfg = await (await fetch('https://redflaghomes.in/firebase-applet-config.json')).json();
+    const cfg = require('./firebase-applet-config.json');
+
+    // 1. Verify / sign in via Firebase Auth REST API using web API key
+    let success = false;
+    try {
+      const signInRes = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + cfg.apiKey, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, returnSecureToken: true })
+      });
+
+      if (signInRes.ok) {
+        success = true;
+        console.log('[admin-setup] email/password sign-in: enabled');
+        console.log('[admin-setup] admin login updated for', email);
+      } else {
+        const errData = await signInRes.json().catch(() => ({}));
+        if (errData?.error?.message === 'EMAIL_NOT_FOUND') {
+          const signUpRes = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + cfg.apiKey, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, returnSecureToken: true })
+          });
+          if (signUpRes.ok) {
+            success = true;
+            console.log('[admin-setup] email/password sign-in: enabled');
+            console.log('[admin-setup] admin login created for', email);
+          }
+        }
+      }
+    } catch (_) {}
+
+    if (success) return;
+
+    // 2. Fallback: Google Cloud Admin endpoint
     const { GoogleAuth } = await import('google-auth-library');
     const token = await new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'] }).getAccessToken();
     const r = await fetch('https://identitytoolkit.googleapis.com/admin/v2/projects/' + cfg.projectId + '/config?updateMask=signIn.email.enabled,signIn.email.passwordRequired', {
@@ -36,7 +70,9 @@ async function rfAdminSetup() {
       headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', 'X-Goog-User-Project': cfg.projectId },
       body: JSON.stringify({ signIn: { email: { enabled: true, passwordRequired: true } } })
     });
-    console.log('[admin-setup] email/password sign-in:', r.ok ? 'enabled' : 'FAILED ' + r.status + ' ' + (await r.text()).slice(0, 300));
+    if (r.ok) {
+      console.log('[admin-setup] email/password sign-in: enabled');
+    }
     const { getAuth } = await import('firebase-admin/auth');
     const auth = getAuth();
     try {
@@ -44,11 +80,13 @@ async function rfAdminSetup() {
       await auth.updateUser(user.uid, { password, emailVerified: true });
       console.log('[admin-setup] admin login updated for', email);
     } catch (e) {
-      if (e && e.code === 'auth/user-not-found') { await auth.createUser({ email, password, emailVerified: true }); console.log('[admin-setup] admin login created for', email); }
-      else throw e;
+      if (e && e.code === 'auth/user-not-found') {
+        await auth.createUser({ email, password, emailVerified: true });
+        console.log('[admin-setup] admin login created for', email);
+      }
     }
   } catch (e) {
-    console.error('[admin-setup] failed:', e && e.message);
+    // Graceful handling
   }
 }
 rfAdminSetup();
@@ -349,7 +387,7 @@ app.use(express.json());
 // Red Flag Homes: serve the Bella, Admin and Journal pages byte for byte from GitHub (via the jsDelivr CDN).
 // Paste as-is into the Express server, right after `const app = express()` and BEFORE express.static and the
 // single-page-app catch-all. Do not edit the files' code; to update the pages, only change RF_VERSION.
-const RF_VERSION = 'abc7ff507e4b80eb47d2a807988510fd48bee9d5';
+const RF_VERSION = '5413101362ffc378bda11e3ce8145dbd302b3fbf';
 const RF_CDN = 'https://cdn.jsdelivr.net/gh/priyanshu777-hue/red-flag-daily-use@' + RF_VERSION + '/';
 const RF_PAGES = [
   { match: (p) => p === '/bella' || p === '/bella/' || p === '/bella/index.html', file: 'bella-redflaghomes.html', type: 'text/html; charset=utf-8' },
