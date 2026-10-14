@@ -1,5 +1,5 @@
 // Red Flag Homes Service Worker - Offline Core Cache
-const CACHE_NAME = 'rf-core-v2';
+const CACHE_NAME = 'rf-core-v3';
 
 // Core assets to pre-cache on install
 const CORE_ASSETS = [
@@ -86,8 +86,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Do not intercept AI or dynamic POST API endpoints, or Firebase system paths
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/__/')) {
+  // Do not intercept AI or dynamic POST API endpoints, config files, or Firebase system paths
+  if (
+    url.pathname.startsWith('/api/') || 
+    url.pathname.startsWith('/__/') ||
+    url.pathname === '/firebase-applet-config.json' ||
+    url.pathname === '/admin-config.json'
+  ) {
     return;
   }
 
@@ -177,6 +182,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const isScriptReq = req.destination === 'script' || url.pathname.endsWith('.js') || url.pathname.endsWith('.mjs');
+
   // Fonts & CDN static assets: Cache-first with network fallback
   if (
     url.hostname.includes('fonts.googleapis.com') ||
@@ -185,34 +192,58 @@ self.addEventListener('fetch', (event) => {
     req.destination === 'font' ||
     req.destination === 'image' ||
     req.destination === 'style' ||
-    req.destination === 'script' ||
+    isScriptReq ||
     req.destination === 'video'
   ) {
     event.respondWith(
       caches.match(req).then((cached) => {
         if (cached) {
-          // If cached, return it and opportunistically revalidate in background
-          fetch(req).then((res) => {
-            if (res && res.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(req, res));
-            }
-          }).catch(() => { /* silent offline ignore */ });
-          return cached;
+          const cachedType = cached.headers.get('content-type') || '';
+          // If requesting a script, ensure cached response is never HTML
+          if (isScriptReq && cachedType.includes('text/html')) {
+            caches.open(CACHE_NAME).then((cache) => cache.delete(req));
+          } else {
+            fetch(req).then((res) => {
+              if (res && res.status === 200) {
+                const resType = res.headers.get('content-type') || '';
+                if (!(isScriptReq && resType.includes('text/html'))) {
+                  caches.open(CACHE_NAME).then((cache) => cache.put(req, res));
+                }
+              }
+            }).catch(() => { /* silent offline ignore */ });
+            return cached;
+          }
         }
 
         return fetch(req)
           .then((networkResponse) => {
             if (networkResponse && (networkResponse.status === 200 || networkResponse.status === 0)) {
-              const clone = networkResponse.clone();
-              caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+              const resType = networkResponse.headers.get('content-type') || '';
+              if (!(isScriptReq && resType.includes('text/html'))) {
+                const clone = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+              }
             }
             return networkResponse;
           })
           .catch(async () => {
-            // Check if full URL or pathname is in cache
+            if (isScriptReq) {
+              return new Response('/* offline script placeholder */', {
+                status: 200,
+                headers: { 'Content-Type': 'application/javascript; charset=utf-8' }
+              });
+            }
             const fallback = await caches.match(url.pathname);
-            if (fallback) return fallback;
-            // Return empty response for non-critical assets when completely offline
+            if (fallback) {
+              const fbType = fallback.headers.get('content-type') || '';
+              if (isScriptReq && fbType.includes('text/html')) {
+                return new Response('/* offline script placeholder */', {
+                  status: 200,
+                  headers: { 'Content-Type': 'application/javascript; charset=utf-8' }
+                });
+              }
+              return fallback;
+            }
             return new Response('', { status: 408, statusText: 'Request timed out / offline' });
           });
       })
@@ -223,16 +254,32 @@ self.addEventListener('fetch', (event) => {
   // Default Stale-While-Revalidate for same-origin resources
   event.respondWith(
     caches.match(req).then((cached) => {
+      if (cached && isScriptReq) {
+        const cType = cached.headers.get('content-type') || '';
+        if (cType.includes('text/html')) {
+          cached = null;
+        }
+      }
+
       const fetchPromise = fetch(req)
         .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
-            const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+            const resType = networkResponse.headers.get('content-type') || '';
+            if (!(isScriptReq && resType.includes('text/html'))) {
+              const clone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+            }
           }
           return networkResponse;
         })
         .catch(() => {
           if (cached) return cached;
+          if (isScriptReq) {
+            return new Response('/* offline script placeholder */', {
+              status: 200,
+              headers: { 'Content-Type': 'application/javascript; charset=utf-8' }
+            });
+          }
           return new Response('', { status: 504, statusText: 'Gateway Timeout / Offline' });
         });
 

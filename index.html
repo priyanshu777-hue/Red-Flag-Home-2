@@ -3525,6 +3525,13 @@
       width: 38px;
     }
 
+    .reviews-nav-dot.is-active,
+    .reviews-nav-dot[aria-current="true"] {
+      background: var(--raw-color-signal-red, #E5231B);
+      width: 44px;
+      box-shadow: 0 0 12px rgba(229, 35, 27, 0.45);
+    }
+
     @media (max-width: 900px) {
       .review-card {
         flex: 0 0 calc(50% - 1rem);
@@ -4856,6 +4863,170 @@
     </div>
   </div>
 </section>
+
+<script>
+(function initTestimonialsCarousel() {
+  const track = document.getElementById('reviewsTrack');
+  const wrapper = document.querySelector('.reviews-carousel-wrapper');
+  if (!track || !wrapper) return;
+
+  const cards = Array.from(track.querySelectorAll('.review-card'));
+  const dots = Array.from(wrapper.querySelectorAll('.reviews-nav-dot'));
+  if (cards.length <= 1) return;
+
+  const INTERVAL = 5000; // 5-second auto-play interval
+  let currentIndex = 0;
+  let timer = null;
+  let isHovered = false;
+  let isTouching = false;
+  let isInView = true;
+
+  // Check prefers-reduced-motion
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function updateDots(index) {
+    dots.forEach((dot, idx) => {
+      const active = idx === index;
+      dot.classList.toggle('is-active', active);
+      if (active) {
+        dot.setAttribute('aria-current', 'true');
+      } else {
+        dot.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  function getCardScrollPosition(index) {
+    if (index <= 0) return 0;
+    const card = cards[index];
+    if (!card) return 0;
+    
+    // Exact horizontal offset inside track
+    const trackPaddingLeft = parseFloat(window.getComputedStyle(track).paddingLeft) || 0;
+    const cardRect = card.getBoundingClientRect();
+    const trackRect = track.getBoundingClientRect();
+    return cardRect.left - trackRect.left + track.scrollLeft - trackPaddingLeft;
+  }
+
+  function scrollToCard(index, immediate = false) {
+    if (index < 0 || index >= cards.length) return;
+    currentIndex = index;
+    updateDots(currentIndex);
+
+    const targetLeft = getCardScrollPosition(currentIndex);
+    track.scrollTo({
+      left: targetLeft,
+      behavior: immediate || prefersReducedMotion ? 'auto' : 'smooth'
+    });
+  }
+
+  function nextSlide() {
+    const nextIndex = (currentIndex + 1) % cards.length;
+    scrollToCard(nextIndex);
+  }
+
+  function startAutoPlay() {
+    stopAutoPlay();
+    if (prefersReducedMotion) return;
+    if (isHovered || isTouching || !isInView) return;
+    timer = setInterval(nextSlide, INTERVAL);
+  }
+
+  function stopAutoPlay() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  // Pause-on-hover interaction
+  wrapper.addEventListener('mouseenter', () => {
+    isHovered = true;
+    stopAutoPlay();
+  });
+
+  wrapper.addEventListener('mouseleave', () => {
+    isHovered = false;
+    startAutoPlay();
+  });
+
+  // Pause on keyboard focus for accessibility
+  wrapper.addEventListener('focusin', () => {
+    isHovered = true;
+    stopAutoPlay();
+  });
+
+  wrapper.addEventListener('focusout', () => {
+    isHovered = false;
+    startAutoPlay();
+  });
+
+  // Pause on touch gestures
+  track.addEventListener('touchstart', () => {
+    isTouching = true;
+    stopAutoPlay();
+  }, { passive: true });
+
+  track.addEventListener('touchend', () => {
+    isTouching = false;
+    startAutoPlay();
+  }, { passive: true });
+
+  // Sync active indicator dot during manual user scroll/swipe
+  let scrollTimeout = null;
+  track.addEventListener('scroll', () => {
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const trackPaddingLeft = parseFloat(window.getComputedStyle(track).paddingLeft) || 0;
+      const trackLeft = track.getBoundingClientRect().left + trackPaddingLeft;
+      
+      let closestIdx = 0;
+      let minDiff = Infinity;
+      cards.forEach((c, idx) => {
+        const diff = Math.abs(c.getBoundingClientRect().left - trackLeft);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIdx = idx;
+        }
+      });
+      if (closestIdx !== currentIndex) {
+        currentIndex = closestIdx;
+        updateDots(currentIndex);
+      }
+    }, 60);
+  }, { passive: true });
+
+  // Nav indicator dot clicks
+  dots.forEach((dot, idx) => {
+    dot.addEventListener('click', (e) => {
+      e.preventDefault();
+      scrollToCard(idx);
+      startAutoPlay();
+    });
+  });
+
+  // Pause when off-screen via IntersectionObserver
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        isInView = entry.isIntersecting;
+        if (isInView) {
+          startAutoPlay();
+        } else {
+          stopAutoPlay();
+        }
+      });
+    }, { threshold: 0.15 });
+
+    observer.observe(wrapper);
+  } else {
+    startAutoPlay();
+  }
+
+  // Initial active state
+  updateDots(0);
+})();
+</script>
 
 <section id="contact" class="section-container">
   <div class="contact-container">

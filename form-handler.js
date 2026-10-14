@@ -25,6 +25,8 @@
       rf_market: rfMarket
     });
 
+    try { if (navigator.sendBeacon) navigator.sendBeacon('/api/leads', new Blob([JSON.stringify(payload)], { type: 'text/plain;charset=UTF-8' })); } catch (e) {}
+
     var controller = new AbortController();
     var timeoutId = setTimeout(function () {
       controller.abort();

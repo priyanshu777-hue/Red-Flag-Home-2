@@ -22,6 +22,10 @@ service cloud.firestore {
     match /posts/{id}         { allow read: if resource.data.status == 'published' || isRfAdmin();
                                 allow create, update, delete: if isRfAdmin(); }
     match /bellaPayments/{id} { allow read, update: if isRfAdmin(); }
+    match /leads/{id} { 
+      allow read, create: if true;
+      allow update, delete: if isRfAdmin();
+    }
 
     // User profile documents
     match /users/{userId} {
