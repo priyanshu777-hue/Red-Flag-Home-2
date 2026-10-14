@@ -549,10 +549,14 @@
     .field-group { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
     .field-group label { font-size: 0.85rem; font-family: var(--typeface-ui); color: var(--foreground-accent); text-transform: uppercase; letter-spacing: 0.05em; }
     
-    .book-input { width: 100%; height: 52px; min-height: 52px; background: transparent; border: 1px solid var(--foreground-accent-muted); color: var(--foreground); padding: 0 1rem; border-radius: 6px; font-family: var(--typeface-ui); font-size: 1rem; outline: none; transition: border-color 0.2s ease; box-sizing: border-box; }
+    .book-input { width: 100%; height: 52px; min-height: 52px; background: transparent; border: 1px solid var(--foreground-accent-muted); color: var(--foreground); padding: 0 1rem; border-radius: 6px; font-family: var(--typeface-ui); font-size: 1rem; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; }
     .book-input[type="date"] { position: relative; }
     .book-input[type="date"]::-webkit-calendar-picker-indicator { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
     .book-input:focus { border-color: var(--foreground); }
+    #booking-form .book-input:focus {
+      border-color: var(--raw-color-signal-red);
+      box-shadow: 0 0 0 3px rgba(163, 22, 33, 0.35);
+    }
     .book-input option { background: var(--background); color: var(--foreground); }
     
     .book-submit-btn { width: 100%; height: 56px; padding: 0 2.5rem; background: var(--raw-color-velvet-700); color: var(--foreground); font-family: var(--typeface-ui); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; border: none; border-radius: 999px; cursor: pointer; transition: background 0.2s ease, opacity 0.2s ease; display: flex; justify-content: center; align-items: center; }
@@ -4192,7 +4196,8 @@
         <a href="#journal" class="rf-menu-overlay-link" style="--stagger-i: 2">Explore</a>
         <a href="#contact" class="rf-menu-overlay-link" style="--stagger-i: 3">Contact</a>
         <a href="/bella/" class="rf-menu-overlay-link" style="--stagger-i: 4">Bella</a>
-        <button type="button" class="rf-menu-overlay-link pwa-install-trigger" style="--stagger-i: 5; text-align: left;">Install App</button>
+        <a href="#profile" id="rf-menu-profile-link" class="rf-menu-overlay-link" style="--stagger-i: 5; display: none;">My Profile</a>
+        <button type="button" class="rf-menu-overlay-link pwa-install-trigger" style="--stagger-i: 6; text-align: left;">Install App</button>
       </nav>
     </div>
   </div>
@@ -5543,16 +5548,31 @@
     // Set min dates
     const today = new Date().toISOString().split('T')[0];
     if (bookCheckin) bookCheckin.min = today;
+    if (bookCheckout) bookCheckout.min = today;
+
+    function addDays(dateStr, days) {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return '';
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split('T')[0];
+    }
+
+    function updateCheckoutMin() {
+      if (!bookCheckin || !bookCheckout) return;
+      if (bookCheckin.value) {
+        const minCheckout = addDays(bookCheckin.value, 1);
+        bookCheckout.min = minCheckout;
+        if (bookCheckout.value && bookCheckout.value < minCheckout) {
+          bookCheckout.value = '';
+        }
+      } else {
+        bookCheckout.min = today;
+      }
+    }
     
     if (bookCheckin) {
-      bookCheckin.addEventListener('change', () => {
-        if (bookCheckout) {
-          bookCheckout.min = bookCheckin.value;
-          if (bookCheckout.value && bookCheckout.value <= bookCheckin.value) {
-            bookCheckout.value = '';
-          }
-        }
-      });
+      bookCheckin.addEventListener('change', updateCheckoutMin);
+      updateCheckoutMin();
     }
 
     bookSubmitBtn.addEventListener('click', () => {
@@ -5564,6 +5584,18 @@
           window.showToast({
             title: 'Dates Required',
             message: 'Please select both check-in and check-out dates to check availability.',
+            type: 'warning',
+            duration: 3000
+          });
+        }
+        return;
+      }
+
+      if (checkout <= checkin) {
+        if (typeof window.showToast === 'function') {
+          window.showToast({
+            title: 'Invalid Dates',
+            message: 'Check-out date must be at least one day after the check-in date.',
             type: 'warning',
             duration: 3000
           });
@@ -6854,8 +6886,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Pre-fill contact details if signed in
   const contactName = document.getElementById('contact-name');
   const contactEmail = document.getElementById('contact-email');
+  const profileLink = document.getElementById('rf-menu-profile-link');
 
   onUserChange((user) => {
+    if (profileLink) {
+      profileLink.style.display = user ? 'block' : 'none';
+    }
     if (user) {
       if (contactName && !contactName.value && user.displayName) {
         contactName.value = user.displayName;
