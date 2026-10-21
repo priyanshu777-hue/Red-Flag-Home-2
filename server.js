@@ -404,6 +404,10 @@ const RF_PAGES = [
 ];
 const rfCache = new Map();
 async function rfFile(file) {
+  const localPath = path.join(__dirname, file);
+  if (fs.existsSync(localPath)) {
+    return fs.readFileSync(localPath, 'utf8');
+  }
   const hit = rfCache.get(file);
   if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit.body;
   try {
