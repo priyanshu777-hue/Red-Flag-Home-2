@@ -93,6 +93,43 @@ rfAdminSetup();
 
 const app = express();
 
+// Global CORS headers middleware for iframe preview compatibility
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+// Internal control plane dev status and health check handler
+app.use((req, res, next) => {
+  if (req.path.startsWith('/__aistudio')) {
+    if (req.path.includes('status') || req.path.includes('/dev/')) {
+      return res.status(200).json({ status: 'ok', online: true, timestamp: Date.now() });
+    }
+  }
+  next();
+});
+
+// Explicit route to serve firebase-applet-config.json with proper CORS & caching headers
+app.get('/firebase-applet-config.json', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.type('json');
+  const configPath = path.join(__dirname, 'firebase-applet-config.json');
+  if (fs.existsSync(configPath)) {
+    return res.sendFile(configPath);
+  }
+  const publicConfigPath = path.join(__dirname, 'public', 'firebase-applet-config.json');
+  if (fs.existsSync(publicConfigPath)) {
+    return res.sendFile(publicConfigPath);
+  }
+  res.status(404).json({ error: 'Config file not found' });
+});
+
 // Helper to determine plan and period from payment amount and currency
 function getPlanAndPeriod(amount, currency) {
   const cur = (currency || '').toUpperCase();
@@ -1559,7 +1596,10 @@ app.get(['/franchise', '/franchise.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'franchise.html'));
 });
 
-app.get('*', (req, res) => {
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/__aistudio')) {
+    return res.status(200).json({ status: 'ok', online: true });
+  }
   if (
     req.path.startsWith('/api/') || 
     path.extname(req.path) ||

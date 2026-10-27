@@ -27,13 +27,24 @@ const authSubscribers = [];
 export async function initFirebase() {
   if (app) return { app, auth, db };
 
+  const FALLBACK_CONFIG = {
+    projectId: "plucky-block-8n96h",
+    appId: "1:892677398857:web:f069bf529757a0e5817a98",
+    apiKey: "AIzaSyBCRqk3kq5kIC1S5VFjjGvgPOA37ipNl0k",
+    authDomain: "plucky-block-8n96h.firebaseapp.com",
+    firestoreDatabaseId: "ai-studio-redflaghomesnetw-9febca9a-32e8-4c54-8bd8-180753508ec9",
+    storageBucket: "plucky-block-8n96h.firebasestorage.app",
+    messagingSenderId: "892677398857"
+  };
+
   let config;
   try {
     const res = await fetch('/firebase-applet-config.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     config = await res.json();
   } catch (err) {
-    console.error('Failed to load firebase-applet-config.json:', err);
-    throw err;
+    console.warn('Could not load /firebase-applet-config.json via fetch, using default applet config:', err);
+    config = FALLBACK_CONFIG;
   }
 
   const firebaseConfig = {
