@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <style>
   /* Red Flag Homes admin. Dark by default to match redflaghomes.in; a light theme follows the system or the toggle. */
   :root {
@@ -377,6 +378,7 @@
       <a href="#/bella" data-view="bella"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>Bella payments<span class="count" id="c-bella" hidden></span></a>
       <a href="#/journal" data-view="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Journal</a>
       <a href="#/leads" data-view="leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg>Form leads</a>
+      <a href="#/free-audit" data-view="free-audit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Free Audit Leads<span class="count" id="c-free-audit" hidden></span></a>
       <a href="#/users" data-view="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg>Users</a>
       <a href="#/health" data-view="health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Site health</a>
       <a href="#/setup" data-view="setup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Setup</a>
@@ -448,10 +450,10 @@ function pill(kind, status) { const t = tone(kind, status); return `<span class=
 
 const S = {
   mode: 'none', user: null, fb: null,
-  data: { applications: [], inquiries: [], users: [], posts: [], bellaPayments: [] },
-  loaded: { applications: false, inquiries: false, users: false, posts: false, bellaPayments: false },
+  data: { applications: [], inquiries: [], users: [], posts: [], bellaPayments: [], free_audit_visitors: [], free_audit_events: [] },
+  loaded: { applications: false, inquiries: false, users: false, posts: false, bellaPayments: false, free_audit_visitors: false, free_audit_events: false },
   errors: {}, leads: null, leadsErr: '', health: null,
-  ui: { applications: { q: '', status: 'all', sort: 'createdAt', dir: -1 }, inquiries: { q: '', status: 'all', sort: 'createdAt', dir: -1 }, users: { q: '', sort: 'lastLoginAt', dir: -1 }, leads: { q: '', tab: 0 }, bella: { q: '', status: 'all' }, journal: { status: 'all', q: '', tab: 'stories', hmStory: 'all', hmMetric: 'all', hmRange: '30' } }
+  ui: { applications: { q: '', status: 'all', sort: 'createdAt', dir: -1 }, inquiries: { q: '', status: 'all', sort: 'createdAt', dir: -1 }, users: { q: '', sort: 'lastLoginAt', dir: -1 }, leads: { q: '', tab: 0 }, bella: { q: '', status: 'all' }, journal: { status: 'all', q: '', tab: 'stories', hmStory: 'all', hmMetric: 'all', hmRange: '30' }, 'free-audit': { q: '', status: 'all', admin_status: 'all', property_type: 'all', pdf: 'all', contact: 'all' } }
 };
 
 /* ---------------- time helpers ---------------- */
@@ -501,15 +503,16 @@ async function startLive() {
 }
 function subscribe() {
   const { fsM, db } = S.fb;
-  ['applications', 'inquiries', 'users', 'posts', 'bellaPayments'].forEach(name => {
+  ['applications', 'inquiries', 'users', 'posts', 'bellaPayments', 'free_audit_visitors', 'free_audit_events'].forEach(name => {
     let first = true;
     fsM.onSnapshot(fsM.collection(db, name), snap => {
       if (!first && name === 'bellaPayments') snap.docChanges().forEach(ch => { const d = ch.doc.data(); if (ch.type === 'added' && d.status === 'failed') toast('Bella payment failed', (d.name || d.email || 'A customer') + ' · ' + money(d.amount, d.currency) + (d.reason ? ' · ' + d.reason : '')); });
       if (!first && (name === 'applications' || name === 'inquiries')) snap.docChanges().forEach(ch => { if (ch.type === 'added') { const d = ch.doc.data(); toast(name === 'applications' ? 'New franchise application' : 'New booking inquiry', (d.userName || 'Someone') + (d.city || d.destination ? ' · ' + (d.city || d.destination) : '')); } });
+      if (!first && name === 'free_audit_visitors') snap.docChanges().forEach(ch => { if (ch.type === 'added') { const d = ch.doc.data(); toast('New Free Audit Lead', (d.name || d.property_city || 'Visitor') + (d.redflag_revenue ? ' · Yield: ' + (d.currency || '₹') + d.redflag_revenue : '')); } });
       first = false;
       S.data[name] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       S.loaded[name] = true; delete S.errors[name]; render();
-    }, err => { if (name === 'posts' || name === 'bellaPayments') { S.errors[name] = err.code === 'permission-denied' ? 'Add the Journal and Bella payment rules from the Setup page.' : (err.message || String(err)); S.loaded[name] = true; render(); return; } S.errors[name] = err.code === 'permission-denied' ? 'Firestore rules block admin access. Add the admin rules from the Setup page.' : (err.message || String(err)); S.loaded[name] = true; render(); });
+    }, err => { if (name === 'posts' || name === 'bellaPayments' || name === 'free_audit_visitors' || name === 'free_audit_events') { S.errors[name] = err.code === 'permission-denied' ? 'Add the Free Audit rules from the Setup page.' : (err.message || String(err)); S.loaded[name] = true; render(); return; } S.errors[name] = err.code === 'permission-denied' ? 'Firestore rules block admin access. Add the admin rules from the Setup page.' : (err.message || String(err)); S.loaded[name] = true; render(); });
   });
 }
 async function saveDoc(kind, id, patch) {
@@ -570,13 +573,31 @@ function demoData() {
   });
   // two customers who failed and then paid: shown as recovered
   pays.push({ ...pays[1], id: 'b90', status: 'paid', reason: '', paymentId: 'pay_rec1', createdAt: new Date(ts(pays[1].createdAt) + 3600000).toISOString() });
-  return { apps, inqs, users, leads, posts, pays };
+
+  const faVisitors = [
+    { id: 'v_fa1', visitor_uuid: 'v_fa1', session_id: 's_fa1', created_at: at(1 * day), updated_at: at(1 * day), first_seen_at: at(1 * day), last_seen_at: at(1 * day), ip_hash: 'a1b2c3d4e5f67890', device_type: 'desktop', browser: 'Chrome 122', os: 'macOS', screen_width: 1440, screen_height: 900, language: 'en-US', country: 'India', region: 'Karnataka', city: 'Bengaluru', property_country: 'India', property_city: 'Bengaluru', property_locality: 'Koramangala 4th Block, Bengaluru', property_type: 'Apartment', bedrooms: '2 Bedrooms', bathrooms: '2 Bathrooms', max_guests: '4 Guests', furnishing_status: 'Fully Furnished', property_condition: 'Good condition', already_listed: 'No', photo_quality: 'Good phone photos', conservative_revenue: 45000, expected_revenue: 62000, upside_revenue: 85000, redflag_revenue: 72000, uplift_amount: 10000, uplift_percentage: 16, confidence_score: 'High', currency: '₹', audit_status: 'completed', name: 'Ananya Sharma', email: 'ananya.s@gmail.com', phone: '+91 98123 45678', pdf_downloaded: true, contact_requested: true, whatsapp_clicked: true, utm_source: 'instagram', utm_medium: 'cpc', utm_campaign: 'bengaluru_bnb_audit', gclid: 'gclid_8823419', admin_status: 'new', assigned_to: 'Priyanshu', admin_notes: 'High potential property in Koramangala. Interested in full management.' },
+    { id: 'v_fa2', visitor_uuid: 'v_fa2', session_id: 's_fa2', created_at: at(2 * day), updated_at: at(2 * day), first_seen_at: at(2 * day), last_seen_at: at(2 * day), ip_hash: 'f9e8d7c6b5a43210', device_type: 'mobile', browser: 'Safari Mobile', os: 'iOS 18', screen_width: 390, screen_height: 844, language: 'en-IN', country: 'India', region: 'Goa', city: 'Anjuna', property_country: 'India', property_city: 'Anjuna', property_locality: 'Anjuna Beach Road, Goa', property_type: 'Villa', bedrooms: '3 Bedrooms', bathrooms: '3 Bathrooms', max_guests: '8 Guests', furnishing_status: 'Luxury Furnished', property_condition: 'Excellent', already_listed: 'Yes', photo_quality: 'Professional photos', conservative_revenue: 120000, expected_revenue: 180000, upside_revenue: 250000, redflag_revenue: 215000, uplift_amount: 35000, uplift_percentage: 19, confidence_score: 'High', currency: '₹', audit_status: 'completed', name: 'Rohan Kapoor', email: 'rohan.k@gmail.com', phone: '+91 98765 12345', pdf_downloaded: true, contact_requested: true, whatsapp_clicked: true, utm_source: 'google', utm_medium: 'search', utm_campaign: 'goa_villas_2026', gclid: 'gclid_9981234', admin_status: 'contacted', assigned_to: 'Red Flag Sales', admin_notes: 'Spoke on phone. Sent Outpost proposal.' },
+    { id: 'v_fa3', visitor_uuid: 'v_fa3', session_id: 's_fa3', created_at: at(3 * day), updated_at: at(3 * day), first_seen_at: at(3 * day), last_seen_at: at(3 * day), ip_hash: '1234567890abcdef', device_type: 'desktop', browser: 'Firefox', os: 'Windows 11', screen_width: 1920, screen_height: 1080, language: 'en-US', country: 'United States', region: 'California', city: 'Los Angeles', property_country: 'United States', property_city: 'Los Angeles', property_locality: 'Venice Beach, CA', property_type: 'Apartment', bedrooms: '1 Bedroom', bathrooms: '1 Bathroom', max_guests: '2 Guests', furnishing_status: 'Fully Furnished', property_condition: 'Good condition', already_listed: 'No', photo_quality: 'Basic photos', conservative_revenue: 2800, expected_revenue: 3800, upside_revenue: 5200, redflag_revenue: 4450, uplift_amount: 650, uplift_percentage: 17, confidence_score: 'High', currency: '$', audit_status: 'completed', name: 'James Carter', email: 'jcarter@gmail.com', phone: '+1 310 555 0199', pdf_downloaded: true, contact_requested: false, whatsapp_clicked: false, utm_source: 'facebook', utm_medium: 'paid_social', utm_campaign: 'us_hosts_audit', fbclid: 'fb_887123', admin_status: 'follow_up', assigned_to: 'Global Sales', admin_notes: 'Downloaded PDF. Follow up via email.' },
+    { id: 'v_fa4', visitor_uuid: 'v_fa4', session_id: 's_fa4', created_at: at(4 * day), updated_at: at(4 * day), first_seen_at: at(4 * day), last_seen_at: at(4 * day), ip_hash: 'ababcdcd12123434', device_type: 'mobile', browser: 'Chrome Mobile', os: 'Android 15', screen_width: 412, screen_height: 915, language: 'en-IN', country: 'India', region: 'Uttarakhand', city: 'Rishikesh', property_country: 'India', property_city: 'Rishikesh', property_locality: 'Tapovan, Rishikesh', property_type: 'Homestay', bedrooms: '2 Bedrooms', bathrooms: '2 Bathrooms', max_guests: '5 Guests', furnishing_status: 'Semi Furnished', property_condition: 'Fair', already_listed: 'No', audit_status: 'abandoned', current_step: 3, completed_step: 2, utm_source: 'instagram', utm_medium: 'bio_link', utm_campaign: 'rishikesh_outpost', admin_status: 'new' }
+  ];
+
+  const faEvents = [
+    { id: 'e1', visitor_uuid: 'v_fa1', event_name: 'freeaudit_page_viewed', created_at: at(1 * day + 600000) },
+    { id: 'e2', visitor_uuid: 'v_fa1', event_name: 'audit_started', created_at: at(1 * day + 500000) },
+    { id: 'e3', visitor_uuid: 'v_fa1', event_name: 'location_selected', event_data_json: '{"city":"Bengaluru","locality":"Koramangala"}', created_at: at(1 * day + 400000) },
+    { id: 'e4', visitor_uuid: 'v_fa1', event_name: 'audit_step_completed', event_data_json: '{"step":2}', created_at: at(1 * day + 300000) },
+    { id: 'e5', visitor_uuid: 'v_fa1', event_name: 'estimate_generated', created_at: at(1 * day + 200000) },
+    { id: 'e6', visitor_uuid: 'v_fa1', event_name: 'pdf_downloaded', created_at: at(1 * day + 100000) },
+    { id: 'e7', visitor_uuid: 'v_fa1', event_name: 'contact_form_submitted', created_at: at(1 * day) }
+  ];
+
+  return { apps, inqs, users, leads, posts, pays, faVisitors, faEvents };
 }
 function startDemo() {
   const d = demoData();
   S.mode = 'demo'; S.user = { name: 'Demo admin', email: 'admin@redflaghomes.in' };
-  S.data = { applications: d.apps, inquiries: d.inqs, users: d.users, posts: d.posts, bellaPayments: d.pays };
-  S.loaded = { applications: true, inquiries: true, users: true, posts: true, bellaPayments: true }; S.leads = d.leads;
+  S.data = { applications: d.apps, inquiries: d.inqs, users: d.users, posts: d.posts, bellaPayments: d.pays, free_audit_visitors: d.faVisitors, free_audit_events: d.faEvents };
+  S.loaded = { applications: true, inquiries: true, users: true, posts: true, bellaPayments: true, free_audit_visitors: true, free_audit_events: true }; S.leads = d.leads;
   enterApp();
 }
 
@@ -594,15 +615,20 @@ function newCount(kind) { const seen = +(store(seenKey(kind)) || 0); return S.da
 function counts() {
   { const n = payRows().filter(x => x.view === 'Failed' && !['Contacted', 'Recovered', 'Lost'].includes(x.followUp)).length; const el = $('#c-bella'); el.hidden = !n; el.textContent = n; el.setAttribute('aria-label', n + ' failed payments to follow up'); }
   ['applications', 'inquiries'].forEach(k => { const n = S.data[k].filter(x => OPEN[k].includes(x.status)).length; const el = $('#c-' + k); el.hidden = !n; el.textContent = n; el.setAttribute('aria-label', n + ' waiting'); });
+  if (S.data.free_audit_visitors) {
+    const n = S.data.free_audit_visitors.filter(x => (x.admin_status || 'new') === 'new').length;
+    const el = $('#c-free-audit');
+    if (el) { el.hidden = !n; el.textContent = n; el.setAttribute('aria-label', n + ' new free audit leads'); }
+  }
 }
-function view() { return (location.hash.match(/^#\/(\w+)/) || [, 'overview'])[1]; }
+function view() { return (location.hash.match(/^#\/([\w-]+)/) || [, 'overview'])[1]; }
 function render() {
   if ($('#app').hidden) return;
   const v = view();
   $$('.nav a').forEach(a => { if (a.dataset.view === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   counts();
   const keep = document.activeElement && document.activeElement.id; const pos = keep && document.activeElement.selectionStart;
-  ({ overview, applications: () => records('applications'), inquiries: () => records('inquiries'), users, leads, health, setup, bella, journal }[v] || overview)();
+  ({ overview, applications: () => records('applications'), inquiries: () => records('inquiries'), users, leads, health, setup, bella, journal, 'free-audit': freeAuditLeads, freeaudit: freeAuditLeads }[v] || overview)();
   if (keep && $('#' + keep)) { const el = $('#' + keep); el.focus(); if (pos != null && el.setSelectionRange) try { el.setSelectionRange(pos, pos); } catch (e) {} }
 }
 let lastHash = location.hash;
@@ -947,6 +973,800 @@ function bella() {
   $$('[data-pst]').forEach(b => b.addEventListener('click', () => { u.status = b.dataset.pst; render(); }));
   $('#csv').addEventListener('click', () => csv('bella-payments-' + new Date().toISOString().slice(0, 10) + '.csv', list.map(x => ({ ...x, planText: planLabel(x) })), [['createdAt', 'When'], ['name', 'Name'], ['email', 'Email'], ['phone', 'Phone'], ['planText', 'Plan'], ['currency', 'Currency'], ['amount', 'Amount'], ['gateway', 'Gateway'], ['view', 'Status'], ['reason', 'Reason'], ['followUp', 'Follow-up'], ['paymentId', 'Payment ID'], ['adminNotes', 'Notes']]));
   bindPayOpeners();
+}
+
+/* ===================== Free Audit Leads ===================== */
+function freeAuditPill(st) {
+  const t = { completed: 'good', started: 'info', in_progress: 'info', abandoned: 'warn', new: 'good', contacted: 'info', qualified: 'good', follow_up: 'warn', won: 'good', lost: 'bad' }[st] || 'info';
+  return `<span class="pill ${t}">${esc(st || 'new')}</span>`;
+}
+
+function freeAuditLeads() {
+  const u = S.ui['free-audit'] || { q: '', status: 'all', admin_status: 'all', property_type: 'all', pdf: 'all', contact: 'all', viewTab: 'trends', faRange: '14' };
+  S.ui['free-audit'] = u;
+  const visitors = S.data.free_audit_visitors || [];
+  const events = S.data.free_audit_events || [];
+
+  const q = (u.q || '').trim().toLowerCase();
+
+  const totalVisitors = visitors.length;
+  const started = visitors.filter(x => x.audit_status === 'started' || x.audit_status === 'in_progress' || x.audit_status === 'completed' || x.audit_status === 'abandoned').length;
+  const completed = visitors.filter(x => x.audit_status === 'completed').length;
+  const abandoned = visitors.filter(x => x.audit_status === 'abandoned').length;
+  const convRate = started > 0 ? ((completed / started) * 100).toFixed(1) + '%' : '0.0%';
+  const pdfDownloads = visitors.filter(x => x.pdf_downloaded).length;
+  const contactRequests = visitors.filter(x => x.contact_requested).length;
+  const whatsappClicks = visitors.filter(x => x.whatsapp_clicked).length;
+
+  const filtered = visitors.filter(x => {
+    if (u.status !== 'all' && x.audit_status !== u.status) return false;
+    if (u.admin_status !== 'all' && (x.admin_status || 'new') !== u.admin_status) return false;
+    if (u.property_type !== 'all' && (x.property_type || '').toLowerCase() !== u.property_type.toLowerCase()) return false;
+    if (u.pdf === 'yes' && !x.pdf_downloaded) return false;
+    if (u.pdf === 'no' && x.pdf_downloaded) return false;
+    if (u.contact === 'yes' && !x.contact_requested) return false;
+    if (u.contact === 'no' && x.contact_requested) return false;
+    if (q) {
+      const haystack = [x.name, x.email, x.phone, x.property_city, x.property_country, x.visitor_uuid, x.utm_source, x.utm_campaign].filter(Boolean).join(' ').toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  }).sort((a, b) => ts(b.updated_at || b.created_at) - ts(a.updated_at || a.created_at));
+
+  $('#view').innerHTML = `
+    <div class="top">
+      <div>
+        <h1>Free BNB Audit Analytics & Leads</h1>
+        <p>Real-time visitor tracking, property estimates, and D3.js trend visualization for /freeaudit.</p>
+      </div>
+      <div class="top-actions" style="display:flex; gap:8px;">
+        <button class="btn btn--red" id="fa-trend-csv" type="button" title="Export audit trend visualization data to CSV">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export Audit Trends CSV
+        </button>
+        <button class="btn" id="fa-csv" type="button">Export Leads CSV</button>
+      </div>
+    </div>
+
+    <!-- Segmented Tab Selector -->
+    <div class="chips" role="tablist" style="margin-bottom:18px">
+      <button class="chip" type="button" id="tab-fa-trends" aria-pressed="${u.viewTab !== 'leads'}">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>D3 Audit Trends & Analytics
+      </button>
+      <button class="chip" type="button" id="tab-fa-leads" aria-pressed="${u.viewTab === 'leads'}">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Leads & Visitor Pipeline <small>${visitors.length}</small>
+      </button>
+    </div>
+
+    ${S.errors.free_audit_visitors ? `<div class="demo-bar" style="border-color:var(--bad);margin-bottom:16px">${esc(S.errors.free_audit_visitors)} <a class="btn btn--sm" href="#/setup">Open setup</a></div>` : ''}
+
+    <div class="grid kpis" style="margin-bottom:16px">
+      ${kpi('Total Visitors', totalVisitors, started + ' started audit form')}
+      ${kpi('Audits Completed', completed, convRate + ' completion rate')}
+      ${kpi('Abandoned Audits', abandoned, 'partial leads captured')}
+      ${kpi('PDF Downloads', pdfDownloads, contactRequests + ' contact requests · ' + whatsappClicks + ' WA clicks')}
+    </div>
+
+    ${u.viewTab !== 'leads' ? `
+      <!-- D3.js Charts Dashboard -->
+      <div class="grid two" style="margin-bottom:18px; gap:16px;">
+        <!-- Chart 1: Daily Trend -->
+        <section class="card" style="min-width:0">
+          <div class="card-head" style="margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+            <div>
+              <h2 style="font-size:1.1rem; font-weight:600;">Visitor & Conversion Trend (D3.js)</h2>
+              <p style="font-size:0.8rem; color:var(--muted); margin:0;">Daily visits vs completed audit conversions</p>
+            </div>
+            <div class="chips" style="margin:0; display:flex; gap:6px; align-items:center;">
+              ${['7', '14', '30'].map(r => `<button class="chip" type="button" data-fa-range="${r}" aria-pressed="${(u.faRange || '14') === r}">${r}d</button>`).join('')}
+              <button class="btn btn--sm" id="fa-trend-card-csv" type="button" style="margin-left:4px;" title="Download CSV"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:2px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV</button>
+            </div>
+          </div>
+          <div id="d3-audit-trend-chart" style="width:100%; min-height:240px; position:relative;"></div>
+          <div style="display:flex; gap:16px; justify-content:center; margin-top:8px; font-size:0.78rem; color:var(--muted);">
+            <span style="display:flex; align-items:center; gap:6px;"><i style="width:10px; height:10px; border-radius:50%; background:var(--accent); display:inline-block;"></i> Total Visitors</span>
+            <span style="display:flex; align-items:center; gap:6px;"><i style="width:10px; height:10px; border-radius:50%; background:var(--good); display:inline-block;"></i> Completed Audits</span>
+          </div>
+        </section>
+
+        <!-- Chart 2: Conversion Funnel -->
+        <section class="card" style="min-width:0">
+          <div class="card-head" style="margin-bottom:12px;">
+            <h2 style="font-size:1.1rem; font-weight:600;">Audit Funnel Conversion Step Flow (D3.js)</h2>
+            <p style="font-size:0.8rem; color:var(--muted); margin:0;">Stage-by-stage progression & drop-off rates</p>
+          </div>
+          <div id="d3-funnel-chart" style="width:100%; min-height:240px;"></div>
+        </section>
+      </div>
+
+      <div class="grid two" style="margin-bottom:18px; gap:16px;">
+        <!-- Chart 3: Source Distribution -->
+        <section class="card" style="min-width:0">
+          <div class="card-head" style="margin-bottom:12px;">
+            <h2 style="font-size:1.1rem; font-weight:600;">Traffic Source & UTM Attribution (D3.js)</h2>
+            <p style="font-size:0.8rem; color:var(--muted); margin:0;">Channel sources driving audit starts</p>
+          </div>
+          <div id="d3-source-chart" style="width:100%; min-height:220px;"></div>
+        </section>
+
+        <!-- Chart 4: Top Cities Potential -->
+        <section class="card" style="min-width:0">
+          <div class="card-head" style="margin-bottom:12px;">
+            <h2 style="font-size:1.1rem; font-weight:600;">Earning Potential by Top Cities (D3.js)</h2>
+            <p style="font-size:0.8rem; color:var(--muted); margin:0;">Target location revenue pipeline</p>
+          </div>
+          <div id="d3-city-chart" style="width:100%; min-height:220px;"></div>
+        </section>
+      </div>
+    ` : ''}
+
+    <!-- Leads Table Section -->
+    <div class="card" style="margin-top:16px;">
+      <div class="toolbar" style="margin-bottom:12px">
+        <label class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="sr-only">Search leads</span>
+          <input id="q-fa" type="search" placeholder="Search name, email, phone, city, visitor UUID, UTM source…" value="${esc(u.q)}" autocomplete="off">
+        </label>
+      </div>
+
+      <div class="chips" role="group" style="margin-bottom:12px; flex-wrap:wrap;">
+        <span style="font-size:0.8rem; font-weight:600; color:var(--muted); align-self:center; margin-right:4px;">Audit:</span>
+        ${['all', 'completed', 'in_progress', 'abandoned', 'started'].map(st => `<button class="chip" type="button" data-fa-st="${st}" aria-pressed="${u.status === st}">${st === 'all' ? 'All' : st}<small>${st === 'all' ? visitors.length : visitors.filter(x => x.audit_status === st).length}</small></button>`).join('')}
+      </div>
+
+      <div class="chips" role="group" style="margin-bottom:16px; flex-wrap:wrap;">
+        <span style="font-size:0.8rem; font-weight:600; color:var(--muted); align-self:center; margin-right:4px;">Lead Status:</span>
+        ${['all', 'new', 'contacted', 'qualified', 'follow_up', 'won', 'lost'].map(ast => `<button class="chip" type="button" data-fa-ast="${ast}" aria-pressed="${u.admin_status === ast}">${ast === 'all' ? 'All' : ast}<small>${ast === 'all' ? visitors.length : visitors.filter(x => (x.admin_status || 'new') === ast).length}</small></button>`).join('')}
+      </div>
+
+      ${!S.loaded.free_audit_visitors ? '<p class="empty">Loading free audit leads…</p>' : filtered.length ? `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Lead / Visitor</th>
+                <th>Location</th>
+                <th>Property</th>
+                <th>Yield Estimate</th>
+                <th>Audit Funnel</th>
+                <th>Admin Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.map(x => `
+                <tr data-fa-lead="${esc(x.id || x.visitor_uuid)}" tabindex="0">
+                  <td class="lead-cell">
+                    <b style="font-weight:600;">${esc(x.name || x.visitor_uuid || 'Anonymous Visitor')}</b>
+                    <span class="sub">${esc(x.email || x.phone || ('Source: ' + (x.utm_source || x.referrer_url || 'Direct')))}</span>
+                  </td>
+                  <td data-l="Location">
+                    ${esc(x.property_city || x.city || '—')}, ${esc(x.property_country || x.country || '')}
+                    <span class="sub">${esc(x.property_locality || '')}</span>
+                  </td>
+                  <td data-l="Property">
+                    ${esc(x.property_type || 'Property')} · ${esc(x.bedrooms || '—')}
+                    <span class="sub">${x.already_listed === 'Yes' ? 'Already listed' : 'Not listed'}</span>
+                  </td>
+                  <td data-l="Yield Estimate">
+                    <b>${x.redflag_revenue ? (x.currency || '₹') + Number(x.redflag_revenue).toLocaleString() : '—'}</b>
+                    <span class="sub">${x.uplift_percentage ? '+' + x.uplift_percentage + '% uplift' : 'Self: ' + (x.expected_revenue ? (x.currency || '₹') + Number(x.expected_revenue).toLocaleString() : '—')}</span>
+                  </td>
+                  <td data-l="Audit Funnel">
+                    ${freeAuditPill(x.audit_status || 'started')}
+                    <span class="sub">${x.pdf_downloaded ? '📄 PDF Downloaded' : x.contact_requested ? '📞 Contact Requested' : 'Visited ' + ago(x.created_at)}</span>
+                  </td>
+                  <td data-l="Admin Status">
+                    ${freeAuditPill(x.admin_status || 'new')}
+                  </td>
+                  <td data-l="Action">
+                    <button class="btn btn--sm" type="button" data-fa-open="${esc(x.id || x.visitor_uuid)}">View Details</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <p class="count-line">${filtered.length} of ${visitors.length} leads</p>
+      ` : `<div class="card empty">${visitors.length ? 'No matching leads.' : 'No audit visitors recorded yet. Visits to /freeaudit will appear here automatically in real-time.'}</div>`}
+    </div>
+  `;
+
+  // Bind tab navigation events
+  $('#tab-fa-trends')?.addEventListener('click', () => { u.viewTab = 'trends'; render(); });
+  $('#tab-fa-leads')?.addEventListener('click', () => { u.viewTab = 'leads'; render(); });
+
+  $$('[data-fa-range]').forEach(b => {
+    b.addEventListener('click', () => {
+      u.faRange = b.dataset['faRange'];
+      render();
+    });
+  });
+
+  $('#q-fa')?.addEventListener('input', e => { u.q = e.target.value; render(); });
+  $$('[data-fa-st]').forEach(b => b.addEventListener('click', () => { u.status = b.dataset['faSt']; render(); }));
+  $$('[data-fa-ast]').forEach(b => b.addEventListener('click', () => { u.admin_status = b.dataset['faAst']; render(); }));
+  $('#fa-csv')?.addEventListener('click', () => {
+    window.location.href = '/api/admin/free-audit/export';
+  });
+
+  $('#fa-trend-csv')?.addEventListener('click', () => {
+    const days = parseInt(u.faRange || '14', 10) || 14;
+    const now = new Date();
+    now.setHours(23, 59, 59, 999);
+    const dailyMap = {};
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 86400000);
+      const key = d.toISOString().slice(0, 10);
+      dailyMap[key] = { date: d, key, visitors: 0, started: 0, completed: 0, abandoned: 0, pdf: 0, contact: 0 };
+    }
+
+    visitors.forEach(v => {
+      const key = (v.created_at || v.first_seen_at || '').slice(0, 10);
+      if (dailyMap[key]) {
+        dailyMap[key].visitors++;
+        if (v.audit_status === 'started' || v.audit_status === 'in_progress') dailyMap[key].started++;
+        if (v.audit_status === 'completed') dailyMap[key].completed++;
+        else if (v.audit_status === 'abandoned') dailyMap[key].abandoned++;
+        if (v.pdf_downloaded) dailyMap[key].pdf++;
+        if (v.contact_requested) dailyMap[key].contact++;
+      }
+    });
+
+    let csvContent = `Red Flag Homes — BNB Earning Audit Visualization Trend Report (${days} Days)\n\n`;
+    csvContent += `Date,Day,Visitors,StartedAudits,CompletedAudits,AbandonedAudits,CompletionRate,PDFDownloads,ContactRequests\n`;
+
+    Object.values(dailyMap).sort((a,b) => a.date - b.date).forEach(row => {
+      const dayName = row.date.toLocaleDateString('en-US', { weekday: 'short' });
+      const rate = row.visitors ? Math.round((row.completed / row.visitors) * 100) + '%' : '0%';
+      csvContent += `"${row.key}","${dayName}",${row.visitors},${row.started + row.completed},${row.completed},${row.abandoned},"${rate}",${row.pdf},${row.contact}\n`;
+    });
+
+    csvContent += `\nAudit Funnel Summary\nStage,Count,ConversionRate\n`;
+    const vTotal = visitors.length || 1;
+    const vStarted = visitors.filter(x => x.audit_status === 'started' || x.audit_status === 'in_progress' || x.audit_status === 'completed' || x.audit_status === 'abandoned').length;
+    const vProperty = visitors.filter(x => x.property_type || x.bedrooms || x.audit_status === 'completed').length;
+    const vEstimate = visitors.filter(x => x.redflag_revenue || x.audit_status === 'completed').length;
+    const vConverted = visitors.filter(x => x.pdf_downloaded || x.contact_requested || x.whatsapp_clicked).length;
+
+    csvContent += `"1. Total Visitors",${vTotal},"100%"\n`;
+    csvContent += `"2. Audit Started",${vStarted},"${Math.round((vStarted/vTotal)*100)}%"\n`;
+    csvContent += `"3. Property Details",${vProperty},"${Math.round((vProperty/vTotal)*100)}%"\n`;
+    csvContent += `"4. AI Estimate Generated",${vEstimate},"${Math.round((vEstimate/vTotal)*100)}%"\n`;
+    csvContent += `"5. Lead Converted",${vConverted},"${Math.round((vConverted/vTotal)*100)}%"\n`;
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `audit-trends-${days}d-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast('Trends CSV Exported', `${days}-day audit trend visualization data downloaded`);
+  });
+
+  $('#fa-trend-card-csv')?.addEventListener('click', () => {
+    $('#fa-trend-csv')?.click();
+  });
+
+  $$('[data-fa-open]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openFreeAuditLeadDetail(el.dataset['faOpen']);
+    });
+  });
+
+  $$('[data-fa-lead]').forEach(el => {
+    el.addEventListener('click', () => {
+      openFreeAuditLeadDetail(el.dataset['faLead']);
+    });
+  });
+
+  if (u.viewTab !== 'leads') {
+    setTimeout(() => renderD3AuditCharts(u, visitors, events), 50);
+  }
+}
+
+function renderD3AuditCharts(u, visitors = [], events = []) {
+  if (typeof d3 === 'undefined') return;
+
+  // 1. Daily Audit Trend Chart
+  const trendEl = document.getElementById('d3-audit-trend-chart');
+  if (trendEl) {
+    d3.select(trendEl).selectAll('*').remove();
+    
+    const days = parseInt(u.faRange || '14', 10) || 14;
+    const now = new Date();
+    now.setHours(23, 59, 59, 999);
+    const dailyMap = {};
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 86400000);
+      const key = d.toISOString().slice(0, 10);
+      dailyMap[key] = { date: d, key, visitors: 0, completed: 0, abandoned: 0 };
+    }
+
+    visitors.forEach(v => {
+      const key = (v.created_at || v.first_seen_at || '').slice(0, 10);
+      if (dailyMap[key]) {
+        dailyMap[key].visitors++;
+        if (v.audit_status === 'completed') dailyMap[key].completed++;
+        else if (v.audit_status === 'abandoned') dailyMap[key].abandoned++;
+      }
+    });
+
+    const data = Object.values(dailyMap).sort((a,b) => a.date - b.date);
+
+    const margin = { top: 20, right: 30, bottom: 35, left: 40 };
+    const width = Math.max(280, trendEl.clientWidth) - margin.left - margin.right;
+    const height = 240 - margin.top - margin.bottom;
+
+    const svg = d3.select(trendEl)
+      .append('svg')
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const defs = svg.append('defs');
+    const gradVisitor = defs.append('linearGradient')
+      .attr('id', 'grad-visitor')
+      .attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
+    gradVisitor.append('stop').attr('offset', '0%').attr('stop-color', 'var(--accent)').attr('stop-opacity', 0.4);
+    gradVisitor.append('stop').attr('offset', '100%').attr('stop-color', 'var(--accent)').attr('stop-opacity', 0.0);
+
+    const x = d3.scaleTime().domain(d3.extent(data, d => d.date)).range([0, width]);
+    const maxVal = Math.max(5, d3.max(data, d => Math.max(d.visitors, d.completed)) || 5);
+    const y = d3.scaleLinear().domain([0, maxVal]).nice().range([height, 0]);
+
+    svg.append('g')
+      .attr('class', 'grid')
+      .call(d3.axisLeft(y).ticks(4).tickSize(-width).tickFormat(''))
+      .selectAll('line')
+      .attr('stroke', 'var(--line)')
+      .attr('stroke-dasharray', '3,3');
+
+    svg.append('g')
+      .attr('transform', `translate(0,${height})`)
+      .call(d3.axisBottom(x).ticks(Math.min(days, 7)).tickFormat(d3.timeFormat('%b %d')))
+      .selectAll('text')
+      .attr('fill', 'var(--muted)').attr('font-size', '11px');
+
+    svg.append('g')
+      .call(d3.axisLeft(y).ticks(4))
+      .selectAll('text')
+      .attr('fill', 'var(--muted)').attr('font-size', '11px');
+
+    const areaVisitor = d3.area()
+      .x(d => x(d.date))
+      .y0(height)
+      .y1(d => y(d.visitors))
+      .curve(d3.curveMonotoneX);
+
+    svg.append('path')
+      .datum(data)
+      .attr('fill', 'url(#grad-visitor)')
+      .attr('d', areaVisitor);
+
+    const lineVisitor = d3.line()
+      .x(d => x(d.date))
+      .y(d => y(d.visitors))
+      .curve(d3.curveMonotoneX);
+
+    svg.append('path')
+      .datum(data)
+      .attr('fill', 'none')
+      .attr('stroke', 'var(--accent)')
+      .attr('stroke-width', 2.5)
+      .attr('d', lineVisitor);
+
+    const lineComp = d3.line()
+      .x(d => x(d.date))
+      .y(d => y(d.completed))
+      .curve(d3.curveMonotoneX);
+
+    svg.append('path')
+      .datum(data)
+      .attr('fill', 'none')
+      .attr('stroke', 'var(--good)')
+      .attr('stroke-width', 2.5)
+      .attr('stroke-dasharray', '4,2')
+      .attr('d', lineComp);
+
+    // Interactive tooltip
+    const tooltip = d3.select('body').selectAll('.d3-fa-tip').data([0]).join('div')
+      .attr('class', 'd3-fa-tip')
+      .style('position', 'absolute')
+      .style('padding', '8px 12px')
+      .style('background', 'var(--surface-3)')
+      .style('border', '1px solid var(--line-2)')
+      .style('border-radius', '8px')
+      .style('color', 'var(--text)')
+      .style('font-size', '12px')
+      .style('pointer-events', 'none')
+      .style('opacity', 0)
+      .style('z-index', '9999');
+
+    svg.selectAll('.dot-visitor')
+      .data(data)
+      .enter()
+      .append('circle')
+      .attr('cx', d => x(d.date))
+      .attr('cy', d => y(d.visitors))
+      .attr('r', 4)
+      .attr('fill', 'var(--accent)')
+      .on('mouseover', (event, d) => {
+        tooltip.style('opacity', 1)
+          .html(`<b>${d3.timeFormat('%A, %b %d')(d.date)}</b><br>` +
+                `<span style="color:var(--accent)">● Total Visitors: ${d.visitors}</span><br>` +
+                `<span style="color:var(--good)">● Completed Audits: ${d.completed}</span><br>` +
+                `<small style="color:var(--muted)">Conversion Rate: ${d.visitors ? Math.round((d.completed/d.visitors)*100) : 0}%</small>`);
+      })
+      .on('mousemove', (event) => {
+        tooltip.style('left', (event.pageX + 12) + 'px').style('top', (event.pageY - 28) + 'px');
+      })
+      .on('mouseout', () => tooltip.style('opacity', 0));
+  }
+
+  // 2. Conversion Funnel Chart
+  const funnelEl = document.getElementById('d3-funnel-chart');
+  if (funnelEl) {
+    d3.select(funnelEl).selectAll('*').remove();
+    
+    const vTotal = visitors.length || 1;
+    const vStarted = visitors.filter(x => x.audit_status === 'started' || x.audit_status === 'in_progress' || x.audit_status === 'completed' || x.audit_status === 'abandoned').length;
+    const vProperty = visitors.filter(x => x.property_type || x.bedrooms || x.audit_status === 'completed').length;
+    const vEstimate = visitors.filter(x => x.redflag_revenue || x.audit_status === 'completed').length;
+    const vConverted = visitors.filter(x => x.pdf_downloaded || x.contact_requested || x.whatsapp_clicked).length;
+
+    const funnelData = [
+      { stage: '1. Total Visits', count: vTotal, pct: 100 },
+      { stage: '2. Audit Started', count: vStarted, pct: Math.round((vStarted / vTotal) * 100) },
+      { stage: '3. Property Details', count: vProperty, pct: Math.round((vProperty / vTotal) * 100) },
+      { stage: '4. AI Estimate', count: vEstimate, pct: Math.round((vEstimate / vTotal) * 100) },
+      { stage: '5. Lead Converted', count: vConverted, pct: Math.round((vConverted / vTotal) * 100) }
+    ];
+
+    const margin = { top: 15, right: 60, bottom: 20, left: 140 };
+    const width = Math.max(280, funnelEl.clientWidth) - margin.left - margin.right;
+    const height = 220 - margin.top - margin.bottom;
+
+    const svg = d3.select(funnelEl)
+      .append('svg')
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const y = d3.scaleBand().domain(funnelData.map(d => d.stage)).range([0, height]).padding(0.3);
+    const x = d3.scaleLinear().domain([0, d3.max(funnelData, d => d.count) || 1]).range([0, width]);
+
+    svg.append('g')
+      .call(d3.axisLeft(y).tickSize(0))
+      .selectAll('text')
+      .attr('fill', 'var(--text)')
+      .attr('font-size', '12px')
+      .attr('font-weight', '500');
+
+    svg.selectAll('.domain').remove();
+
+    svg.selectAll('.bar')
+      .data(funnelData)
+      .enter()
+      .append('rect')
+      .attr('y', d => y(d.stage))
+      .attr('height', y.bandwidth())
+      .attr('x', 0)
+      .attr('width', 0)
+      .attr('rx', 6)
+      .attr('fill', (d, i) => i === 0 ? 'var(--accent)' : i === 4 ? 'var(--good)' : 'var(--s-inq)')
+      .transition()
+      .duration(700)
+      .attr('width', d => Math.max(12, x(d.count)));
+
+    svg.selectAll('.label')
+      .data(funnelData)
+      .enter()
+      .append('text')
+      .attr('y', d => y(d.stage) + y.bandwidth() / 2 + 4)
+      .attr('x', d => Math.max(16, x(d.count)) + 8)
+      .attr('fill', 'var(--text-2)')
+      .attr('font-size', '12px')
+      .attr('font-weight', '600')
+      .text(d => `${d.count} (${d.pct}%)`);
+  }
+
+  // 3. Traffic Source Distribution (Donut Chart)
+  const sourceEl = document.getElementById('d3-source-chart');
+  if (sourceEl) {
+    d3.select(sourceEl).selectAll('*').remove();
+
+    const counts = {};
+    visitors.forEach(v => {
+      const src = (v.utm_source || v.referrer_url || 'Direct').toLowerCase();
+      let key = 'Direct / Organic';
+      if (src.includes('google')) key = 'Google Search';
+      else if (src.includes('instagram') || src.includes('ig')) key = 'Instagram';
+      else if (src.includes('facebook') || src.includes('fb')) key = 'Facebook Ads';
+      else if (src.includes('whatsapp') || src.includes('wa')) key = 'WhatsApp';
+      else if (src.includes('twitter') || src.includes('x.com')) key = 'Twitter / X';
+      counts[key] = (counts[key] || 0) + 1;
+    });
+
+    const pieData = Object.entries(counts).map(([label, value]) => ({ label, value }));
+
+    const width = Math.max(260, sourceEl.clientWidth);
+    const height = 220;
+    const radius = Math.min(width, height) / 2 - 15;
+
+    const svg = d3.select(sourceEl)
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .append('g')
+      .attr('transform', `translate(${width / 2},${height / 2})`);
+
+    const color = d3.scaleOrdinal()
+      .domain(pieData.map(d => d.label))
+      .range(['var(--accent)', 'var(--s-inq)', 'var(--good)', 'var(--warn)', 'var(--info)', 'var(--muted)']);
+
+    const pie = d3.pie().value(d => d.value).sort(null);
+    const arc = d3.arc().innerRadius(radius * 0.55).outerRadius(radius * 0.9);
+
+    const arcs = svg.selectAll('.arc')
+      .data(pie(pieData))
+      .enter()
+      .append('g')
+      .attr('class', 'arc');
+
+    arcs.append('path')
+      .attr('fill', d => color(d.data.label))
+      .attr('d', arc)
+      .attr('stroke', 'var(--surface)')
+      .attr('stroke-width', 2);
+
+    svg.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('dy', '-0.2em')
+      .attr('fill', 'var(--text)')
+      .attr('font-size', '20px')
+      .attr('font-weight', '700')
+      .text(visitors.length);
+
+    svg.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('dy', '1.2em')
+      .attr('fill', 'var(--muted)')
+      .attr('font-size', '11px')
+      .text('Total Traffic');
+  }
+
+  // 4. Top Cities Potential
+  const cityEl = document.getElementById('d3-city-chart');
+  if (cityEl) {
+    d3.select(cityEl).selectAll('*').remove();
+
+    const cityMap = {};
+    visitors.forEach(v => {
+      const city = v.property_city || v.city || 'Other';
+      if (!cityMap[city]) cityMap[city] = { city, count: 0, revenue: 0 };
+      cityMap[city].count++;
+      cityMap[city].revenue += Number(v.redflag_revenue || v.expected_revenue || 0);
+    });
+
+    const cityData = Object.values(cityMap)
+      .sort((a,b) => b.revenue - a.revenue)
+      .slice(0, 5);
+
+    const margin = { top: 15, right: 90, bottom: 25, left: 110 };
+    const width = Math.max(280, cityEl.clientWidth) - margin.left - margin.right;
+    const height = 220 - margin.top - margin.bottom;
+
+    const svg = d3.select(cityEl)
+      .append('svg')
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const y = d3.scaleBand().domain(cityData.map(d => d.city)).range([0, height]).padding(0.3);
+    const x = d3.scaleLinear().domain([0, d3.max(cityData, d => d.revenue) || 100000]).range([0, width]);
+
+    svg.append('g')
+      .call(d3.axisLeft(y).tickSize(0))
+      .selectAll('text')
+      .attr('fill', 'var(--text)')
+      .attr('font-size', '12px');
+
+    svg.selectAll('.domain').remove();
+
+    svg.selectAll('.bar')
+      .data(cityData)
+      .enter()
+      .append('rect')
+      .attr('y', d => y(d.city))
+      .attr('height', y.bandwidth())
+      .attr('x', 0)
+      .attr('width', 0)
+      .attr('rx', 4)
+      .attr('fill', 'var(--good)')
+      .transition()
+      .duration(700)
+      .attr('width', d => Math.max(8, x(d.revenue)));
+
+    svg.selectAll('.label')
+      .data(cityData)
+      .enter()
+      .append('text')
+      .attr('y', d => y(d.city) + y.bandwidth() / 2 + 4)
+      .attr('x', d => Math.max(12, x(d.revenue)) + 8)
+      .attr('fill', 'var(--text-2)')
+      .attr('font-size', '11px')
+      .attr('font-weight', '600')
+      .text(d => `₹${Math.round(d.revenue / 1000)}k/mo (${d.count})`);
+  }
+}
+
+function openFreeAuditLeadDetail(id) {
+  const visitors = S.data.free_audit_visitors || [];
+  const events = S.data.free_audit_events || [];
+  const x = visitors.find(v => (v.id === id || v.visitor_uuid === id));
+  if (!x) return;
+
+  const leadEvents = events.filter(e => e.visitor_uuid === (x.visitor_uuid || x.id)).sort((a,b) => ts(a.created_at) - ts(b.created_at));
+
+  const p = $('#drawer-panel');
+  const phone = (x.phone || '').replace(/\D/g, '');
+
+  p.innerHTML = `
+    <div class="drawer-top">
+      <div>
+        <h2 id="d-title">${esc(x.name || x.visitor_uuid || 'Anonymous Lead')}</h2>
+        <p>${esc(x.property_city || x.city || 'Unknown Location')} · ${freeAuditPill(x.admin_status || 'new')}</p>
+      </div>
+      <button class="btn btn--icon" type="button" id="d-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="quick" style="margin-bottom:16px;">
+      ${phone ? `<a class="btn btn--red btn--sm" target="_blank" rel="noopener" href="https://wa.me/${esc(phone)}?text=${encodeURIComponent('Hi ' + (x.name || '') + ', this is Red Flag Homes regarding your BNB earning audit for ' + (x.property_city || 'your property') + '.')}" >WhatsApp</a>` : ''}
+      ${phone ? `<a class="btn btn--sm" href="tel:${esc(phone)}">Call</a>` : ''}
+      ${x.email ? `<a class="btn btn--sm" href="mailto:${esc(x.email)}?subject=${encodeURIComponent('Your BNB Earning Audit - Red Flag Homes')}">Email</a>` : ''}
+    </div>
+
+    <!-- Lead Status & Assignment -->
+    <div class="card" style="margin-bottom:16px; background:var(--surface-2);">
+      <div class="grid two" style="gap:12px;">
+        <div class="field">
+          <label for="d-fa-status">Lead Status</label>
+          <select id="d-fa-status">
+            ${['new', 'contacted', 'qualified', 'follow_up', 'won', 'lost'].map(st => `<option value="${st}" ${(x.admin_status || 'new') === st ? 'selected' : ''}>${st.toUpperCase()}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label for="d-fa-assigned">Assigned To</label>
+          <input type="text" id="d-fa-assigned" value="${esc(x.assigned_to || 'Priyanshu')}" placeholder="Team member name">
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview & Estimates -->
+    <div class="card" style="margin-bottom:16px;">
+      <h3>Revenue & Yield Estimates</h3>
+      <dl class="facts">
+        <dt>Self-Managed Estimate</dt>
+        <dd>${x.expected_revenue ? (x.currency || '₹') + Number(x.expected_revenue).toLocaleString() + ' / mo' : '—'}</dd>
+        <dt>Red Flag Yield</dt>
+        <dd><b>${x.redflag_revenue ? (x.currency || '₹') + Number(x.redflag_revenue).toLocaleString() + ' / mo' : '—'}</b></dd>
+        <dt>Potential Uplift</dt>
+        <dd style="color:var(--good); font-weight:600;">+${x.uplift_percentage || 15}% (+${x.currency || '₹'}${Number(x.uplift_amount || 0).toLocaleString()}/mo)</dd>
+        <dt>Confidence Score</dt>
+        <dd>${esc(x.confidence_score || 'High')}</dd>
+      </dl>
+    </div>
+
+    <!-- Location & Google Maps Place Details -->
+    <div class="card" style="margin-bottom:16px;">
+      <h3>Property & Location</h3>
+      <dl class="facts">
+        <dt>City / Area</dt><dd>${esc(x.property_city || x.city || '—')}, ${esc(x.property_country || x.country || '')}</dd>
+        <dt>Address</dt><dd>${esc(x.property_locality || '—')}</dd>
+        <dt>Property Type</dt><dd>${esc(x.property_type || '—')} (${esc(x.bedrooms || '')}, ${esc(x.bathrooms || '')})</dd>
+        <dt>Capacity</dt><dd>${esc(x.max_guests || '—')} · ${esc(x.furnishing_status || '')}</dd>
+        <dt>Listed Status</dt><dd>${esc(x.already_listed === 'Yes' ? 'Currently listed on platforms' : 'Not yet listed')}</dd>
+        <dt>Photo Quality</dt><dd>${esc(x.photo_quality || '—')}</dd>
+      </dl>
+      ${x.lat && x.lng ? `
+        <div style="margin-top:12px; height:180px; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
+          <iframe width="100%" height="100%" frameborder="0" src="https://maps.google.com/maps?q=${x.lat},${x.lng}&hl=en&z=14&output=embed"></iframe>
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- Event Timeline -->
+    <div class="card" style="margin-bottom:16px;">
+      <h3>Visitor Journey Timeline</h3>
+      ${leadEvents.length ? `
+        <ul class="mini">
+          ${leadEvents.map(e => `
+            <li>
+              <div class="t">
+                <b>${esc(e.event_name.replace(/_/g, ' '))}</b>
+                <small>${esc(full(e.created_at))}</small>
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+      ` : '<p class="empty" style="padding:12px;">No recorded events for this session.</p>'}
+    </div>
+
+    <!-- UTM Attribution & Technical Spec -->
+    <div class="card" style="margin-bottom:16px;">
+      <h3>Traffic Source & Device Spec</h3>
+      <dl class="facts">
+        <dt>UTM Source</dt><dd>${esc(x.utm_source || 'Direct')}</dd>
+        <dt>UTM Campaign</dt><dd>${esc(x.utm_campaign || '—')}</dd>
+        <dt>Landing Page</dt><dd style="word-break:break-all">${esc(x.landing_url || '/freeaudit')}</dd>
+        <dt>Device / OS</dt><dd>${esc(x.device_type || 'desktop')} (${esc(x.os || '')}, ${esc(x.browser || '')})</dd>
+        <dt>Screen Res</dt><dd>${x.screen_width || '—'} x ${x.screen_height || '—'}</dd>
+        <dt>Hashed IP</dt><dd style="font-family:monospace; font-size:0.8rem">${esc(x.ip_hash || '—')}</dd>
+      </dl>
+    </div>
+
+    <!-- Admin Notes -->
+    <div class="field" style="margin-bottom:16px;">
+      <label for="d-fa-notes">Admin Notes & History</label>
+      <textarea id="d-fa-notes" rows="3" placeholder="Add follow-up notes, call summary, or customer intent...">${esc(x.admin_notes || '')}</textarea>
+    </div>
+
+    <div class="drawer-actions">
+      <button class="btn btn--red" type="button" id="d-fa-save">Save Lead Updates</button>
+    </div>
+  `;
+
+  $('#drawer').hidden = false;
+  document.body.style.overflow = 'hidden';
+  $('#d-close')?.focus();
+
+  $('#d-close')?.addEventListener('click', closeDrawer);
+
+  $('#d-fa-save')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    const newStatus = $('#d-fa-status').value;
+    const newAssigned = $('#d-fa-assigned').value;
+    const newNotes = $('#d-fa-notes').value;
+
+    const patch = {
+      admin_status: newStatus,
+      assigned_to: newAssigned,
+      admin_notes: newNotes,
+      updated_at: new Date().toISOString()
+    };
+
+    try {
+      if (S.mode === 'demo') {
+        Object.assign(x, patch);
+      } else {
+        const idToken = S.fb && S.fb.auth.currentUser ? await S.fb.auth.currentUser.getIdToken() : '';
+        await fetch(`/api/admin/free-audit/leads/${x.id || x.visitor_uuid}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + idToken
+          },
+          body: JSON.stringify(patch)
+        });
+      }
+      toast('Lead Updated', x.name || x.visitor_uuid);
+      closeDrawer();
+      render();
+    } catch (err) {
+      btn.disabled = false;
+      toast('Error saving lead', err.message);
+    }
+  });
 }
 function retryLink(x) {
   const g = guessPlan(x), c = x.currency === 'USD' ? 'USD' : 'INR';

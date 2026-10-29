@@ -337,15 +337,62 @@
       color: var(--fa-text);
     }
 
-    /* Map Preview Container */
+    /* Places Autocomplete & Map Preview */
+    .fa-places-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      background: #ffffff;
+      border: 1px solid var(--fa-border);
+      border-radius: var(--fa-radius-sm);
+      box-shadow: var(--fa-shadow-lg);
+      max-height: 240px;
+      overflow-y: auto;
+      margin-top: 4px;
+    }
+    .fa-place-item {
+      padding: 10px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--fa-surface-2);
+      transition: background 0.15s;
+    }
+    .fa-place-item:last-child {
+      border-bottom: none;
+    }
+    .fa-place-item:hover, .fa-place-item.focused {
+      background: var(--fa-surface-2);
+    }
+    .fa-place-main {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--fa-text);
+    }
+    .fa-place-sec {
+      font-size: 0.8rem;
+      color: var(--fa-muted);
+    }
     #fa-map-preview {
       width: 100%;
-      height: 200px;
+      height: 220px;
       border-radius: var(--fa-radius-sm);
       border: 1px solid var(--fa-border);
       margin-top: 12px;
       display: none;
       overflow: hidden;
+      background: var(--fa-surface-2);
+    }
+    .fa-map-header {
+      padding: 8px 12px;
+      background: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--fa-text);
+      border-bottom: 1px solid var(--fa-border);
     }
 
     /* Buttons */
@@ -828,9 +875,10 @@
                 </select>
               </div>
 
-              <div class="fa-field-group">
+              <div class="fa-field-group" style="position: relative;">
                 <label class="fa-label" for="fa-city">City / Area / Suburb *</label>
-                <input type="text" id="fa-city" class="fa-input" placeholder="e.g. Gomti Nagar, Lucknow or Goa" required>
+                <input type="text" id="fa-city" class="fa-input" placeholder="e.g. Koramangala, Bengaluru or Goa" autocomplete="off" required>
+                <div id="fa-places-dropdown" class="fa-places-dropdown" hidden></div>
               </div>
             </div>
 
@@ -839,7 +887,13 @@
               <input type="text" id="fa-address" class="fa-input" placeholder="e.g. Sector 4, Gomti Nagar, Lucknow, UP">
             </div>
 
-            <div id="fa-map-preview"></div>
+            <div id="fa-map-preview" hidden>
+              <div class="fa-map-header">
+                <span>📍 Confirmed Location Pin</span>
+                <span id="fa-map-coords" style="color:var(--fa-muted); font-size:0.75rem;"></span>
+              </div>
+              <div id="fa-map-canvas" style="height:180px; width:100%;"></div>
+            </div>
           </div>
 
           <!-- STEP 2: Property Details -->
@@ -1255,395 +1309,702 @@
       const listedRadios = document.querySelectorAll('input[name="fa-listed"]');
       const conditionalListed = document.getElementById('fa-listed-conditional');
 
-      listedRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-          if (e.target.value === 'Yes') {
-            conditionalListed.style.display = 'block';
-          } else {
-            conditionalListed.style.display = 'none';
-          }
-        });
-      });
-
-      function updateStepView() {
-        steps.forEach(st => {
-          const stepNum = parseInt(st.getAttribute('data-step'), 10);
-          if (stepNum === currentStep) {
-            st.classList.add('active');
-          } else {
-            st.classList.remove('active');
-          }
-        });
-
-        const pct = Math.round((currentStep / totalSteps) * 100);
-        progressBar.style.width = pct + '%';
-        progressText.textContent = `Step ${currentStep} of ${totalSteps}`;
-        progressPct.textContent = `${pct}% Completed`;
-
-        btnBack.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-        if (currentStep === totalSteps) {
-          btnNext.textContent = 'Generate Free Audit ✨';
-        } else {
-          btnNext.textContent = 'Continue →';
+      // Multi-Step Form Logic & Full Visitor Tracking System
+      (function initFreeAuditSystem() {
+        // Cookie Helpers
+        function getCookie(name) {
+          const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+          return v ? v[2] : null;
         }
-      }
-
-      btnBack.addEventListener('click', () => {
-        if (currentStep > 1) {
-          currentStep--;
-          updateStepView();
+        function setCookie(name, value, days) {
+          const d = new Date();
+          d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
+          document.cookie = name + "=" + value + ";path=/;SameSite=Lax;expires=" + d.toUTCString();
         }
-      });
 
-      btnNext.addEventListener('click', async () => {
-        if (!validateStep(currentStep)) return;
+        // Persistent Visitor UUID & Session ID
+        let visitorUuid = localStorage.getItem('rf_fa_uuid') || getCookie('rf_fa_uuid');
+        if (!visitorUuid) {
+          visitorUuid = 'v_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+          localStorage.setItem('rf_fa_uuid', visitorUuid);
+          setCookie('rf_fa_uuid', visitorUuid, 365);
+        }
 
-        if (currentStep < totalSteps) {
-          currentStep++;
-          updateStepView();
-          if (currentStep === 2) {
-            fireEvent('audit_started');
+        let sessionId = sessionStorage.getItem('rf_fa_session');
+        if (!sessionId) {
+          sessionId = 's_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+          sessionStorage.setItem('rf_fa_session', sessionId);
+        }
+
+        // UTM & Ad Click ID Capture
+        const urlParams = new URLSearchParams(window.location.search);
+        const utmSource = urlParams.get('utm_source') || '';
+        const utmMedium = urlParams.get('utm_medium') || '';
+        const utmCampaign = urlParams.get('utm_campaign') || '';
+        const utmTerm = urlParams.get('utm_term') || '';
+        const utmContent = urlParams.get('utm_content') || '';
+        const gclid = urlParams.get('gclid') || '';
+        const fbclid = urlParams.get('fbclid') || '';
+        const msclkid = urlParams.get('msclkid') || '';
+        const ttclid = urlParams.get('ttclid') || '';
+
+        const referrerUrl = document.referrer || '';
+        const landingUrl = window.location.href;
+
+        function getDeviceType() {
+          const w = window.innerWidth;
+          if (w < 768) return 'mobile';
+          if (w < 1024) return 'tablet';
+          return 'desktop';
+        }
+
+        // Sync Visitor Data to Backend
+        async function syncVisitorProfile() {
+          try {
+            await fetch('/api/free-audit/visitor', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                visitor_uuid: visitorUuid,
+                session_id: sessionId,
+                user_agent: navigator.userAgent,
+                device_type: getDeviceType(),
+                screen_width: window.innerWidth,
+                screen_height: window.innerHeight,
+                language: navigator.language || 'en',
+                referrer_url: referrerUrl,
+                landing_url: landingUrl,
+                current_url: window.location.href,
+                utm_source: utmSource,
+                utm_medium: utmMedium,
+                utm_campaign: utmCampaign,
+                utm_term: utmTerm,
+                utm_content: utmContent,
+                gclid, fbclid, msclkid, ttclid
+              })
+            });
+          } catch (err) {
+            console.warn('Visitor sync notice:', err);
           }
-        } else {
-          // Submit form for AI analysis
-          await runAuditAnalysis();
         }
-      });
+        syncVisitorProfile();
 
-      function validateStep(step) {
-        if (step === 1) {
-          const city = document.getElementById('fa-city').value.trim();
-          if (!city) {
-            alert('Please enter your city or location.');
-            return false;
+        // Funnel Event Dispatcher
+        async function fireFunnelEvent(eventName, eventData = {}) {
+          console.log('[FreeAudit Event]', eventName, eventData);
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', eventName, { event_category: 'freeaudit', ...eventData });
+          }
+          try {
+            await fetch('/api/free-audit/event', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                visitor_uuid: visitorUuid,
+                session_id: sessionId,
+                event_name: eventName,
+                event_data_json: eventData,
+                page_url: window.location.href,
+                referrer_url: referrerUrl
+              })
+            });
+          } catch (e) {
+            console.warn('Event dispatch notice:', e);
           }
         }
-        return true;
-      }
 
-      async function runAuditAnalysis() {
-        // Collect form data
-        const formData = {
-          country: document.getElementById('fa-country').value,
-          city: document.getElementById('fa-city').value,
-          address: document.getElementById('fa-address').value,
-          propertyType: document.querySelector('input[name="fa-prop-type"]:checked')?.value || 'Apartment',
-          bedrooms: document.getElementById('fa-bedrooms').value,
-          bathrooms: document.getElementById('fa-bathrooms').value,
-          guests: document.getElementById('fa-guests').value,
-          furnishing: document.getElementById('fa-furnishing').value,
-          condition: document.getElementById('fa-condition').value,
-          listed: document.querySelector('input[name="fa-listed"]:checked')?.value || 'No',
-          currentRate: document.getElementById('fa-curr-rate').value,
-          currentOccupancy: document.getElementById('fa-curr-occ').value,
-          bookingSource: document.getElementById('fa-booking-source').value,
-          photoQuality: document.querySelector('input[name="fa-photos"]:checked')?.value || 'Good phone photos',
-          amenities: Array.from(document.querySelectorAll('input[name="fa-amenities"]:checked')).map(el => el.value),
-          targetIncome: document.getElementById('fa-target-income').value,
-          availability: document.getElementById('fa-availability').value,
-          openMgmt: document.querySelector('input[name="fa-open-mgmt"]:checked')?.value || 'Yes',
-        };
+        // Google Places Autocomplete with Session Tokens (Feature 2)
+        let mapsSessionToken = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : ('st_' + Math.random().toString(36).substring(2, 12));
+        let selectedLocationData = null;
+        const cityInput = document.getElementById('fa-city');
+        const dropdownEl = document.getElementById('fa-places-dropdown');
+        const mapPreviewEl = document.getElementById('fa-map-preview');
+        const mapCanvasEl = document.getElementById('fa-map-canvas');
+        let autocompleteDebounceTimer = null;
 
-        // Show loading
-        document.getElementById('fa-form-container').style.display = 'none';
-        document.getElementById('fa-loading-card').style.display = 'block';
+        if (cityInput && dropdownEl) {
+          cityInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            clearTimeout(autocompleteDebounceTimer);
 
-        try {
-          const res = await fetch('/api/freeaudit/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
+            if (query.length < 2) {
+              dropdownEl.hidden = true;
+              dropdownEl.innerHTML = '';
+              return;
+            }
+
+            autocompleteDebounceTimer = setTimeout(async () => {
+              try {
+                const res = await fetch('/api/free-audit/places-autocomplete', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ input: query, sessionToken: mapsSessionToken })
+                });
+                const data = await res.json();
+                renderAutocompleteResults(data.predictions || []);
+              } catch (err) {
+                console.warn('Autocomplete fetch error:', err);
+              }
+            }, 300);
           });
 
-          if (!res.ok) throw new Error('Analysis failed');
-          const data = await res.json();
-          auditResultData = { formData, analysis: data };
+          function renderAutocompleteResults(predictions) {
+            if (!predictions || predictions.length === 0) {
+              dropdownEl.hidden = true;
+              return;
+            }
 
-          renderResults(auditResultData);
-          fireEvent('audit_completed');
-        } catch (err) {
-          console.warn('Fallback result triggered:', err);
-          // High-grade client fallback calculation if server is offline
-          const fallbackData = generateFallbackAnalysis(formData);
-          auditResultData = { formData, analysis: fallbackData };
-          renderResults(auditResultData);
-        } finally {
-          document.getElementById('fa-loading-card').style.display = 'none';
-          document.getElementById('fa-results-wrap').style.display = 'block';
-        }
-      }
+            dropdownEl.innerHTML = predictions.map(p => `
+              <div class="fa-place-item" data-placeid="${p.place_id}" data-desc="${p.description || p.main_text}" data-lat="${p.lat || ''}" data-lng="${p.lng || ''}" data-city="${p.city || ''}">
+                <div class="fa-place-main">${p.main_text}</div>
+                <div class="fa-place-sec">${p.secondary_text}</div>
+              </div>
+            `).join('');
 
-      function formatMoney(val, symbol = '$') {
-        const num = Math.round(Number(val) || 0);
-        return symbol + num.toLocaleString();
-      }
+            dropdownEl.hidden = false;
 
-      function renderResults(data) {
-        const a = data.analysis;
-        const sym = a.currencySymbol || '$';
+            dropdownEl.querySelectorAll('.fa-place-item').forEach(item => {
+              item.addEventListener('click', async () => {
+                const placeId = item.getAttribute('data-placeid');
+                const desc = item.getAttribute('data-desc');
+                cityInput.value = item.querySelector('.fa-place-main').textContent;
+                dropdownEl.hidden = true;
 
-        document.getElementById('fa-res-property-title').textContent = `${data.formData.bedrooms} ${data.formData.propertyType} in ${data.formData.city}`;
-        document.getElementById('fa-self-amount').textContent = formatMoney(a.selfManagedMonthly.expected, sym);
-        document.getElementById('fa-rf-amount').textContent = formatMoney(a.redFlagMonthly.expected, sym);
-        document.getElementById('fa-uplift-monthly').textContent = `+${formatMoney(a.upliftMonthlyAmount, sym)} / mo`;
-        document.getElementById('fa-uplift-annual').textContent = `+${formatMoney(a.upliftAnnualAmount, sym)} / yr`;
-        document.getElementById('fa-uplift-pct').textContent = `${a.upliftPercentage}%`;
-        document.getElementById('fa-rf-pct-sub').textContent = `${a.upliftPercentage}%`;
+                try {
+                  const res = await fetch('/api/free-audit/place-details', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      place_id: placeId,
+                      sessionToken: mapsSessionToken,
+                      description: desc,
+                      lat: parseFloat(item.getAttribute('data-lat') || '0'),
+                      lng: parseFloat(item.getAttribute('data-lng') || '0'),
+                      city: item.getAttribute('data-city') || ''
+                    })
+                  });
 
-        // Scenarios
-        document.getElementById('fa-scen-rate-low').textContent = `${formatMoney(a.nightlyRateRange.min, sym)} / night`;
-        document.getElementById('fa-scen-rate-avg').textContent = `${formatMoney(a.nightlyRateRange.avg, sym)} / night`;
-        document.getElementById('fa-scen-rate-high').textContent = `${formatMoney(a.nightlyRateRange.max, sym)} / night`;
+                  selectedLocationData = await res.json();
 
-        document.getElementById('fa-scen-occ-low').textContent = `${a.monthlyOccupancyRange.min}%`;
-        document.getElementById('fa-scen-occ-avg').textContent = `${a.monthlyOccupancyRange.avg}%`;
-        document.getElementById('fa-scen-occ-high').textContent = `${a.monthlyOccupancyRange.max}%`;
+                  const addressInput = document.getElementById('fa-address');
+                  if (addressInput && selectedLocationData.formatted_address) {
+                    addressInput.value = selectedLocationData.formatted_address;
+                  }
 
-        document.getElementById('fa-scen-self-low').textContent = formatMoney(a.selfManagedMonthly.conservative, sym);
-        document.getElementById('fa-scen-self-avg').textContent = formatMoney(a.selfManagedMonthly.expected, sym);
-        document.getElementById('fa-scen-self-high').textContent = formatMoney(a.selfManagedMonthly.upside, sym);
+                  fetch(`/api/free-audit/visitor/${visitorUuid}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      property_city: selectedLocationData.city || cityInput.value,
+                      property_locality: selectedLocationData.formatted_address || '',
+                      property_country: selectedLocationData.country || document.getElementById('fa-country').value,
+                      place_id: selectedLocationData.place_id,
+                      lat: selectedLocationData.lat,
+                      lng: selectedLocationData.lng
+                    })
+                  });
 
-        document.getElementById('fa-scen-rf-low').textContent = formatMoney(a.redFlagMonthly.conservative, sym);
-        document.getElementById('fa-scen-rf-avg').textContent = formatMoney(a.redFlagMonthly.expected, sym);
-        document.getElementById('fa-scen-rf-high').textContent = formatMoney(a.redFlagMonthly.upside, sym);
+                  fireFunnelEvent('location_selected', selectedLocationData);
+                  renderMapPreview(selectedLocationData);
 
-        document.getElementById('fa-scen-ann-low').textContent = formatMoney(a.redFlagMonthly.conservative * 12, sym);
-        document.getElementById('fa-scen-ann-avg').textContent = formatMoney(a.redFlagMonthly.expected * 12, sym);
-        document.getElementById('fa-scen-ann-high').textContent = formatMoney(a.redFlagMonthly.upside * 12, sym);
+                  // Create new session token for subsequent session
+                  mapsSessionToken = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : ('st_' + Math.random().toString(36).substring(2, 12));
+                } catch (err) {
+                  console.warn('Place details error:', err);
+                }
+              });
+            });
+          }
 
-        // Tags & Insights
-        const tagsContainer = document.getElementById('fa-intel-tags');
-        tagsContainer.innerHTML = (a.nearbyAttractions || []).map(t => `<span class="fa-tag">${t}</span>`).join('');
-
-        document.getElementById('fa-intel-summary').textContent = a.competitivePositioning || `High demand driven by local attractions in ${data.formData.city}.`;
-        document.getElementById('fa-confidence-badge').textContent = a.confidenceScore || 'High';
-
-        // Citations
-        const citContainer = document.getElementById('fa-citations-list');
-        if (a.citations && a.citations.length > 0) {
-          citContainer.innerHTML = a.citations.map(c => `<li><a href="${c.url}" target="_blank" rel="noopener">${c.title || c.url}</a></li>`).join('');
-        } else {
-          citContainer.innerHTML = `<li><a href="https://redflaghomes.in/journal" target="_blank">Red Flag Homes Market Analytics Engine</a></li>`;
-        }
-      }
-
-      function generateFallbackAnalysis(formData) {
-        const isIndia = formData.country === 'India';
-        const sym = isIndia ? '₹' : '$';
-        
-        let baseNightly = isIndia ? 3500 : 95;
-        if (formData.propertyType === 'Villa') baseNightly *= 2.2;
-        if (formData.bedrooms.includes('2')) baseNightly *= 1.4;
-        if (formData.bedrooms.includes('3')) baseNightly *= 1.8;
-
-        const lowRate = Math.round(baseNightly * 0.8);
-        const avgRate = Math.round(baseNightly);
-        const highRate = Math.round(baseNightly * 1.3);
-
-        const lowOcc = 50;
-        const avgOcc = 65;
-        const highOcc = 82;
-
-        const selfExpected = Math.round((avgRate * (30 * (avgOcc / 100))));
-        const selfCons = Math.round((lowRate * (30 * (lowOcc / 100))));
-        const selfUp = Math.round((highRate * (30 * (highOcc / 100))));
-
-        let upliftPct = 15;
-        if (formData.listed === 'No' || formData.photoQuality === 'No photos' || formData.photoQuality === 'Basic photos') {
-          upliftPct = 20;
-        } else if (formData.condition === 'Excellent' && formData.photoQuality === 'Professional') {
-          upliftPct = 10;
-        }
-
-        const rfExpected = Math.round(selfExpected * (1 + upliftPct / 100));
-        const rfCons = Math.round(selfCons * (1 + upliftPct / 100));
-        const rfUp = Math.round(selfUp * (1 + upliftPct / 100));
-
-        return {
-          currencySymbol: sym,
-          nightlyRateRange: { min: lowRate, avg: avgRate, max: highRate },
-          monthlyOccupancyRange: { min: lowOcc, avg: avgOcc, max: highOcc },
-          selfManagedMonthly: { conservative: selfCons, expected: selfExpected, upside: selfUp },
-          redFlagMonthly: { conservative: rfCons, expected: rfExpected, upside: rfUp },
-          upliftPercentage: upliftPct,
-          upliftMonthlyAmount: rfExpected - selfExpected,
-          upliftAnnualAmount: (rfExpected - selfExpected) * 12,
-          confidenceScore: 'High',
-          competitivePositioning: `Prime location in ${formData.city} with high demand potential across short-stay platforms.`,
-          nearbyAttractions: [`${formData.city} City Center`, 'Transit Connections', 'Local Dining & Markets', 'Business Hub'],
-          citations: [
-            { title: `${formData.city} Short-Stay Market Insights`, url: `https://redflaghomes.in/journal` }
-          ]
-        };
-      }
-
-      // PDF Generation & Download
-      document.getElementById('fa-lead-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('fa-btn-download-pdf');
-        btn.disabled = true;
-        btn.textContent = 'Generating PDF Report…';
-
-        const leadData = {
-          name: document.getElementById('fa-lead-name').value,
-          email: document.getElementById('fa-lead-email').value,
-          phone: document.getElementById('fa-lead-phone').value,
-          time: document.getElementById('fa-lead-time').value,
-          formData: auditResultData?.formData,
-          analysis: auditResultData?.analysis
-        };
-
-        try {
-          await fetch('/api/freeaudit/lead', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(leadData)
+          document.addEventListener('click', (e) => {
+            if (!cityInput.contains(e.target) && !dropdownEl.contains(e.target)) {
+              dropdownEl.hidden = true;
+            }
           });
-        } catch (err) {
-          console.warn('Lead submit notice:', err);
         }
 
-        // Generate PDF
-        generatePdfDoc(leadData);
-        fireEvent('pdf_downloaded');
-        btn.disabled = false;
-        btn.textContent = '✓ Downloaded PDF Report';
-      });
+        function renderMapPreview(locData) {
+          if (!mapPreviewEl || !mapCanvasEl) return;
+          mapPreviewEl.hidden = false;
 
-      function generatePdfDoc(data) {
-        const { jspdf } = window.jspdf || {};
-        if (!jspdf) return;
+          const lat = locData.lat || 12.9352;
+          const lng = locData.lng || 77.6245;
 
-        const doc = new jspdf.jsPDF();
-        const a = data.analysis;
-        const f = data.formData;
-        const sym = a.currencySymbol || '$';
+          const coordsEl = document.getElementById('fa-map-coords');
+          if (coordsEl) coordsEl.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
 
-        // Styling
-        doc.setFillColor(185, 28, 28);
-        doc.rect(0, 0, 210, 30, 'F');
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(20);
-        doc.text("RED FLAG HOMES", 14, 18);
-        doc.setFontSize(10);
-        doc.setFont('Helvetica', 'normal');
-        doc.text("FREE BNB EARNING AUDIT REPORT", 140, 18);
-
-        // Body
-        doc.setTextColor(17, 24, 39);
-        doc.setFontSize(16);
-        doc.setFont('Helvetica', 'bold');
-        doc.text("Property Earning Potential Summary", 14, 45);
-
-        doc.setFontSize(10);
-        doc.setFont('Helvetica', 'normal');
-        doc.text(`Location: ${f.city}, ${f.country}`, 14, 53);
-        doc.text(`Property: ${f.bedrooms} • ${f.bathrooms} Bath • ${f.propertyType}`, 14, 60);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 67);
-
-        // Box 1: Typical Self Managed
-        doc.setFillColor(249, 250, 251);
-        doc.rect(14, 75, 88, 35, 'F');
-        doc.setDrawColor(229, 231, 235);
-        doc.rect(14, 75, 88, 35, 'S');
-
-        doc.setFont('Helvetica', 'bold');
-        doc.text("Self-Managed Estimate", 20, 85);
-        doc.setFontSize(18);
-        doc.setTextColor(17, 24, 39);
-        doc.text(`${sym}${a.selfManagedMonthly.expected.toLocaleString()} / mo`, 20, 98);
-
-        // Box 2: Managed by Red Flag Homes
-        doc.setFillColor(254, 242, 242);
-        doc.rect(108, 75, 88, 35, 'F');
-        doc.setDrawColor(252, 165, 165);
-        doc.rect(108, 75, 88, 35, 'S');
-
-        doc.setTextColor(185, 28, 28);
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.text("Red Flag Homes Managed", 114, 85);
-        doc.setFontSize(18);
-        doc.text(`${sym}${a.redFlagMonthly.expected.toLocaleString()} / mo`, 114, 98);
-
-        // Revenue Table
-        doc.setTextColor(17, 24, 39);
-        doc.setFontSize(12);
-        doc.setFont('Helvetica', 'bold');
-        doc.text("Detailed Monthly Revenue Scenarios", 14, 125);
-
-        let y = 135;
-        doc.setFillColor(243, 244, 246);
-        doc.rect(14, y, 182, 10, 'F');
-        doc.setFontSize(9);
-        doc.text("Scenario", 20, y + 7);
-        doc.text("Nightly Rate", 65, y + 7);
-        doc.text("Occupancy", 110, y + 7);
-        doc.text("Red Flag Revenue", 155, y + 7);
-
-        y += 10;
-        doc.setFont('Helvetica', 'normal');
-        doc.text("Conservative", 20, y + 7);
-        doc.text(`${sym}${a.nightlyRateRange.min}`, 65, y + 7);
-        doc.text(`${a.monthlyOccupancyRange.min}%`, 110, y + 7);
-        doc.text(`${sym}${a.redFlagMonthly.conservative.toLocaleString()}`, 155, y + 7);
-
-        y += 10;
-        doc.text("Expected Average", 20, y + 7);
-        doc.text(`${sym}${a.nightlyRateRange.avg}`, 65, y + 7);
-        doc.text(`${a.monthlyOccupancyRange.avg}%`, 110, y + 7);
-        doc.text(`${sym}${a.redFlagMonthly.expected.toLocaleString()}`, 155, y + 7);
-
-        y += 10;
-        doc.text("Peak Upside", 20, y + 7);
-        doc.text(`${sym}${a.nightlyRateRange.max}`, 65, y + 7);
-        doc.text(`${a.monthlyOccupancyRange.max}%`, 110, y + 7);
-        doc.text(`${sym}${a.redFlagMonthly.upside.toLocaleString()}`, 155, y + 7);
-
-        // Core Drivers
-        y += 20;
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.text("Why Red Flag Homes Increases Yield (+10% to +20%)", 14, y);
-
-        y += 8;
-        doc.setFontSize(9);
-        doc.setFont('Helvetica', 'normal');
-        doc.text("1. Professional Photography & Staging: Increases listing click-through rate.", 14, y); y += 6;
-        doc.text("2. 24/7 AI Guest Co-Host (Bella): Immediate responses in 50+ languages.", 14, y); y += 6;
-        doc.text("3. Dynamic Pricing: Algorithmic adjustments for weekend & event demand surges.", 14, y); y += 6;
-        doc.text("4. Multi-Channel Synchronization: Direct booking engine + BNB platforms.", 14, y);
-
-        // Disclaimer
-        y += 16;
-        doc.setFontSize(8);
-        doc.setTextColor(107, 114, 128);
-        doc.text("Disclaimer: This is an independent market estimate based on location data. Actual earnings vary by season,", 14, y); y += 4;
-        doc.text("pricing, guest reviews, and property maintenance. This report is not a financial income guarantee.", 14, y);
-
-        // Footer CTA
-        y += 12;
-        doc.setFillColor(185, 28, 28);
-        doc.rect(14, y, 182, 16, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.text("Talk to Red Flag Homes: hello@redflaghomes.in • WhatsApp +1 205 351 6554", 30, y + 10);
-
-        doc.save("Red-Flag-Homes-Free-BNB-Earning-Audit.pdf");
-      }
-
-      function fireEvent(evt) {
-        console.log('[Analytics Event]', evt);
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', evt, { event_category: 'freeaudit' });
+          mapCanvasEl.innerHTML = `
+            <iframe width="100%" height="100%" frameborder="0" style="border:0; border-radius:0 0 8px 8px;"
+              src="https://maps.google.com/maps?q=${lat},${lng}&hl=en&z=14&output=embed"
+              allowfullscreen loading="lazy"></iframe>
+          `;
         }
-      }
 
-      document.getElementById('fa-btn-wa').addEventListener('click', () => fireEvent('whatsapp_clicked'));
-      document.getElementById('fa-btn-talk').addEventListener('click', () => fireEvent('contact_requested'));
+        // Multi-step form
+        let currentStep = 1;
+        const totalSteps = 5;
+        let auditResultData = null;
+
+        const steps = document.querySelectorAll('.fa-step');
+        const progressBar = document.getElementById('fa-progress-bar');
+        const progressText = document.getElementById('fa-progress-text');
+        const progressPct = document.getElementById('fa-progress-pct');
+        const btnBack = document.getElementById('fa-btn-back');
+        const btnNext = document.getElementById('fa-btn-next');
+
+        const listedRadios = document.querySelectorAll('input[name="fa-listed"]');
+        const conditionalListed = document.getElementById('fa-listed-conditional');
+
+        listedRadios.forEach(radio => {
+          radio.addEventListener('change', (e) => {
+            if (e.target.value === 'Yes') {
+              if (conditionalListed) conditionalListed.style.display = 'block';
+            } else {
+              if (conditionalListed) conditionalListed.style.display = 'none';
+            }
+          });
+        });
+
+        function updateStepView() {
+          steps.forEach(st => {
+            const stepNum = parseInt(st.getAttribute('data-step'), 10);
+            if (stepNum === currentStep) {
+              st.classList.add('active');
+            } else {
+              st.classList.remove('active');
+            }
+          });
+
+          const pct = Math.round((currentStep / totalSteps) * 100);
+          progressBar.style.width = pct + '%';
+          progressText.textContent = `Step ${currentStep} of ${totalSteps}`;
+          progressPct.textContent = `${pct}% Completed`;
+
+          btnBack.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+          btnNext.textContent = currentStep === totalSteps ? 'Generate Free Audit ✨' : 'Continue →';
+        }
+
+        async function saveStepProgress(stepNum) {
+          const formData = collectCurrentFormData();
+          try {
+            await fetch(`/api/free-audit/visitor/${visitorUuid}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                audit_status: 'in_progress',
+                current_step: stepNum,
+                completed_step: stepNum - 1,
+                property_country: formData.country,
+                property_city: formData.city,
+                property_type: formData.propertyType,
+                bedrooms: formData.bedrooms,
+                bathrooms: formData.bathrooms,
+                max_guests: formData.guests,
+                furnishing_status: formData.furnishing,
+                property_condition: formData.condition,
+                already_listed: formData.listed
+              })
+            });
+            fireFunnelEvent('audit_step_completed', { step: stepNum });
+          } catch (e) {
+            console.warn('Auto-save progress notice:', e);
+          }
+        }
+
+        function collectCurrentFormData() {
+          return {
+            country: document.getElementById('fa-country')?.value || 'India',
+            city: document.getElementById('fa-city')?.value || '',
+            address: document.getElementById('fa-address')?.value || '',
+            propertyType: document.querySelector('input[name="fa-prop-type"]:checked')?.value || 'Apartment',
+            bedrooms: document.getElementById('fa-bedrooms')?.value || '1 Bedroom',
+            bathrooms: document.getElementById('fa-bathrooms')?.value || '1 Bathroom',
+            guests: document.getElementById('fa-guests')?.value || '2 Guests',
+            furnishing: document.getElementById('fa-furnishing')?.value || 'Fully Furnished',
+            condition: document.getElementById('fa-condition')?.value || 'Good condition',
+            listed: document.querySelector('input[name="fa-listed"]:checked')?.value || 'No',
+            currentRate: document.getElementById('fa-curr-rate')?.value || '',
+            currentOccupancy: document.getElementById('fa-curr-occ')?.value || '',
+            photoQuality: document.querySelector('input[name="fa-photos"]:checked')?.value || 'Good phone photos',
+            amenities: Array.from(document.querySelectorAll('input[name="fa-amenities"]:checked')).map(el => el.value),
+            targetIncome: document.getElementById('fa-target-income')?.value || '',
+            availability: document.getElementById('fa-availability')?.value || 'Full-time',
+            openMgmt: document.querySelector('input[name="fa-open-mgmt"]:checked')?.value || 'Yes'
+          };
+        }
+
+        btnBack.addEventListener('click', () => {
+          if (currentStep > 1) {
+            currentStep--;
+            updateStepView();
+          }
+        });
+
+        btnNext.addEventListener('click', async () => {
+          if (!validateStep(currentStep)) return;
+
+          if (currentStep === 1) {
+            fireFunnelEvent('audit_started');
+          }
+
+          if (currentStep < totalSteps) {
+            currentStep++;
+            updateStepView();
+            saveStepProgress(currentStep);
+          } else {
+            fireFunnelEvent('estimate_requested');
+            await runAuditAnalysis();
+          }
+        });
+
+        function validateStep(step) {
+          if (step === 1) {
+            const city = document.getElementById('fa-city').value.trim();
+            if (!city) {
+              alert('Please enter your city or property location.');
+              return false;
+            }
+          }
+          return true;
+        }
+
+        // Track funnel abandonment
+        window.addEventListener('beforeunload', () => {
+          if (currentStep > 1 && currentStep <= totalSteps && (!auditResultData)) {
+            navigator.sendBeacon && navigator.sendBeacon('/api/free-audit/event', JSON.stringify({
+              visitor_uuid: visitorUuid,
+              session_id: sessionId,
+              event_name: 'audit_abandoned',
+              event_data_json: JSON.stringify({ abandoned_at_step: currentStep }),
+              page_url: window.location.href
+            }));
+          }
+        });
+
+        async function runAuditAnalysis() {
+          const formData = collectCurrentFormData();
+
+          document.getElementById('fa-form-container').style.display = 'none';
+          document.getElementById('fa-loading-card').style.display = 'block';
+
+          try {
+            const res = await fetch('/api/freeaudit/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(formData)
+            });
+
+            if (!res.ok) throw new Error('Analysis failed');
+            const data = await res.json();
+            auditResultData = { formData, analysis: data };
+          } catch (err) {
+            console.warn('Fallback result triggered:', err);
+            const fallbackData = generateFallbackAnalysis(formData);
+            auditResultData = { formData, analysis: fallbackData };
+          } finally {
+            document.getElementById('fa-loading-card').style.display = 'none';
+            document.getElementById('fa-results-wrap').style.display = 'block';
+
+            const a = auditResultData.analysis;
+            fetch(`/api/free-audit/visitor/${visitorUuid}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                audit_status: 'completed',
+                conservative_revenue: a.selfManagedMonthly?.conservative,
+                expected_revenue: a.selfManagedMonthly?.expected,
+                upside_revenue: a.selfManagedMonthly?.upside,
+                redflag_revenue: a.redFlagMonthly?.expected,
+                uplift_amount: a.upliftMonthlyAmount,
+                uplift_percentage: a.upliftPercentage,
+                confidence_score: a.confidenceScore,
+                currency: a.currencySymbol
+              })
+            });
+
+            renderResults(auditResultData);
+            fireFunnelEvent('estimate_generated', { city: formData.city, country: formData.country });
+            fireFunnelEvent('estimate_viewed');
+          }
+        }
+
+        function formatMoney(val, symbol = '$') {
+          const num = Math.round(Number(val) || 0);
+          return symbol + num.toLocaleString();
+        }
+
+        function renderResults(data) {
+          const a = data.analysis;
+          const sym = a.currencySymbol || '$';
+
+          document.getElementById('fa-res-property-title').textContent = `${data.formData.bedrooms} ${data.formData.propertyType} in ${data.formData.city}`;
+          document.getElementById('fa-self-amount').textContent = formatMoney(a.selfManagedMonthly.expected, sym);
+          document.getElementById('fa-rf-amount').textContent = formatMoney(a.redFlagMonthly.expected, sym);
+          document.getElementById('fa-uplift-monthly').textContent = `+${formatMoney(a.upliftMonthlyAmount, sym)} / mo`;
+          document.getElementById('fa-uplift-annual').textContent = `+${formatMoney(a.upliftAnnualAmount, sym)} / yr`;
+          document.getElementById('fa-uplift-pct').textContent = `${a.upliftPercentage}%`;
+          document.getElementById('fa-rf-pct-sub').textContent = `${a.upliftPercentage}%`;
+
+          document.getElementById('fa-scen-rate-low').textContent = `${formatMoney(a.nightlyRateRange.min, sym)} / night`;
+          document.getElementById('fa-scen-rate-avg').textContent = `${formatMoney(a.nightlyRateRange.avg, sym)} / night`;
+          document.getElementById('fa-scen-rate-high').textContent = `${formatMoney(a.nightlyRateRange.max, sym)} / night`;
+
+          document.getElementById('fa-scen-occ-low').textContent = `${a.monthlyOccupancyRange.min}%`;
+          document.getElementById('fa-scen-occ-avg').textContent = `${a.monthlyOccupancyRange.avg}%`;
+          document.getElementById('fa-scen-occ-high').textContent = `${a.monthlyOccupancyRange.max}%`;
+
+          document.getElementById('fa-scen-self-low').textContent = formatMoney(a.selfManagedMonthly.conservative, sym);
+          document.getElementById('fa-scen-self-avg').textContent = formatMoney(a.selfManagedMonthly.expected, sym);
+          document.getElementById('fa-scen-self-high').textContent = formatMoney(a.selfManagedMonthly.upside, sym);
+
+          document.getElementById('fa-scen-rf-low').textContent = formatMoney(a.redFlagMonthly.conservative, sym);
+          document.getElementById('fa-scen-rf-avg').textContent = formatMoney(a.redFlagMonthly.expected, sym);
+          document.getElementById('fa-scen-rf-high').textContent = formatMoney(a.redFlagMonthly.upside, sym);
+
+          document.getElementById('fa-scen-ann-low').textContent = formatMoney(a.redFlagMonthly.conservative * 12, sym);
+          document.getElementById('fa-scen-ann-avg').textContent = formatMoney(a.redFlagMonthly.expected * 12, sym);
+          document.getElementById('fa-scen-ann-high').textContent = formatMoney(a.redFlagMonthly.upside * 12, sym);
+
+          const tagsContainer = document.getElementById('fa-intel-tags');
+          tagsContainer.innerHTML = (a.nearbyAttractions || []).map(t => `<span class="fa-tag">${t}</span>`).join('');
+
+          document.getElementById('fa-intel-summary').textContent = a.competitivePositioning || `High demand driven by local attractions in ${data.formData.city}.`;
+          document.getElementById('fa-confidence-badge').textContent = a.confidenceScore || 'High';
+
+          const citContainer = document.getElementById('fa-citations-list');
+          if (a.citations && a.citations.length > 0) {
+            citContainer.innerHTML = a.citations.map(c => `<li><a href="${c.url}" target="_blank" rel="noopener">${c.title || c.url}</a></li>`).join('');
+          } else {
+            citContainer.innerHTML = `<li><a href="https://redflaghomes.in/journal" target="_blank">Red Flag Homes Market Analytics Engine</a></li>`;
+          }
+        }
+
+        function generateFallbackAnalysis(formData) {
+          const isIndia = formData.country === 'India';
+          const sym = isIndia ? '₹' : '$';
+          
+          let baseNightly = isIndia ? 3500 : 95;
+          if (formData.propertyType === 'Villa') baseNightly *= 2.2;
+          if (formData.bedrooms.includes('2')) baseNightly *= 1.4;
+          if (formData.bedrooms.includes('3')) baseNightly *= 1.8;
+
+          const lowRate = Math.round(baseNightly * 0.8);
+          const avgRate = Math.round(baseNightly);
+          const highRate = Math.round(baseNightly * 1.3);
+
+          const lowOcc = 50;
+          const avgOcc = 65;
+          const highOcc = 82;
+
+          const selfExpected = Math.round((avgRate * (30 * (avgOcc / 100))));
+          const selfCons = Math.round((lowRate * (30 * (lowOcc / 100))));
+          const selfUp = Math.round((highRate * (30 * (highOcc / 100))));
+
+          let upliftPct = 15;
+          if (formData.listed === 'No' || formData.photoQuality === 'No photos' || formData.photoQuality === 'Basic photos') {
+            upliftPct = 20;
+          } else if (formData.condition === 'Excellent' && formData.photoQuality === 'Professional') {
+            upliftPct = 10;
+          }
+
+          const rfExpected = Math.round(selfExpected * (1 + upliftPct / 100));
+          const rfCons = Math.round(selfCons * (1 + upliftPct / 100));
+          const rfUp = Math.round(selfUp * (1 + upliftPct / 100));
+
+          return {
+            currencySymbol: sym,
+            nightlyRateRange: { min: lowRate, avg: avgRate, max: highRate },
+            monthlyOccupancyRange: { min: lowOcc, avg: avgOcc, max: highOcc },
+            selfManagedMonthly: { conservative: selfCons, expected: selfExpected, upside: selfUp },
+            redFlagMonthly: { conservative: rfCons, expected: rfExpected, upside: rfUp },
+            upliftPercentage: upliftPct,
+            upliftMonthlyAmount: rfExpected - selfExpected,
+            upliftAnnualAmount: (rfExpected - selfExpected) * 12,
+            confidenceScore: 'High',
+            competitivePositioning: `Prime location in ${formData.city} with high demand potential across short-stay platforms.`,
+            nearbyAttractions: [`${formData.city} City Center`, 'Transit Connections', 'Local Dining & Markets', 'Business Hub'],
+            citations: [
+              { title: `${formData.city} Short-Stay Market Insights`, url: `https://redflaghomes.in/journal` }
+            ]
+          };
+        }
+
+        // PDF & Lead Submission
+        document.getElementById('fa-lead-form').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById('fa-btn-download-pdf');
+          btn.disabled = true;
+          btn.textContent = 'Generating PDF Report…';
+
+          fireFunnelEvent('pdf_download_clicked');
+
+          const leadData = {
+            visitor_uuid: visitorUuid,
+            name: document.getElementById('fa-lead-name').value,
+            email: document.getElementById('fa-lead-email').value,
+            phone: document.getElementById('fa-lead-phone').value,
+            time: document.getElementById('fa-lead-time').value,
+            consent_marketing: document.getElementById('fa-lead-consent')?.checked || false,
+            consent_timestamp: new Date().toISOString(),
+            formData: auditResultData?.formData,
+            analysis: auditResultData?.analysis
+          };
+
+          // Save contact details to visitor record & leads
+          try {
+            await fetch(`/api/free-audit/visitor/${visitorUuid}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: leadData.name,
+                email: leadData.email,
+                phone: leadData.phone,
+                contact_requested: true,
+                contact_requested_at: new Date().toISOString(),
+                consent_marketing: leadData.consent_marketing,
+                consent_timestamp: leadData.consent_timestamp,
+                admin_status: 'new'
+              })
+            });
+
+            await fetch('/api/freeaudit/lead', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(leadData)
+            });
+          } catch (err) {
+            console.warn('Lead submit notice:', err);
+          }
+
+          // Generate PDF Report
+          generatePdfDoc(leadData);
+          fireFunnelEvent('pdf_downloaded');
+          fireFunnelEvent('contact_form_submitted');
+          btn.disabled = false;
+          btn.textContent = '✓ Downloaded PDF Report';
+        });
+
+        function generatePdfDoc(data) {
+          const { jspdf } = window.jspdf || {};
+          if (!jspdf) return;
+
+          const doc = new jspdf.jsPDF();
+          const a = data.analysis;
+          const f = data.formData;
+          const sym = a.currencySymbol || '$';
+
+          doc.setFillColor(185, 28, 28);
+          doc.rect(0, 0, 210, 30, 'F');
+
+          doc.setTextColor(255, 255, 255);
+          doc.setFont('Helvetica', 'bold');
+          doc.setFontSize(20);
+          doc.text("RED FLAG HOMES", 14, 18);
+          doc.setFontSize(10);
+          doc.setFont('Helvetica', 'normal');
+          doc.text("FREE BNB EARNING AUDIT REPORT", 140, 18);
+
+          doc.setTextColor(17, 24, 39);
+          doc.setFontSize(16);
+          doc.setFont('Helvetica', 'bold');
+          doc.text("Property Earning Potential Summary", 14, 45);
+
+          doc.setFontSize(10);
+          doc.setFont('Helvetica', 'normal');
+          doc.text(`Location: ${f.city}, ${f.country}`, 14, 53);
+          doc.text(`Property: ${f.bedrooms} • ${f.bathrooms} Bath • ${f.propertyType}`, 14, 60);
+          doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 67);
+
+          doc.setFillColor(249, 250, 251);
+          doc.rect(14, 75, 88, 35, 'F');
+          doc.setDrawColor(229, 231, 235);
+          doc.rect(14, 75, 88, 35, 'S');
+
+          doc.setFont('Helvetica', 'bold');
+          doc.text("Self-Managed Estimate", 20, 85);
+          doc.setFontSize(18);
+          doc.setTextColor(17, 24, 39);
+          doc.text(`${sym}${a.selfManagedMonthly.expected.toLocaleString()} / mo`, 20, 98);
+
+          doc.setFillColor(254, 242, 242);
+          doc.rect(108, 75, 88, 35, 'F');
+          doc.setDrawColor(252, 165, 165);
+          doc.rect(108, 75, 88, 35, 'S');
+
+          doc.setTextColor(185, 28, 28);
+          doc.setFont('Helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.text("Red Flag Homes Managed", 114, 85);
+          doc.setFontSize(18);
+          doc.text(`${sym}${a.redFlagMonthly.expected.toLocaleString()} / mo`, 114, 98);
+
+          doc.setTextColor(17, 24, 39);
+          doc.setFontSize(12);
+          doc.setFont('Helvetica', 'bold');
+          doc.text("Detailed Monthly Revenue Scenarios", 14, 125);
+
+          let y = 135;
+          doc.setFillColor(243, 244, 246);
+          doc.rect(14, y, 182, 10, 'F');
+          doc.setFontSize(9);
+          doc.text("Scenario", 20, y + 7);
+          doc.text("Nightly Rate", 65, y + 7);
+          doc.text("Occupancy", 110, y + 7);
+          doc.text("Red Flag Revenue", 155, y + 7);
+
+          y += 10;
+          doc.setFont('Helvetica', 'normal');
+          doc.text("Conservative", 20, y + 7);
+          doc.text(`${sym}${a.nightlyRateRange.min}`, 65, y + 7);
+          doc.text(`${a.monthlyOccupancyRange.min}%`, 110, y + 7);
+          doc.text(`${sym}${a.redFlagMonthly.conservative.toLocaleString()}`, 155, y + 7);
+
+          y += 10;
+          doc.text("Expected Average", 20, y + 7);
+          doc.text(`${sym}${a.nightlyRateRange.avg}`, 65, y + 7);
+          doc.text(`${a.monthlyOccupancyRange.avg}%`, 110, y + 7);
+          doc.text(`${sym}${a.redFlagMonthly.expected.toLocaleString()}`, 155, y + 7);
+
+          y += 10;
+          doc.text("Peak Upside", 20, y + 7);
+          doc.text(`${sym}${a.nightlyRateRange.max}`, 65, y + 7);
+          doc.text(`${a.monthlyOccupancyRange.max}%`, 110, y + 7);
+          doc.text(`${sym}${a.redFlagMonthly.upside.toLocaleString()}`, 155, y + 7);
+
+          y += 20;
+          doc.setFont('Helvetica', 'bold');
+          doc.setFontSize(12);
+          doc.text("Why Red Flag Homes Increases Yield (+10% to +20%)", 14, y);
+
+          y += 8;
+          doc.setFontSize(9);
+          doc.setFont('Helvetica', 'normal');
+          doc.text("1. Professional Photography & Staging: Increases listing click-through rate.", 14, y); y += 6;
+          doc.text("2. 24/7 AI Guest Co-Host (Bella): Immediate responses in 50+ languages.", 14, y); y += 6;
+          doc.text("3. Dynamic Pricing: Algorithmic adjustments for weekend & event demand surges.", 14, y); y += 6;
+          doc.text("4. Multi-Channel Synchronization: Direct booking engine + BNB platforms.", 14, y);
+
+          y += 16;
+          doc.setFontSize(8);
+          doc.setTextColor(107, 114, 128);
+          doc.text("Disclaimer: This is an independent market estimate based on location data. Actual earnings vary by season,", 14, y); y += 4;
+          doc.text("pricing, guest reviews, and property maintenance. This report is not a financial income guarantee.", 14, y);
+
+          y += 12;
+          doc.setFillColor(185, 28, 28);
+          doc.rect(14, y, 182, 16, 'F');
+          doc.setTextColor(255, 255, 255);
+          doc.setFont('Helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.text("Talk to Red Flag Homes: hello@redflaghomes.in • WhatsApp +1 205 351 6554", 30, y + 10);
+
+          doc.save("Red-Flag-Homes-Free-BNB-Earning-Audit.pdf");
+        }
+
+        document.getElementById('fa-btn-wa')?.addEventListener('click', () => fireFunnelEvent('whatsapp_clicked'));
+        document.getElementById('fa-btn-talk')?.addEventListener('click', () => fireFunnelEvent('contact_requested'));
+
+      })();
 
     })();
   </script>

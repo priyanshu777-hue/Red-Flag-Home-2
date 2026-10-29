@@ -1053,6 +1053,456 @@ app.post('/api/freeaudit/lead', async (req, res) => {
   }
 });
 
+/* ==========================================================================
+   FREE AUDIT LEADS & VISITOR TRACKING API ENDPOINTS
+   ========================================================================== */
+
+function hashIp(ip) {
+  if (!ip) return '';
+  return crypto.createHash('sha256').update(ip + '_rf_salt_2026').digest('hex').substring(0, 32);
+}
+
+// POST /api/free-audit/visitor - Capture/update visitor profile & session
+app.post('/api/free-audit/visitor', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const data = req.body || {};
+    const visitor_uuid = data.visitor_uuid || ('v_' + crypto.randomBytes(8).toString('hex'));
+    const session_id = data.session_id || ('s_' + crypto.randomBytes(8).toString('hex'));
+
+    const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
+    const ip_hash = hashIp(rawIp);
+    const nowIso = new Date().toISOString();
+
+    const docRef = db.collection('free_audit_visitors').doc(visitor_uuid);
+    const existingDoc = await docRef.get();
+
+    const payload = {
+      visitor_uuid,
+      session_id,
+      updated_at: nowIso,
+      last_seen_at: nowIso,
+      ip_hash,
+      user_agent: data.user_agent || req.headers['user-agent'] || '',
+      device_type: data.device_type || 'desktop',
+      browser: data.browser || '',
+      os: data.os || '',
+      screen_width: data.screen_width || 0,
+      screen_height: data.screen_height || 0,
+      language: data.language || '',
+      country: data.country || '',
+      region: data.region || '',
+      city: data.city || '',
+      referrer_url: data.referrer_url || '',
+      landing_url: data.landing_url || '',
+      current_url: data.current_url || '',
+      utm_source: data.utm_source || '',
+      utm_medium: data.utm_medium || '',
+      utm_campaign: data.utm_campaign || '',
+      utm_term: data.utm_term || '',
+      utm_content: data.utm_content || '',
+      gclid: data.gclid || '',
+      fbclid: data.fbclid || '',
+      msclkid: data.msclkid || '',
+      ttclid: data.ttclid || ''
+    };
+
+    if (!existingDoc.exists) {
+      payload.created_at = nowIso;
+      payload.first_seen_at = nowIso;
+      payload.audit_status = 'started';
+      payload.current_step = 1;
+      payload.completed_step = 0;
+      payload.admin_status = 'new';
+      await docRef.set(payload);
+    } else {
+      await docRef.set(payload, { merge: true });
+    }
+
+    const eventRef = db.collection('free_audit_events').doc();
+    await eventRef.set({
+      id: eventRef.id,
+      visitor_uuid,
+      session_id,
+      event_name: existingDoc.exists ? 'return_visit' : 'freeaudit_page_viewed',
+      event_data_json: JSON.stringify({ landing_url: data.landing_url, utm_source: data.utm_source }),
+      page_url: data.current_url || '/freeaudit',
+      referrer_url: data.referrer_url || '',
+      created_at: nowIso
+    });
+
+    return res.json({ success: true, visitor_uuid, session_id });
+  } catch (err) {
+    console.error('[free-audit/visitor] error:', err);
+    return res.status(500).json({ error: 'Failed to record visitor' });
+  }
+});
+
+// PATCH /api/free-audit/visitor/:id - Auto-save step progress & form details
+app.patch('/api/free-audit/visitor/:id', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const id = req.params.id;
+    const patch = req.body || {};
+    patch.updated_at = new Date().toISOString();
+    patch.last_seen_at = patch.updated_at;
+
+    await db.collection('free_audit_visitors').doc(id).set(patch, { merge: true });
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('[free-audit/visitor patch] error:', err);
+    return res.status(500).json({ error: 'Failed to update visitor progress' });
+  }
+});
+
+// POST /api/free-audit/event - Log funnel events
+app.post('/api/free-audit/event', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const { visitor_uuid, session_id, event_name, event_data_json, page_url, referrer_url } = req.body || {};
+    if (!visitor_uuid || !event_name) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    const nowIso = new Date().toISOString();
+    const eventRef = db.collection('free_audit_events').doc();
+    await eventRef.set({
+      id: eventRef.id,
+      visitor_uuid,
+      session_id: session_id || '',
+      event_name,
+      event_data_json: typeof event_data_json === 'object' ? JSON.stringify(event_data_json) : (event_data_json || '{}'),
+      page_url: page_url || '/freeaudit',
+      referrer_url: referrer_url || '',
+      created_at: nowIso
+    });
+
+    const visitorPatch = { updated_at: nowIso, last_seen_at: nowIso };
+    if (event_name === 'pdf_downloaded') {
+      visitorPatch.pdf_downloaded = true;
+      visitorPatch.pdf_download_at = nowIso;
+    } else if (event_name === 'whatsapp_clicked') {
+      visitorPatch.whatsapp_clicked = true;
+      visitorPatch.whatsapp_clicked_at = nowIso;
+    } else if (event_name === 'call_clicked') {
+      visitorPatch.call_clicked = true;
+      visitorPatch.call_clicked_at = nowIso;
+    } else if (event_name === 'contact_requested' || event_name === 'contact_form_submitted') {
+      visitorPatch.contact_requested = true;
+      visitorPatch.contact_requested_at = nowIso;
+    } else if (event_name === 'audit_started') {
+      visitorPatch.audit_status = 'started';
+    } else if (event_name === 'audit_completed') {
+      visitorPatch.audit_status = 'completed';
+    } else if (event_name === 'audit_abandoned') {
+      visitorPatch.audit_status = 'abandoned';
+    }
+
+    await db.collection('free_audit_visitors').doc(visitor_uuid).set(visitorPatch, { merge: true });
+
+    return res.json({ success: true, event_id: eventRef.id });
+  } catch (err) {
+    console.error('[free-audit/event] error:', err);
+    return res.status(500).json({ error: 'Failed to record event' });
+  }
+});
+
+// POST /api/free-audit/places-autocomplete - Google Places Autocomplete proxy with session tokens
+app.post('/api/free-audit/places-autocomplete', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const { input, sessionToken } = req.body || {};
+  if (!input || typeof input !== 'string' || input.trim().length < 2) {
+    return res.json({ predictions: [] });
+  }
+
+  const query = input.trim();
+  const mapsKey = process.env.GOOGLE_MAPS_API_KEY || process.env.GEMINI_API_KEY;
+
+  if (mapsKey) {
+    try {
+      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&sessiontoken=${encodeURIComponent(sessionToken || '')}&key=${mapsKey}`;
+      const r = await fetch(url);
+      if (r.ok) {
+        const data = await r.json();
+        if (data.status === 'OK' && Array.isArray(data.predictions)) {
+          const predictions = data.predictions.map(p => ({
+            place_id: p.place_id,
+            description: p.description,
+            main_text: p.structured_formatting?.main_text || p.description.split(',')[0],
+            secondary_text: p.structured_formatting?.secondary_text || p.description.split(',').slice(1).join(',').trim()
+          }));
+          return res.json({ predictions });
+        }
+      }
+    } catch (err) {
+      console.warn('[places-autocomplete] Google Maps fetch warning:', err.message);
+    }
+  }
+
+  // Global OSM / Nominatim geocoding fallback
+  try {
+    const nomUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=6`;
+    const nomRes = await fetch(nomUrl, { headers: { 'User-Agent': 'RedFlagHomesFreeAudit/1.0' } });
+    if (nomRes.ok) {
+      const nomData = await nomRes.json();
+      if (Array.isArray(nomData) && nomData.length > 0) {
+        const predictions = nomData.map((item) => {
+          const addr = item.address || {};
+          const city = addr.city || addr.town || addr.village || addr.suburb || addr.county || '';
+          const state = addr.state || addr.region || '';
+          const country = addr.country || '';
+          const secondary = [city, state, country].filter(Boolean).join(', ');
+          return {
+            place_id: 'nom_' + item.place_id,
+            description: item.display_name,
+            main_text: item.name || item.display_name.split(',')[0],
+            secondary_text: secondary || item.display_name.split(',').slice(1).join(',').trim(),
+            lat: parseFloat(item.lat),
+            lng: parseFloat(item.lon),
+            city,
+            region: state,
+            country,
+            postal_code: addr.postcode || ''
+          };
+        });
+        return res.json({ predictions });
+      }
+    }
+  } catch (nomErr) {
+    console.warn('[places-autocomplete] Nominatim fallback warning:', nomErr.message);
+  }
+
+  return res.json({ predictions: [] });
+});
+
+// POST /api/free-audit/place-details - Google Place Details proxy
+app.post('/api/free-audit/place-details', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const { place_id, sessionToken, description, lat, lng, city, region, country, postal_code } = req.body || {};
+  if (!place_id) {
+    return res.status(400).json({ error: 'Missing place_id' });
+  }
+
+  const mapsKey = process.env.GOOGLE_MAPS_API_KEY || process.env.GEMINI_API_KEY;
+
+  if (mapsKey && !place_id.startsWith('nom_')) {
+    try {
+      const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(place_id)}&sessiontoken=${encodeURIComponent(sessionToken || '')}&fields=address_components,formatted_address,geometry,place_id,name&key=${mapsKey}`;
+      const r = await fetch(url);
+      if (r.ok) {
+        const data = await r.json();
+        if (data.status === 'OK' && data.result) {
+          const resObj = data.result;
+          const comps = resObj.address_components || [];
+          const getComp = (type) => comps.find(c => c.types.includes(type))?.long_name || '';
+
+          const pCity = getComp('locality') || getComp('administrative_area_level_2') || getComp('sublocality_level_1');
+          const pRegion = getComp('administrative_area_level_1');
+          const pCountry = getComp('country');
+          const pPostal = getComp('postal_code');
+          const pLat = resObj.geometry?.location?.lat || 0;
+          const pLng = resObj.geometry?.location?.lng || 0;
+
+          return res.json({
+            place_id: resObj.place_id,
+            formatted_address: resObj.formatted_address,
+            name: resObj.name,
+            lat: pLat,
+            lng: pLng,
+            city: pCity,
+            region: pRegion,
+            country: pCountry,
+            postal_code: pPostal
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[place-details] Google Maps Details warning:', err.message);
+    }
+  }
+
+  return res.json({
+    place_id,
+    formatted_address: description || place_id,
+    lat: lat || 12.9352,
+    lng: lng || 77.6245,
+    city: city || 'Bengaluru',
+    region: region || 'Karnataka',
+    country: country || 'India',
+    postal_code: postal_code || ''
+  });
+});
+
+// GET /api/admin/free-audit/leads - Admin get list of leads
+app.get('/api/admin/free-audit/leads', verifyAdminToken, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const snap = await db.collection('free_audit_visitors').orderBy('updated_at', 'desc').limit(200).get();
+    const leads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return res.json({ leads, total: leads.length });
+  } catch (err) {
+    console.error('[admin/free-audit/leads] error:', err);
+    return res.status(500).json({ error: 'Failed to fetch leads' });
+  }
+});
+
+// GET /api/admin/free-audit/leads/:id - Admin get lead details & timeline events
+app.get('/api/admin/free-audit/leads/:id', verifyAdminToken, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const visitorDoc = await db.collection('free_audit_visitors').doc(req.params.id).get();
+    if (!visitorDoc.exists) {
+      return res.status(404).json({ error: 'Lead not found' });
+    }
+    const lead = { id: visitorDoc.id, ...visitorDoc.data() };
+
+    const eventsSnap = await db.collection('free_audit_events')
+      .where('visitor_uuid', '==', req.params.id)
+      .get();
+    
+    const events = eventsSnap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+
+    return res.json({ lead, events });
+  } catch (err) {
+    console.error('[admin/free-audit/lead detail] error:', err);
+    return res.status(500).json({ error: 'Failed to fetch lead details' });
+  }
+});
+
+// PATCH /api/admin/free-audit/leads/:id - Admin update status/notes
+app.patch('/api/admin/free-audit/leads/:id', verifyAdminToken, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const { admin_status, admin_notes, assigned_to } = req.body || {};
+    const patch = { updated_at: new Date().toISOString() };
+    if (admin_status !== undefined) patch.admin_status = admin_status;
+    if (admin_notes !== undefined) patch.admin_notes = admin_notes;
+    if (assigned_to !== undefined) patch.assigned_to = assigned_to;
+
+    await db.collection('free_audit_visitors').doc(req.params.id).set(patch, { merge: true });
+
+    const eventRef = db.collection('free_audit_events').doc();
+    await eventRef.set({
+      id: eventRef.id,
+      visitor_uuid: req.params.id,
+      event_name: 'admin_updated_lead',
+      event_data_json: JSON.stringify({ admin: req.adminUser?.email, patch }),
+      created_at: new Date().toISOString()
+    });
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('[admin/free-audit/lead patch] error:', err);
+    return res.status(500).json({ error: 'Failed to update lead' });
+  }
+});
+
+// GET /api/admin/free-audit/stats - Admin overview stats
+app.get('/api/admin/free-audit/stats', verifyAdminToken, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const snap = await db.collection('free_audit_visitors').get();
+    const docs = snap.docs.map(d => d.data());
+
+    const totalVisitors = docs.length;
+    const started = docs.filter(d => d.audit_status === 'started' || d.audit_status === 'in_progress' || d.audit_status === 'completed' || d.audit_status === 'abandoned').length;
+    const completed = docs.filter(d => d.audit_status === 'completed').length;
+    const abandoned = docs.filter(d => d.audit_status === 'abandoned').length;
+    const conversionRate = started > 0 ? ((completed / started) * 100).toFixed(1) : '0.0';
+
+    const pdfDownloads = docs.filter(d => d.pdf_downloaded).length;
+    const contactRequests = docs.filter(d => d.contact_requested).length;
+    const whatsappClicks = docs.filter(d => d.whatsapp_clicked).length;
+
+    const sources = {}, countries = {}, cities = {};
+    let pipelineRevenue = 0;
+
+    docs.forEach(d => {
+      const src = d.utm_source || d.referrer_url || 'Direct';
+      sources[src] = (sources[src] || 0) + 1;
+      const c = d.property_country || d.country || 'Unknown';
+      const ci = d.property_city || d.city || 'Unknown';
+      countries[c] = (countries[c] || 0) + 1;
+      cities[ci] = (cities[ci] || 0) + 1;
+      if (d.redflag_revenue) pipelineRevenue += Number(d.redflag_revenue) || 0;
+    });
+
+    return res.json({
+      totalVisitors,
+      started,
+      completed,
+      abandoned,
+      conversionRate,
+      pdfDownloads,
+      contactRequests,
+      whatsappClicks,
+      pipelineRevenue,
+      topSources: Object.entries(sources).sort((a,b) => b[1]-a[1]).slice(0, 5),
+      topCountries: Object.entries(countries).sort((a,b) => b[1]-a[1]).slice(0, 5),
+      topCities: Object.entries(cities).sort((a,b) => b[1]-a[1]).slice(0, 5)
+    });
+  } catch (err) {
+    console.error('[admin/free-audit/stats] error:', err);
+    return res.status(500).json({ error: 'Failed to compute stats' });
+  }
+});
+
+// GET /api/admin/free-audit/export - Admin CSV export
+app.get('/api/admin/free-audit/export', verifyAdminToken, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const snap = await db.collection('free_audit_visitors').orderBy('created_at', 'desc').get();
+    const docs = snap.docs.map(d => d.data());
+
+    const headers = [
+      'Visitor UUID', 'Date Created', 'Name', 'Email', 'Phone',
+      'Country', 'City', 'Property Type', 'Bedrooms', 'Bathrooms',
+      'Listed', 'Self Estimate', 'Red Flag Estimate', 'Potential Uplift',
+      'Audit Status', 'PDF Downloaded', 'Contact Requested', 'WhatsApp Clicked',
+      'UTM Source', 'UTM Campaign', 'Device', 'Admin Status', 'Admin Notes'
+    ];
+
+    let csv = headers.join(',') + '\n';
+    docs.forEach(d => {
+      const row = [
+        d.visitor_uuid || '',
+        d.created_at || '',
+        `"${(d.name || '').replace(/"/g, '""')}"`,
+        `"${(d.email || '').replace(/"/g, '""')}"`,
+        `"${(d.phone || '').replace(/"/g, '""')}"`,
+        `"${(d.property_country || d.country || '').replace(/"/g, '""')}"`,
+        `"${(d.property_city || d.city || '').replace(/"/g, '""')}"`,
+        `"${(d.property_type || '').replace(/"/g, '""')}"`,
+        d.bedrooms || '',
+        d.bathrooms || '',
+        d.already_listed || '',
+        d.expected_revenue || '',
+        d.redflag_revenue || '',
+        d.uplift_amount || '',
+        d.audit_status || '',
+        d.pdf_downloaded ? 'Yes' : 'No',
+        d.contact_requested ? 'Yes' : 'No',
+        d.whatsapp_clicked ? 'Yes' : 'No',
+        `"${(d.utm_source || '').replace(/"/g, '""')}"`,
+        `"${(d.utm_campaign || '').replace(/"/g, '""')}"`,
+        d.device_type || '',
+        d.admin_status || 'new',
+        `"${(d.admin_notes || '').replace(/"/g, '""')}"`
+      ];
+      csv += row.join(',') + '\n';
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="red-flag-free-audit-leads.csv"');
+    return res.status(200).send(csv);
+  } catch (err) {
+    console.error('[admin/free-audit/export] error:', err);
+    return res.status(500).json({ error: 'Failed to export CSV' });
+  }
+});
+
 app.get('/api/bella/receipt', async (req, res) => {
   res.set('Cache-Control', 'no-store');
   if (rfBellaLimited(req.ip)) return res.status(429).json({ ok: false, error: 'Too many requests. Please try again in a few minutes.' });

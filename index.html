@@ -906,6 +906,32 @@
     }
     .book-input option { background: var(--background); color: var(--foreground); }
     
+    .book-date-error-msg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      border-radius: 8px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #F87171;
+      font-size: 0.88rem;
+      font-weight: 500;
+      line-height: 1.4;
+      animation: dateErrSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes dateErrSlideIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .book-input.invalid-date-input {
+      border-color: #EF4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35) !important;
+      background-color: rgba(239, 68, 68, 0.05) !important;
+    }
+    
     .book-submit-btn { width: 100%; height: 56px; padding: 0 2.5rem; background: var(--raw-color-velvet-700); color: var(--foreground); font-family: var(--typeface-ui); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; border: none; border-radius: 999px; cursor: pointer; transition: background 0.2s ease, opacity 0.2s ease; display: flex; justify-content: center; align-items: center; }
     .book-submit-btn:hover { background: var(--raw-color-velvet-500); }
     
@@ -4948,6 +4974,7 @@
           </select>
         </div>
       </div>
+      <div id="book-date-error" class="book-date-error-msg" hidden role="alert"></div>
       <button type="button" id="book-submit-btn" class="book-submit-btn whatsapp-btn interactive-btn" style="width: 100%; height: 52px; border: none;">
           <span class="btn-dot"></span><span class="btn-label-default"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Check Availability</span><span class="btn-label-hover"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 8px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Check Availability →</span>
         </button>
@@ -7343,36 +7370,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Booking Form Date Logic & Shake Validation
+  // Booking Form Date Logic & Client-Side Validation
   (function initBookingFormDates() {
     const bookCheckin = document.getElementById('book-checkin');
     const bookCheckout = document.getElementById('book-checkout');
     const bookForm = document.getElementById('booking-form');
     const bookInputs = document.querySelectorAll('#booking-form .book-input');
+    const dateErrEl = document.getElementById('book-date-error');
 
     if (!bookCheckin || !bookCheckout) return;
 
-    const todayStr = new Date().toISOString().split('T')[0];
-    bookCheckin.min = todayStr;
+    function getTodayStr() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
 
-    function updateCheckoutMin() {
-      if (bookCheckin.value) {
-        const checkinDate = new Date(bookCheckin.value);
-        checkinDate.setDate(checkinDate.getDate() + 1);
-        const nextDayStr = checkinDate.toISOString().split('T')[0];
-        bookCheckout.min = nextDayStr;
-        if (bookCheckout.value && bookCheckout.value < nextDayStr) {
-          bookCheckout.value = nextDayStr;
-        }
-      } else {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        bookCheckout.min = tomorrow.toISOString().split('T')[0];
+    function addDaysStr(dateStr, days) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return '';
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      d.setDate(d.getDate() + days);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    const todayStr = getTodayStr();
+    bookCheckin.min = todayStr;
+    const tomorrowStr = addDaysStr(todayStr, 1);
+    bookCheckout.min = tomorrowStr;
+
+    function showErr(msg) {
+      if (dateErrEl) {
+        dateErrEl.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="flex:none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>${msg}</span>`;
+        dateErrEl.hidden = false;
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast({
+          title: 'Invalid Date Selection',
+          message: msg,
+          type: 'warning',
+          duration: 3500
+        });
       }
     }
 
-    bookCheckin.addEventListener('change', updateCheckoutMin);
-    updateCheckoutMin();
+    function clearErr() {
+      if (dateErrEl) {
+        dateErrEl.hidden = true;
+        dateErrEl.innerHTML = '';
+      }
+      bookCheckin.classList.remove('invalid-date-input');
+      bookCheckout.classList.remove('invalid-date-input');
+    }
 
     function triggerShake() {
       bookInputs.forEach(input => {
@@ -7383,26 +7438,103 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    if (bookForm) {
-      bookForm.addEventListener('submit', (e) => {
-        if (!bookCheckin.value || !bookCheckout.value || bookCheckout.value <= bookCheckin.value) {
-          e.preventDefault();
-          e.stopPropagation();
-          triggerShake();
-        }
-      }, true);
+    function validateDateRange(showFeedback = true) {
+      const checkinVal = bookCheckin.value;
+      const checkoutVal = bookCheckout.value;
+      const curToday = getTodayStr();
+
+      bookCheckin.classList.remove('invalid-date-input');
+      bookCheckout.classList.remove('invalid-date-input');
+
+      // 1. Validate Check-in not in past
+      if (checkinVal && checkinVal < curToday) {
+        bookCheckin.classList.add('invalid-date-input');
+        if (showFeedback) showErr('Check-in date cannot be in the past.');
+        return false;
+      }
+
+      // Update minimum checkout date based on checkin
+      const minCheckout = checkinVal ? addDaysStr(checkinVal, 1) : addDaysStr(curToday, 1);
+      bookCheckout.min = minCheckout;
+
+      // 2. Validate Check-out not in past
+      if (checkoutVal && checkoutVal < curToday) {
+        bookCheckout.classList.add('invalid-date-input');
+        if (showFeedback) showErr('Check-out date cannot be in the past.');
+        return false;
+      }
+
+      // 3. Validate Check-out strictly after check-in
+      if (checkinVal && checkoutVal && checkoutVal <= checkinVal) {
+        bookCheckout.classList.add('invalid-date-input');
+        if (showFeedback) showErr(`Check-out date (${checkoutVal}) must be at least 1 day after check-in (${checkinVal}).`);
+        return false;
+      }
+
+      clearErr();
+      return true;
     }
 
-    const bookBtn = document.getElementById('book-submit-btn');
-    if (bookBtn) {
-      bookBtn.addEventListener('click', (e) => {
-        if (!bookCheckin.value || !bookCheckout.value || bookCheckout.value <= bookCheckin.value) {
-          e.preventDefault();
-          e.stopPropagation();
-          triggerShake();
+    // Auto-adjust checkout date when checkin changes if checkout becomes invalid
+    bookCheckin.addEventListener('change', () => {
+      const checkinVal = bookCheckin.value;
+      if (checkinVal) {
+        const curToday = getTodayStr();
+        if (checkinVal < curToday) {
+          bookCheckin.value = curToday;
+          showErr('Check-in date cannot be in the past. Set to today.');
         }
-      }, true);
-    }
+        const minCheckout = addDaysStr(bookCheckin.value, 1);
+        bookCheckout.min = minCheckout;
+
+        if (bookCheckout.value && bookCheckout.value <= bookCheckin.value) {
+          bookCheckout.value = minCheckout;
+          if (dateErrEl) {
+            dateErrEl.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="flex:none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Check-out auto-adjusted to <b>${minCheckout}</b> (1-night minimum).</span>`;
+            dateErrEl.hidden = false;
+            setTimeout(() => { if (dateErrEl) dateErrEl.hidden = true; }, 4000);
+          }
+        } else {
+          validateDateRange(true);
+        }
+      } else {
+        validateDateRange(false);
+      }
+    });
+
+    bookCheckout.addEventListener('change', () => {
+      validateDateRange(true);
+    });
+
+    ['input', 'blur'].forEach(evt => {
+      bookCheckin.addEventListener(evt, () => validateDateRange(false));
+      bookCheckout.addEventListener(evt, () => validateDateRange(false));
+    });
+
+    // Form submission validation
+    const handleFormValidation = (e) => {
+      if (!bookCheckin.value || !bookCheckout.value) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerShake();
+        if (!bookCheckin.value) bookCheckin.classList.add('invalid-date-input');
+        if (!bookCheckout.value) bookCheckout.classList.add('invalid-date-input');
+        showErr('Please select both check-in and check-out dates.');
+        return false;
+      }
+
+      if (!validateDateRange(true)) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerShake();
+        return false;
+      }
+      return true;
+    };
+
+    if (bookForm) bookForm.addEventListener('submit', handleFormValidation, true);
+    const bookBtn = document.getElementById('book-submit-btn');
+    if (bookBtn) bookBtn.addEventListener('click', handleFormValidation, true);
   })();
 
   // Intercept Booking form click to persist in Firestore

@@ -46,6 +46,95 @@
         "createdAt": { "type": "string" }
       },
       "required": ["userId", "userEmail"]
+    },
+    "FreeAuditVisitor": {
+      "title": "Free Audit Visitor & Lead",
+      "description": "Visitor session, UTM attribution, property audit form answers, revenue estimates, and lead status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "visitor_uuid": { "type": "string" },
+        "session_id": { "type": "string" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" },
+        "first_seen_at": { "type": "string" },
+        "last_seen_at": { "type": "string" },
+        "ip_hash": { "type": "string" },
+        "user_agent": { "type": "string" },
+        "device_type": { "type": "string" },
+        "browser": { "type": "string" },
+        "os": { "type": "string" },
+        "screen_width": { "type": "number" },
+        "screen_height": { "type": "number" },
+        "language": { "type": "string" },
+        "country": { "type": "string" },
+        "region": { "type": "string" },
+        "city": { "type": "string" },
+        "referrer_url": { "type": "string" },
+        "landing_url": { "type": "string" },
+        "current_url": { "type": "string" },
+        "traffic_source": { "type": "string" },
+        "utm_source": { "type": "string" },
+        "utm_medium": { "type": "string" },
+        "utm_campaign": { "type": "string" },
+        "utm_term": { "type": "string" },
+        "utm_content": { "type": "string" },
+        "gclid": { "type": "string" },
+        "fbclid": { "type": "string" },
+        "msclkid": { "type": "string" },
+        "ttclid": { "type": "string" },
+        "property_country": { "type": "string" },
+        "property_city": { "type": "string" },
+        "property_locality": { "type": "string" },
+        "place_id": { "type": "string" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "property_type": { "type": "string" },
+        "bedrooms": { "type": "string" },
+        "bathrooms": { "type": "string" },
+        "max_guests": { "type": "string" },
+        "furnishing_status": { "type": "string" },
+        "property_condition": { "type": "string" },
+        "already_listed": { "type": "string" },
+        "photo_quality": { "type": "string" },
+        "conservative_revenue": { "type": "number" },
+        "expected_revenue": { "type": "number" },
+        "upside_revenue": { "type": "number" },
+        "redflag_revenue": { "type": "number" },
+        "uplift_amount": { "type": "number" },
+        "uplift_percentage": { "type": "number" },
+        "confidence_score": { "type": "string" },
+        "currency": { "type": "string" },
+        "current_step": { "type": "number" },
+        "completed_step": { "type": "number" },
+        "audit_status": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "marketing_consent": { "type": "boolean" },
+        "pdf_downloaded": { "type": "boolean" },
+        "contact_requested": { "type": "boolean" },
+        "whatsapp_clicked": { "type": "boolean" },
+        "call_clicked": { "type": "boolean" },
+        "admin_status": { "type": "string" },
+        "assigned_to": { "type": "string" },
+        "admin_notes": { "type": "string" }
+      },
+      "required": ["visitor_uuid"]
+    },
+    "FreeAuditEvent": {
+      "title": "Free Audit Visitor Event",
+      "description": "Granular user action event in the /freeaudit funnel",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "visitor_uuid": { "type": "string" },
+        "session_id": { "type": "string" },
+        "event_name": { "type": "string" },
+        "event_data_json": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["visitor_uuid", "event_name"]
     }
   },
   "firestore": {
@@ -63,6 +152,16 @@
       "path": "inquiries/{inquiryId}",
       "schema": "BookingInquiry",
       "description": "Booking requests and reservations"
+    },
+    "free_audit_visitors": {
+      "path": "free_audit_visitors/{visitorUuid}",
+      "schema": "FreeAuditVisitor",
+      "description": "Visitor session tracking and BNB earning audit leads"
+    },
+    "free_audit_events": {
+      "path": "free_audit_events/{eventId}",
+      "schema": "FreeAuditEvent",
+      "description": "Audit funnel events and CTA tracking"
     }
   }
 }

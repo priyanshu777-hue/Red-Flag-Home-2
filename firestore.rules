@@ -14,8 +14,9 @@ service cloud.firestore {
     function isRfAdmin() {
       return request.auth != null
         && (request.auth.token.email_verified == true || request.auth.token.firebase.sign_in_provider == 'password')
-        && request.auth.token.email in ['priyanshu@redflaghomes.in'];
+        && request.auth.token.email in ['priyanshu@redflaghomes.in', 'crazypriyanshu.777@gmail.com'];
     }
+
     match /applications/{id}  { allow read, update, delete: if isRfAdmin(); }
     match /inquiries/{id}     { allow read, update, delete: if isRfAdmin(); }
     match /users/{id}         { allow read: if isRfAdmin(); }
@@ -25,6 +26,14 @@ service cloud.firestore {
     match /leads/{id} { 
       allow read, create: if true;
       allow update, delete: if isRfAdmin();
+    }
+
+    // Free Audit Visitors & Events: Read/write access restricted to authenticated admins
+    match /free_audit_visitors/{id} {
+      allow read, write: if isRfAdmin();
+    }
+    match /free_audit_events/{id} {
+      allow read, write: if isRfAdmin();
     }
 
     // User profile documents
