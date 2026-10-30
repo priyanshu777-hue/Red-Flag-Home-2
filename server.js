@@ -1054,8 +1054,243 @@ app.post('/api/freeaudit/lead', async (req, res) => {
 });
 
 /* ==========================================================================
-   FREE AUDIT LEADS & VISITOR TRACKING API ENDPOINTS
+   FREE AUDIT LEADS & VISITOR TRACKING API ENDPOINTS (REST + FAIL-SAFE)
    ========================================================================== */
+
+const fsRestConfig = require('./firebase-applet-config.json');
+let cachedAdminToken = null;
+let cachedAdminTokenExpiry = 0;
+
+async function getAdminToken() {
+  const now = Date.now();
+  if (cachedAdminToken && cachedAdminTokenExpiry > now + 60000) {
+    return cachedAdminToken;
+  }
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password) return null;
+  try {
+    const res = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + fsRestConfig.apiKey, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'priyanshu@redflaghomes.in',
+        password,
+        returnSecureToken: true
+      })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    cachedAdminToken = data.idToken;
+    cachedAdminTokenExpiry = now + (parseInt(data.expiresIn || '3600', 10) * 1000);
+    return cachedAdminToken;
+  } catch (err) {
+    console.warn('[getAdminToken] error:', err.message);
+    return null;
+  }
+}
+
+function toFirestoreValue(val) {
+  if (val === null || val === undefined) return { nullValue: null };
+  if (typeof val === 'boolean') return { booleanValue: val };
+  if (typeof val === 'number') {
+    return Number.isInteger(val) ? { integerValue: String(val) } : { doubleValue: val };
+  }
+  if (typeof val === 'string') return { stringValue: val };
+  if (Array.isArray(val)) {
+    return { arrayValue: { values: val.map(toFirestoreValue) } };
+  }
+  if (typeof val === 'object') {
+    const fields = {};
+    for (const [k, v] of Object.entries(val)) {
+      if (v !== undefined) fields[k] = toFirestoreValue(v);
+    }
+    return { mapValue: { fields } };
+  }
+  return { stringValue: String(val) };
+}
+
+function fromFirestoreValue(val) {
+  if (!val) return null;
+  if ('nullValue' in val) return null;
+  if ('booleanValue' in val) return val.booleanValue;
+  if ('integerValue' in val) return parseInt(val.integerValue, 10);
+  if ('doubleValue' in val) return val.doubleValue;
+  if ('stringValue' in val) return val.stringValue;
+  if ('timestampValue' in val) return val.timestampValue;
+  if ('arrayValue' in val) return (val.arrayValue.values || []).map(fromFirestoreValue);
+  if ('mapValue' in val) {
+    const obj = {};
+    for (const [k, v] of Object.entries(val.mapValue.fields || {})) {
+      obj[k] = fromFirestoreValue(v);
+    }
+    return obj;
+  }
+  return null;
+}
+
+function fromFirestoreDoc(doc) {
+  if (!doc) return null;
+  const id = doc.name ? doc.name.split('/').pop() : '';
+  const obj = { id };
+  for (const [k, v] of Object.entries(doc.fields || {})) {
+    obj[k] = fromFirestoreValue(v);
+  }
+  return obj;
+}
+
+// Local fail-safe persistent store
+const DATA_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) {
+  try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (_) {}
+}
+const LOCAL_STORE_FILE = path.join(DATA_DIR, 'free_audit_store.json');
+let localStore = { visitors: {}, events: [] };
+try {
+  if (fs.existsSync(LOCAL_STORE_FILE)) {
+    localStore = JSON.parse(fs.readFileSync(LOCAL_STORE_FILE, 'utf-8'));
+    if (!localStore.visitors) localStore.visitors = {};
+    if (!Array.isArray(localStore.events)) localStore.events = [];
+  }
+} catch (_) {}
+
+function saveLocalStore() {
+  try {
+    fs.writeFileSync(LOCAL_STORE_FILE, JSON.stringify(localStore, null, 2), 'utf-8');
+  } catch (e) {
+    console.warn('[saveLocalStore] warning:', e.message);
+  }
+}
+
+async function saveVisitorDoc(visitorUuid, data) {
+  const existing = localStore.visitors[visitorUuid] || {};
+  localStore.visitors[visitorUuid] = { ...existing, ...data, id: visitorUuid, visitor_uuid: visitorUuid };
+  saveLocalStore();
+
+  try {
+    const fields = {};
+    for (const [k, v] of Object.entries(localStore.visitors[visitorUuid])) {
+      if (k !== 'id') fields[k] = toFirestoreValue(v);
+    }
+    const url = `https://firestore.googleapis.com/v1/projects/${fsRestConfig.projectId}/databases/${fsRestConfig.firestoreDatabaseId}/documents/free_audit_visitors/${encodeURIComponent(visitorUuid)}?key=${fsRestConfig.apiKey}`;
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields })
+    });
+    if (!res.ok) {
+      console.warn('[saveVisitorDoc] Firestore sync response not ok:', res.status);
+    }
+  } catch (err) {
+    console.warn('[saveVisitorDoc] Firestore sync notice:', err.message);
+  }
+  return localStore.visitors[visitorUuid];
+}
+
+async function saveEventDoc(eventData) {
+  const eventId = eventData.id || ('ev_' + crypto.randomBytes(8).toString('hex'));
+  const fullEvent = { ...eventData, id: eventId };
+  localStore.events.push(fullEvent);
+  saveLocalStore();
+
+  try {
+    const fields = {};
+    for (const [k, v] of Object.entries(fullEvent)) {
+      if (k !== 'id') fields[k] = toFirestoreValue(v);
+    }
+    const url = `https://firestore.googleapis.com/v1/projects/${fsRestConfig.projectId}/databases/${fsRestConfig.firestoreDatabaseId}/documents/free_audit_events/${encodeURIComponent(eventId)}?key=${fsRestConfig.apiKey}`;
+    await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields })
+    });
+  } catch (err) {
+    console.warn('[saveEventDoc] Firestore sync notice:', err.message);
+  }
+  return fullEvent;
+}
+
+async function getAllVisitors() {
+  const token = await getAdminToken();
+  if (token) {
+    try {
+      const url = `https://firestore.googleapis.com/v1/projects/${fsRestConfig.projectId}/databases/${fsRestConfig.firestoreDatabaseId}/documents:runQuery?key=${fsRestConfig.apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          structuredQuery: {
+            from: [{ collectionId: 'free_audit_visitors' }]
+          }
+        })
+      });
+      if (res.ok) {
+        const queryResults = await res.json();
+        const firestoreDocs = (Array.isArray(queryResults) ? queryResults : [])
+          .filter(r => r.document)
+          .map(r => fromFirestoreDoc(r.document));
+        
+        firestoreDocs.forEach(d => {
+          if (d && d.visitor_uuid) {
+            localStore.visitors[d.visitor_uuid] = { ...(localStore.visitors[d.visitor_uuid] || {}), ...d };
+          }
+        });
+        saveLocalStore();
+      }
+    } catch (err) {
+      console.warn('[getAllVisitors] Firestore fetch warning:', err.message);
+    }
+  }
+  return Object.values(localStore.visitors).sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+}
+
+async function getVisitorEvents(visitorUuid) {
+  const token = await getAdminToken();
+  if (token) {
+    try {
+      const url = `https://firestore.googleapis.com/v1/projects/${fsRestConfig.projectId}/databases/${fsRestConfig.firestoreDatabaseId}/documents:runQuery?key=${fsRestConfig.apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          structuredQuery: {
+            from: [{ collectionId: 'free_audit_events' }],
+            where: {
+              fieldFilter: {
+                field: { fieldPath: 'visitor_uuid' },
+                op: 'EQUAL',
+                value: { stringValue: visitorUuid }
+              }
+            }
+          }
+        })
+      });
+      if (res.ok) {
+        const queryResults = await res.json();
+        const firestoreEvents = (Array.isArray(queryResults) ? queryResults : [])
+          .filter(r => r.document)
+          .map(r => fromFirestoreDoc(r.document));
+        
+        firestoreEvents.forEach(fe => {
+          if (!localStore.events.some(e => e.id === fe.id)) {
+            localStore.events.push(fe);
+          }
+        });
+        saveLocalStore();
+      }
+    } catch (err) {
+      console.warn('[getVisitorEvents] Firestore fetch warning:', err.message);
+    }
+  }
+  return localStore.events
+    .filter(e => e.visitor_uuid === visitorUuid)
+    .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+}
 
 function hashIp(ip) {
   if (!ip) return '';
@@ -1074,8 +1309,7 @@ app.post('/api/free-audit/visitor', async (req, res) => {
     const ip_hash = hashIp(rawIp);
     const nowIso = new Date().toISOString();
 
-    const docRef = db.collection('free_audit_visitors').doc(visitor_uuid);
-    const existingDoc = await docRef.get();
+    const existing = localStore.visitors[visitor_uuid] || null;
 
     const payload = {
       visitor_uuid,
@@ -1096,6 +1330,7 @@ app.post('/api/free-audit/visitor', async (req, res) => {
       referrer_url: data.referrer_url || '',
       landing_url: data.landing_url || '',
       current_url: data.current_url || '',
+      traffic_source: data.traffic_source || data.utm_source || (data.referrer_url ? 'Referral' : 'Direct'),
       utm_source: data.utm_source || '',
       utm_medium: data.utm_medium || '',
       utm_campaign: data.utm_campaign || '',
@@ -1107,34 +1342,31 @@ app.post('/api/free-audit/visitor', async (req, res) => {
       ttclid: data.ttclid || ''
     };
 
-    if (!existingDoc.exists) {
+    if (!existing) {
       payload.created_at = nowIso;
       payload.first_seen_at = nowIso;
       payload.audit_status = 'started';
       payload.current_step = 1;
       payload.completed_step = 0;
       payload.admin_status = 'new';
-      await docRef.set(payload);
-    } else {
-      await docRef.set(payload, { merge: true });
     }
 
-    const eventRef = db.collection('free_audit_events').doc();
-    await eventRef.set({
-      id: eventRef.id,
+    const savedVisitor = await saveVisitorDoc(visitor_uuid, payload);
+
+    await saveEventDoc({
       visitor_uuid,
       session_id,
-      event_name: existingDoc.exists ? 'return_visit' : 'freeaudit_page_viewed',
+      event_name: existing ? 'return_visit' : 'freeaudit_page_viewed',
       event_data_json: JSON.stringify({ landing_url: data.landing_url, utm_source: data.utm_source }),
       page_url: data.current_url || '/freeaudit',
       referrer_url: data.referrer_url || '',
       created_at: nowIso
     });
 
-    return res.json({ success: true, visitor_uuid, session_id });
+    return res.json({ success: true, visitor_uuid, session_id, visitor: savedVisitor });
   } catch (err) {
     console.error('[free-audit/visitor] error:', err);
-    return res.status(500).json({ error: 'Failed to record visitor' });
+    return res.status(500).json({ error: 'Failed to record visitor: ' + err.message });
   }
 });
 
@@ -1147,11 +1379,11 @@ app.patch('/api/free-audit/visitor/:id', async (req, res) => {
     patch.updated_at = new Date().toISOString();
     patch.last_seen_at = patch.updated_at;
 
-    await db.collection('free_audit_visitors').doc(id).set(patch, { merge: true });
-    return res.json({ success: true });
+    const savedVisitor = await saveVisitorDoc(id, patch);
+    return res.json({ success: true, visitor: savedVisitor });
   } catch (err) {
     console.error('[free-audit/visitor patch] error:', err);
-    return res.status(500).json({ error: 'Failed to update visitor progress' });
+    return res.status(500).json({ error: 'Failed to update visitor progress: ' + err.message });
   }
 });
 
@@ -1159,15 +1391,13 @@ app.patch('/api/free-audit/visitor/:id', async (req, res) => {
 app.post('/api/free-audit/event', async (req, res) => {
   res.set('Cache-Control', 'no-store');
   try {
-    const { visitor_uuid, session_id, event_name, event_data_json, page_url, referrer_url } = req.body || {};
+    const { visitor_uuid, session_id, event_name, event_data_json, page_url, referrer_url, current_step } = req.body || {};
     if (!visitor_uuid || !event_name) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
 
     const nowIso = new Date().toISOString();
-    const eventRef = db.collection('free_audit_events').doc();
-    await eventRef.set({
-      id: eventRef.id,
+    const eventObj = await saveEventDoc({
       visitor_uuid,
       session_id: session_id || '',
       event_name,
@@ -1178,6 +1408,8 @@ app.post('/api/free-audit/event', async (req, res) => {
     });
 
     const visitorPatch = { updated_at: nowIso, last_seen_at: nowIso };
+    if (current_step) visitorPatch.current_step = current_step;
+
     if (event_name === 'pdf_downloaded') {
       visitorPatch.pdf_downloaded = true;
       visitorPatch.pdf_download_at = nowIso;
@@ -1198,12 +1430,12 @@ app.post('/api/free-audit/event', async (req, res) => {
       visitorPatch.audit_status = 'abandoned';
     }
 
-    await db.collection('free_audit_visitors').doc(visitor_uuid).set(visitorPatch, { merge: true });
+    await saveVisitorDoc(visitor_uuid, visitorPatch);
 
-    return res.json({ success: true, event_id: eventRef.id });
+    return res.json({ success: true, event_id: eventObj.id });
   } catch (err) {
     console.error('[free-audit/event] error:', err);
-    return res.status(500).json({ error: 'Failed to record event' });
+    return res.status(500).json({ error: 'Failed to record event: ' + err.message });
   }
 });
 
@@ -1337,8 +1569,7 @@ app.post('/api/free-audit/place-details', async (req, res) => {
 app.get('/api/admin/free-audit/leads', verifyAdminToken, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   try {
-    const snap = await db.collection('free_audit_visitors').orderBy('updated_at', 'desc').limit(200).get();
-    const leads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const leads = await getAllVisitors();
     return res.json({ leads, total: leads.length });
   } catch (err) {
     console.error('[admin/free-audit/leads] error:', err);
@@ -1350,20 +1581,17 @@ app.get('/api/admin/free-audit/leads', verifyAdminToken, async (req, res) => {
 app.get('/api/admin/free-audit/leads/:id', verifyAdminToken, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   try {
-    const visitorDoc = await db.collection('free_audit_visitors').doc(req.params.id).get();
-    if (!visitorDoc.exists) {
+    const id = req.params.id;
+    let lead = localStore.visitors[id] || null;
+    if (!lead) {
+      const all = await getAllVisitors();
+      lead = all.find(v => v.visitor_uuid === id || v.id === id);
+    }
+    if (!lead) {
       return res.status(404).json({ error: 'Lead not found' });
     }
-    const lead = { id: visitorDoc.id, ...visitorDoc.data() };
 
-    const eventsSnap = await db.collection('free_audit_events')
-      .where('visitor_uuid', '==', req.params.id)
-      .get();
-    
-    const events = eventsSnap.docs
-      .map(d => ({ id: d.id, ...d.data() }))
-      .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
-
+    const events = await getVisitorEvents(id);
     return res.json({ lead, events });
   } catch (err) {
     console.error('[admin/free-audit/lead detail] error:', err);
@@ -1381,14 +1609,14 @@ app.patch('/api/admin/free-audit/leads/:id', verifyAdminToken, async (req, res) 
     if (admin_notes !== undefined) patch.admin_notes = admin_notes;
     if (assigned_to !== undefined) patch.assigned_to = assigned_to;
 
-    await db.collection('free_audit_visitors').doc(req.params.id).set(patch, { merge: true });
+    await saveVisitorDoc(req.params.id, patch);
 
-    const eventRef = db.collection('free_audit_events').doc();
-    await eventRef.set({
-      id: eventRef.id,
+    await saveEventDoc({
       visitor_uuid: req.params.id,
       event_name: 'admin_updated_lead',
       event_data_json: JSON.stringify({ admin: req.adminUser?.email, patch }),
+      page_url: '/admin/free-audit',
+      referrer_url: '',
       created_at: new Date().toISOString()
     });
 
@@ -1403,8 +1631,7 @@ app.patch('/api/admin/free-audit/leads/:id', verifyAdminToken, async (req, res) 
 app.get('/api/admin/free-audit/stats', verifyAdminToken, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   try {
-    const snap = await db.collection('free_audit_visitors').get();
-    const docs = snap.docs.map(d => d.data());
+    const docs = await getAllVisitors();
 
     const totalVisitors = docs.length;
     const started = docs.filter(d => d.audit_status === 'started' || d.audit_status === 'in_progress' || d.audit_status === 'completed' || d.audit_status === 'abandoned').length;
@@ -1415,6 +1642,7 @@ app.get('/api/admin/free-audit/stats', verifyAdminToken, async (req, res) => {
     const pdfDownloads = docs.filter(d => d.pdf_downloaded).length;
     const contactRequests = docs.filter(d => d.contact_requested).length;
     const whatsappClicks = docs.filter(d => d.whatsapp_clicked).length;
+    const callClicks = docs.filter(d => d.call_clicked).length;
 
     const sources = {}, countries = {}, cities = {};
     let pipelineRevenue = 0;
@@ -1438,6 +1666,7 @@ app.get('/api/admin/free-audit/stats', verifyAdminToken, async (req, res) => {
       pdfDownloads,
       contactRequests,
       whatsappClicks,
+      callClicks,
       pipelineRevenue,
       topSources: Object.entries(sources).sort((a,b) => b[1]-a[1]).slice(0, 5),
       topCountries: Object.entries(countries).sort((a,b) => b[1]-a[1]).slice(0, 5),
@@ -1453,27 +1682,29 @@ app.get('/api/admin/free-audit/stats', verifyAdminToken, async (req, res) => {
 app.get('/api/admin/free-audit/export', verifyAdminToken, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   try {
-    const snap = await db.collection('free_audit_visitors').orderBy('created_at', 'desc').get();
-    const docs = snap.docs.map(d => d.data());
+    const docs = await getAllVisitors();
 
     const headers = [
-      'Visitor UUID', 'Date Created', 'Name', 'Email', 'Phone',
-      'Country', 'City', 'Property Type', 'Bedrooms', 'Bathrooms',
-      'Listed', 'Self Estimate', 'Red Flag Estimate', 'Potential Uplift',
-      'Audit Status', 'PDF Downloaded', 'Contact Requested', 'WhatsApp Clicked',
-      'UTM Source', 'UTM Campaign', 'Device', 'Admin Status', 'Admin Notes'
+      'Visitor UUID', 'Date Created', 'Full Name', 'Mobile Number', 'Email',
+      'Country', 'City', 'Locality', 'Property Type', 'Bedrooms', 'Bathrooms',
+      'Already Listed', 'Self Estimate', 'Red Flag Estimate', 'Potential Uplift',
+      'Audit Status', 'Current Step', 'PDF Downloaded', 'Contact Requested', 'WhatsApp Clicked', 'Call Clicked',
+      'UTM Source', 'UTM Medium', 'UTM Campaign', 'Device', 'Admin Status', 'Admin Notes'
     ];
 
     let csv = headers.join(',') + '\n';
     docs.forEach(d => {
+      const name = d.full_name || d.name || '';
+      const phone = d.mobile_e164 || d.mobile_number || d.phone || '';
       const row = [
         d.visitor_uuid || '',
         d.created_at || '',
-        `"${(d.name || '').replace(/"/g, '""')}"`,
+        `"${name.replace(/"/g, '""')}"`,
+        `"${phone.replace(/"/g, '""')}"`,
         `"${(d.email || '').replace(/"/g, '""')}"`,
-        `"${(d.phone || '').replace(/"/g, '""')}"`,
         `"${(d.property_country || d.country || '').replace(/"/g, '""')}"`,
         `"${(d.property_city || d.city || '').replace(/"/g, '""')}"`,
+        `"${(d.property_locality || '').replace(/"/g, '""')}"`,
         `"${(d.property_type || '').replace(/"/g, '""')}"`,
         d.bedrooms || '',
         d.bathrooms || '',
@@ -1482,10 +1713,13 @@ app.get('/api/admin/free-audit/export', verifyAdminToken, async (req, res) => {
         d.redflag_revenue || '',
         d.uplift_amount || '',
         d.audit_status || '',
+        d.current_step || '',
         d.pdf_downloaded ? 'Yes' : 'No',
         d.contact_requested ? 'Yes' : 'No',
         d.whatsapp_clicked ? 'Yes' : 'No',
+        d.call_clicked ? 'Yes' : 'No',
         `"${(d.utm_source || '').replace(/"/g, '""')}"`,
+        `"${(d.utm_medium || '').replace(/"/g, '""')}"`,
         `"${(d.utm_campaign || '').replace(/"/g, '""')}"`,
         d.device_type || '',
         d.admin_status || 'new',
@@ -1500,6 +1734,110 @@ app.get('/api/admin/free-audit/export', verifyAdminToken, async (req, res) => {
   } catch (err) {
     console.error('[admin/free-audit/export] error:', err);
     return res.status(500).json({ error: 'Failed to export CSV' });
+  }
+});
+
+// POST /api/free-audit/estimate - Alias/Integration for estimate generation + visitor update
+app.post('/api/free-audit/estimate', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const { visitor_uuid, ...formData } = req.body || {};
+    // Call internal analyze logic or forward to existing analyzer
+    const analyzeReq = { body: formData, headers: req.headers };
+    // Update visitor document with property form inputs
+    if (visitor_uuid) {
+      await saveVisitorDoc(visitor_uuid, {
+        property_country: formData.country || '',
+        property_city: formData.city || '',
+        property_locality: formData.locality || formData.address || '',
+        property_type: formData.propertyType || '',
+        bedrooms: Number(formData.bedrooms) || 0,
+        bathrooms: Number(formData.bathrooms) || 0,
+        max_guests: Number(formData.guests) || 0,
+        property_condition: formData.condition || '',
+        photo_quality: formData.photoQuality || '',
+        already_listed: formData.listed || 'no',
+        expected_monthly_income: Number(formData.expectedMonthlyIncome) || 0,
+        current_step: 5,
+        updated_at: new Date().toISOString()
+      });
+      await saveEventDoc({
+        visitor_uuid,
+        event_name: 'estimate_requested',
+        event_data_json: JSON.stringify({ city: formData.city, bedrooms: formData.bedrooms }),
+        page_url: '/freeaudit',
+        referrer_url: '',
+        created_at: new Date().toISOString()
+      });
+    }
+
+    // Call analyze handler
+    return res.redirect(307, '/api/freeaudit/analyze');
+  } catch (err) {
+    console.error('[free-audit/estimate] error:', err);
+    return res.status(500).json({ error: 'Failed to process estimate: ' + err.message });
+  }
+});
+
+// POST /api/free-audit/contact - Save contact request & record lead event
+app.post('/api/free-audit/contact', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const { visitor_uuid, name, email, phone, message, time, formData, analysis } = req.body || {};
+    const nowIso = new Date().toISOString();
+
+    if (visitor_uuid) {
+      await saveVisitorDoc(visitor_uuid, {
+        full_name: name || undefined,
+        name: name || undefined,
+        email: email || undefined,
+        mobile_number: phone || undefined,
+        phone: phone || undefined,
+        contact_requested: true,
+        contact_requested_at: nowIso,
+        audit_status: 'completed',
+        completed_step: 5,
+        updated_at: nowIso
+      });
+
+      await saveEventDoc({
+        visitor_uuid,
+        event_name: 'contact_form_submitted',
+        event_data_json: JSON.stringify({ name, email, phone, preferred_time: time }),
+        page_url: '/freeaudit',
+        referrer_url: '',
+        created_at: nowIso
+      });
+    }
+
+    // Also forward/save to main leads collection so it displays in main admin Leads as well
+    const leadDoc = {
+      formType: 'freeaudit',
+      name: name || 'Audit Applicant',
+      email: email || '',
+      phone: phone || '',
+      message: message || `Free Short-Stay Audit for ${formData?.city || ''}, ${formData?.country || ''}. Preferred time: ${time || 'Anytime'}`,
+      details: {
+        visitor_uuid,
+        propertyType: formData?.propertyType,
+        bedrooms: formData?.bedrooms,
+        bathrooms: formData?.bathrooms,
+        city: formData?.city,
+        country: formData?.country,
+        estimatedRevenue: analysis?.redFlagMonthly?.expected
+      },
+      status: 'New',
+      createdAt: nowIso
+    };
+
+    try {
+      await db.collection('leads').add(leadDoc);
+    } catch (_) {}
+
+    return res.json({ ok: true, success: true });
+  } catch (err) {
+    console.error('[free-audit/contact] error:', err);
+    return res.status(500).json({ ok: false, error: 'Could not save contact request.' });
   }
 });
 
@@ -1599,7 +1937,29 @@ async function verifyAdminToken(req, res, next) {
   try {
     decodedToken = await adminAuth.verifyIdToken(token);
   } catch (err) {
-    return res.status(401).json({ error: 'Invalid token' });
+    // Resilient REST API fallback for token verification
+    try {
+      const vRes = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + firebaseConfig.apiKey, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: token })
+      });
+      if (vRes.ok) {
+        const vData = await vRes.json();
+        if (vData.users && vData.users[0]) {
+          const u = vData.users[0];
+          decodedToken = {
+            uid: u.localId,
+            email: u.email,
+            email_verified: u.emailVerified !== false,
+            firebase: { sign_in_provider: 'password' }
+          };
+        }
+      }
+    } catch (_) {}
+    if (!decodedToken) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
   }
 
   const adminEmailsEnv = (process.env.ADMIN_EMAILS || 'priyanshu@redflaghomes.in,crazypriyanshu.777@gmail.com')

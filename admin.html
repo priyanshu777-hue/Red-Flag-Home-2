@@ -514,6 +514,38 @@ function subscribe() {
       S.loaded[name] = true; delete S.errors[name]; render();
     }, err => { if (name === 'posts' || name === 'bellaPayments' || name === 'free_audit_visitors' || name === 'free_audit_events') { S.errors[name] = err.code === 'permission-denied' ? 'Add the Free Audit rules from the Setup page.' : (err.message || String(err)); S.loaded[name] = true; render(); return; } S.errors[name] = err.code === 'permission-denied' ? 'Firestore rules block admin access. Add the admin rules from the Setup page.' : (err.message || String(err)); S.loaded[name] = true; render(); });
   });
+
+  // Direct backend sync & 20s auto-refresh polling for Free Audit leads
+  syncFreeAuditFromApi();
+  if (!window._faPollTimer) {
+    window._faPollTimer = setInterval(syncFreeAuditFromApi, 20000);
+  }
+}
+
+async function syncFreeAuditFromApi() {
+  if (S.mode === 'demo') return;
+  try {
+    const token = await idToken();
+    if (!token) return;
+    const res = await fetch('/api/admin/free-audit/leads', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.leads)) {
+        S.data.free_audit_visitors = data.leads;
+        S.loaded.free_audit_visitors = true;
+        delete S.errors.free_audit_visitors;
+        counts();
+        const curView = view();
+        if (curView === 'free-audit' || curView === 'freeaudit') {
+          render();
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[syncFreeAuditFromApi] notice:', e);
+  }
 }
 async function saveDoc(kind, id, patch) {
   if (S.mode === 'demo') { Object.assign(S.data[kind].find(x => x.id === id), patch); render(); return; }
@@ -1007,7 +1039,7 @@ function freeAuditLeads() {
     if (u.contact === 'yes' && !x.contact_requested) return false;
     if (u.contact === 'no' && x.contact_requested) return false;
     if (q) {
-      const haystack = [x.name, x.email, x.phone, x.property_city, x.property_country, x.visitor_uuid, x.utm_source, x.utm_campaign].filter(Boolean).join(' ').toLowerCase();
+      const haystack = [x.full_name, x.name, x.mobile_number, x.mobile_country_code, x.mobile_e164, x.phone, x.email, x.property_city, x.city, x.property_country, x.country, x.property_locality, x.visitor_uuid, x.utm_source, x.utm_campaign, x.gclid, x.fbclid].filter(Boolean).join(' ').toLowerCase();
       if (!haystack.includes(q)) return false;
     }
     return true;
@@ -1017,7 +1049,7 @@ function freeAuditLeads() {
     <div class="top">
       <div>
         <h1>Free BNB Audit Analytics & Leads</h1>
-        <p>Real-time visitor tracking, property estimates, and D3.js trend visualization for /freeaudit.</p>
+        <p>Real-time visitor tracking, owner contact capture, property estimates, and D3.js trend visualization for /freeaudit.</p>
       </div>
       <div class="top-actions" style="display:flex; gap:8px;">
         <button class="btn btn--red" id="fa-trend-csv" type="button" title="Export audit trend visualization data to CSV">
@@ -1105,7 +1137,7 @@ function freeAuditLeads() {
         <label class="search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
           <span class="sr-only">Search leads</span>
-          <input id="q-fa" type="search" placeholder="Search name, email, phone, city, visitor UUID, UTM source…" value="${esc(u.q)}" autocomplete="off">
+          <input id="q-fa" type="search" placeholder="Search name, phone, email, city, visitor UUID, campaign, UTM source…" value="${esc(u.q)}" autocomplete="off">
         </label>
       </div>
 
@@ -1130,15 +1162,22 @@ function freeAuditLeads() {
                 <th>Yield Estimate</th>
                 <th>Audit Funnel</th>
                 <th>Admin Status</th>
-                <th>Action</th>
+                <th>Quick Actions</th>
               </tr>
             </thead>
             <tbody>
-              ${filtered.map(x => `
+              ${filtered.map(x => {
+                const leadName = x.full_name || x.name || x.visitor_uuid || 'Anonymous Visitor';
+                const leadPhone = x.mobile_e164 || x.mobile_number || x.phone || '';
+                const cleanDigits = leadPhone.replace(/\D/g, '');
+                const isNew = (x.admin_status || 'new') === 'new';
+                return `
                 <tr data-fa-lead="${esc(x.id || x.visitor_uuid)}" tabindex="0">
                   <td class="lead-cell">
-                    <b style="font-weight:600;">${esc(x.name || x.visitor_uuid || 'Anonymous Visitor')}</b>
-                    <span class="sub">${esc(x.email || x.phone || ('Source: ' + (x.utm_source || x.referrer_url || 'Direct')))}</span>
+                    ${isNew ? '<span class="pill new" style="color:var(--accent); border-color:var(--accent); font-size:0.7rem; padding:1px 6px; margin-bottom:4px; display:inline-block;">NEW</span>' : ''}
+                    <b style="font-weight:600; display:block;">${esc(leadName)}</b>
+                    ${leadPhone ? `<span style="color:var(--good); font-weight:500; font-size:0.82rem;">📞 ${esc(leadPhone)}</span>` : ''}
+                    <span class="sub">${esc(x.email || ('Source: ' + (x.utm_source || x.referrer_url || 'Direct')))}</span>
                   </td>
                   <td data-l="Location">
                     ${esc(x.property_city || x.city || '—')}, ${esc(x.property_country || x.country || '')}
@@ -1154,16 +1193,21 @@ function freeAuditLeads() {
                   </td>
                   <td data-l="Audit Funnel">
                     ${freeAuditPill(x.audit_status || 'started')}
-                    <span class="sub">${x.pdf_downloaded ? '📄 PDF Downloaded' : x.contact_requested ? '📞 Contact Requested' : 'Visited ' + ago(x.created_at)}</span>
+                    <span class="sub">Step ${x.current_step || (x.audit_status === 'completed' ? 5 : 1)} of 5</span>
+                    <span class="sub">${x.pdf_downloaded ? '📄 PDF' : ''} ${x.contact_requested ? '📞 Contact' : ''} ${x.whatsapp_clicked ? '💬 WA' : ''} ${!x.pdf_downloaded && !x.contact_requested && !x.whatsapp_clicked ? ago(x.created_at) : ''}</span>
                   </td>
                   <td data-l="Admin Status">
                     ${freeAuditPill(x.admin_status || 'new')}
                   </td>
-                  <td data-l="Action">
-                    <button class="btn btn--sm" type="button" data-fa-open="${esc(x.id || x.visitor_uuid)}">View Details</button>
+                  <td data-l="Quick Actions" style="white-space:nowrap;">
+                    <div style="display:inline-flex; gap:6px; align-items:center;">
+                      ${cleanDigits ? `<a class="btn btn--sm" href="https://wa.me/${esc(cleanDigits)}?text=${encodeURIComponent('Hi ' + leadName + ', this is Red Flag Homes regarding your short-stay property earning audit.')}" target="_blank" rel="noopener" style="padding:4px 8px; font-size:0.75rem; color:#25D366; border-color:rgba(37,211,102,0.3);" title="WhatsApp Owner" onclick="event.stopPropagation();">💬 WA</a>` : ''}
+                      ${cleanDigits ? `<a class="btn btn--sm" href="tel:${esc(cleanDigits)}" style="padding:4px 8px; font-size:0.75rem;" title="Call Owner" onclick="event.stopPropagation();">📞</a>` : ''}
+                      <button class="btn btn--sm btn--red" type="button" data-fa-open="${esc(x.id || x.visitor_uuid)}" style="padding:4px 10px; font-size:0.75rem;">Details</button>
+                    </div>
                   </td>
                 </tr>
-              `).join('')}
+              `;}).join('')}
             </tbody>
           </table>
         </div>
@@ -1607,21 +1651,46 @@ function renderD3AuditCharts(u, visitors = [], events = []) {
   }
 }
 
-function openFreeAuditLeadDetail(id) {
+async function openFreeAuditLeadDetail(id) {
   const visitors = S.data.free_audit_visitors || [];
-  const events = S.data.free_audit_events || [];
-  const x = visitors.find(v => (v.id === id || v.visitor_uuid === id));
-  if (!x) return;
+  let x = visitors.find(v => (v.id === id || v.visitor_uuid === id)) || { id, visitor_uuid: id };
 
-  const leadEvents = events.filter(e => e.visitor_uuid === (x.visitor_uuid || x.id)).sort((a,b) => ts(a.created_at) - ts(b.created_at));
+  let leadEvents = (S.data.free_audit_events || []).filter(e => e.visitor_uuid === (x.visitor_uuid || x.id));
+
+  // Fetch fresh lead details & events from backend API
+  try {
+    const token = await idToken();
+    if (token) {
+      const res = await fetch(`/api/admin/free-audit/leads/${encodeURIComponent(x.visitor_uuid || x.id)}`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (res.ok) {
+        const payload = await res.json();
+        if (payload.lead) {
+          x = { ...x, ...payload.lead };
+          const idx = visitors.findIndex(v => (v.id === id || v.visitor_uuid === id));
+          if (idx !== -1) visitors[idx] = x;
+        }
+        if (Array.isArray(payload.events)) {
+          leadEvents = payload.events;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[openFreeAuditLeadDetail fetch notice]', e);
+  }
+
+  const sortedEvents = leadEvents.sort((a,b) => ts(a.created_at) - ts(b.created_at));
 
   const p = $('#drawer-panel');
-  const phone = (x.phone || '').replace(/\D/g, '');
+  const rawPhone = x.mobile_e164 || x.mobile_number || x.phone || '';
+  const cleanPhone = rawPhone.replace(/\D/g, '');
+  const leadName = x.full_name || x.name || x.visitor_uuid || 'Anonymous Lead';
 
   p.innerHTML = `
     <div class="drawer-top">
       <div>
-        <h2 id="d-title">${esc(x.name || x.visitor_uuid || 'Anonymous Lead')}</h2>
+        <h2 id="d-title">${esc(leadName)}</h2>
         <p>${esc(x.property_city || x.city || 'Unknown Location')} · ${freeAuditPill(x.admin_status || 'new')}</p>
       </div>
       <button class="btn btn--icon" type="button" id="d-close" aria-label="Close">
@@ -1630,16 +1699,31 @@ function openFreeAuditLeadDetail(id) {
     </div>
 
     <div class="quick" style="margin-bottom:16px;">
-      ${phone ? `<a class="btn btn--red btn--sm" target="_blank" rel="noopener" href="https://wa.me/${esc(phone)}?text=${encodeURIComponent('Hi ' + (x.name || '') + ', this is Red Flag Homes regarding your BNB earning audit for ' + (x.property_city || 'your property') + '.')}" >WhatsApp</a>` : ''}
-      ${phone ? `<a class="btn btn--sm" href="tel:${esc(phone)}">Call</a>` : ''}
-      ${x.email ? `<a class="btn btn--sm" href="mailto:${esc(x.email)}?subject=${encodeURIComponent('Your BNB Earning Audit - Red Flag Homes')}">Email</a>` : ''}
+      ${cleanPhone ? `<a class="btn btn--red btn--sm" target="_blank" rel="noopener" href="https://wa.me/${esc(cleanPhone)}?text=${encodeURIComponent('Hi ' + leadName + ', this is Red Flag Homes regarding your short-stay property earning audit for ' + (x.property_city || 'your property') + '.')}" >💬 WhatsApp Owner</a>` : ''}
+      ${cleanPhone ? `<a class="btn btn--sm" href="tel:${esc(cleanPhone)}">📞 Call (${esc(rawPhone)})</a>` : ''}
+      ${x.email ? `<a class="btn btn--sm" href="mailto:${esc(x.email)}?subject=${encodeURIComponent('Your BNB Earning Audit - Red Flag Homes')}">✉️ Email</a>` : ''}
+    </div>
+
+    <!-- Owner Contact & Lead Capture Info -->
+    <div class="card" style="margin-bottom:16px; border-left:3px solid var(--accent);">
+      <h3>Owner Contact Details (Captured at Step 1)</h3>
+      <dl class="facts">
+        <dt>Full Name</dt><dd><b>${esc(x.full_name || x.name || '—')}</b></dd>
+        <dt>Mobile Number</dt><dd><b>${esc(rawPhone || '—')}</b></dd>
+        <dt>Dial Code</dt><dd>${esc(x.mobile_country_code || '+91')}</dd>
+        <dt>E.164 Format</dt><dd style="font-family:monospace">${esc(x.mobile_e164 || rawPhone || '—')}</dd>
+        <dt>Phone Verified</dt><dd>${x.phone_verified ? '<span class="pill good">Verified</span>' : '<span class="pill warn">Unverified</span>'}</dd>
+        <dt>Email Address</dt><dd>${esc(x.email || '—')}</dd>
+        <dt>Preferred Time</dt><dd>${esc(x.preferred_time || x.time || 'Anytime')}</dd>
+        <dt>Consent Marketing</dt><dd>${x.consent_marketing ? 'Yes (Opted In)' : 'No'}</dd>
+      </dl>
     </div>
 
     <!-- Lead Status & Assignment -->
     <div class="card" style="margin-bottom:16px; background:var(--surface-2);">
       <div class="grid two" style="gap:12px;">
         <div class="field">
-          <label for="d-fa-status">Lead Status</label>
+          <label for="d-fa-status">Admin Lead Status</label>
           <select id="d-fa-status">
             ${['new', 'contacted', 'qualified', 'follow_up', 'won', 'lost'].map(st => `<option value="${st}" ${(x.admin_status || 'new') === st ? 'selected' : ''}>${st.toUpperCase()}</option>`).join('')}
           </select>
@@ -1655,7 +1739,7 @@ function openFreeAuditLeadDetail(id) {
     <div class="card" style="margin-bottom:16px;">
       <h3>Revenue & Yield Estimates</h3>
       <dl class="facts">
-        <dt>Self-Managed Estimate</dt>
+        <dt>Self-Managed</dt>
         <dd>${x.expected_revenue ? (x.currency || '₹') + Number(x.expected_revenue).toLocaleString() + ' / mo' : '—'}</dd>
         <dt>Red Flag Yield</dt>
         <dd><b>${x.redflag_revenue ? (x.currency || '₹') + Number(x.redflag_revenue).toLocaleString() + ' / mo' : '—'}</b></dd>
@@ -1671,7 +1755,7 @@ function openFreeAuditLeadDetail(id) {
       <h3>Property & Location</h3>
       <dl class="facts">
         <dt>City / Area</dt><dd>${esc(x.property_city || x.city || '—')}, ${esc(x.property_country || x.country || '')}</dd>
-        <dt>Address</dt><dd>${esc(x.property_locality || '—')}</dd>
+        <dt>Locality / Address</dt><dd>${esc(x.property_locality || '—')}</dd>
         <dt>Property Type</dt><dd>${esc(x.property_type || '—')} (${esc(x.bedrooms || '')}, ${esc(x.bathrooms || '')})</dd>
         <dt>Capacity</dt><dd>${esc(x.max_guests || '—')} · ${esc(x.furnishing_status || '')}</dd>
         <dt>Listed Status</dt><dd>${esc(x.already_listed === 'Yes' ? 'Currently listed on platforms' : 'Not yet listed')}</dd>
@@ -1684,39 +1768,71 @@ function openFreeAuditLeadDetail(id) {
       ` : ''}
     </div>
 
+    <!-- Funnel Progress & Conversion Flags -->
+    <div class="card" style="margin-bottom:16px;">
+      <h3>Audit Funnel Progression</h3>
+      <dl class="facts">
+        <dt>Audit Status</dt><dd>${freeAuditPill(x.audit_status || 'started')}</dd>
+        <dt>Current Step</dt><dd>Step ${x.current_step || (x.audit_status === 'completed' ? 5 : 1)} of 5</dd>
+        <dt>Completed Step</dt><dd>${x.completed_step || 0} of 5</dd>
+        <dt>PDF Downloaded</dt><dd>${x.pdf_downloaded ? '✓ Yes (' + ago(x.pdf_download_at || x.updated_at) + ')' : 'No'}</dd>
+        <dt>Contact Requested</dt><dd>${x.contact_requested ? '✓ Yes (' + ago(x.contact_requested_at || x.updated_at) + ')' : 'No'}</dd>
+        <dt>WhatsApp Clicked</dt><dd>${x.whatsapp_clicked ? '✓ Yes (' + ago(x.whatsapp_clicked_at || x.updated_at) + ')' : 'No'}</dd>
+        <dt>Call Clicked</dt><dd>${x.call_clicked ? '✓ Yes (' + ago(x.call_clicked_at || x.updated_at) + ')' : 'No'}</dd>
+      </dl>
+    </div>
+
     <!-- Event Timeline -->
     <div class="card" style="margin-bottom:16px;">
-      <h3>Visitor Journey Timeline</h3>
-      ${leadEvents.length ? `
+      <h3>Visitor Journey Timeline (${sortedEvents.length} Events)</h3>
+      ${sortedEvents.length ? `
         <ul class="mini">
-          ${leadEvents.map(e => `
+          ${sortedEvents.map(e => {
+            let dataStr = '';
+            if (e.event_data_json) {
+              try {
+                const parsed = typeof e.event_data_json === 'string' ? JSON.parse(e.event_data_json) : e.event_data_json;
+                dataStr = Object.entries(parsed).filter(([k]) => k !== 'landing_url').map(([k, v]) => `${k}: ${v}`).join(' · ');
+              } catch (_) {
+                dataStr = String(e.event_data_json);
+              }
+            }
+            return `
             <li>
               <div class="t">
-                <b>${esc(e.event_name.replace(/_/g, ' '))}</b>
-                <small>${esc(full(e.created_at))}</small>
+                <b>${esc((e.event_name || '').replace(/_/g, ' ').toUpperCase())}</b>
+                ${dataStr ? `<small style="display:block; color:var(--text-2); margin-top:2px;">${esc(dataStr)}</small>` : ''}
+                <small style="color:var(--muted);">${esc(full(e.created_at))}</small>
               </div>
             </li>
-          `).join('')}
+          `;}).join('')}
         </ul>
       ` : '<p class="empty" style="padding:12px;">No recorded events for this session.</p>'}
     </div>
 
     <!-- UTM Attribution & Technical Spec -->
     <div class="card" style="margin-bottom:16px;">
-      <h3>Traffic Source & Device Spec</h3>
+      <h3>Traffic Source & Ad Campaign Attribution</h3>
       <dl class="facts">
-        <dt>UTM Source</dt><dd>${esc(x.utm_source || 'Direct')}</dd>
-        <dt>UTM Campaign</dt><dd>${esc(x.utm_campaign || '—')}</dd>
+        <dt>UTM Source</dt><dd><b>${esc(x.utm_source || 'Direct')}</b></dd>
+        <dt>UTM Medium</dt><dd>${esc(x.utm_medium || '—')}</dd>
+        <dt>UTM Campaign</dt><dd><b>${esc(x.utm_campaign || '—')}</b></dd>
+        <dt>UTM Term</dt><dd>${esc(x.utm_term || '—')}</dd>
+        <dt>UTM Content</dt><dd>${esc(x.utm_content || '—')}</dd>
+        <dt>Ad Click IDs</dt><dd>${esc(x.fbclid ? 'fbclid: ' + x.fbclid : x.gclid ? 'gclid: ' + x.gclid : '—')}</dd>
         <dt>Landing Page</dt><dd style="word-break:break-all">${esc(x.landing_url || '/freeaudit')}</dd>
+        <dt>Referrer</dt><dd style="word-break:break-all">${esc(x.referrer_url || 'Direct')}</dd>
         <dt>Device / OS</dt><dd>${esc(x.device_type || 'desktop')} (${esc(x.os || '')}, ${esc(x.browser || '')})</dd>
         <dt>Screen Res</dt><dd>${x.screen_width || '—'} x ${x.screen_height || '—'}</dd>
         <dt>Hashed IP</dt><dd style="font-family:monospace; font-size:0.8rem">${esc(x.ip_hash || '—')}</dd>
+        <dt>First Seen</dt><dd>${esc(full(x.first_seen_at || x.created_at))}</dd>
+        <dt>Last Active</dt><dd>${esc(full(x.last_seen_at || x.updated_at))}</dd>
       </dl>
     </div>
 
     <!-- Admin Notes -->
     <div class="field" style="margin-bottom:16px;">
-      <label for="d-fa-notes">Admin Notes & History</label>
+      <label for="d-fa-notes">Admin Notes & Follow-Up Log</label>
       <textarea id="d-fa-notes" rows="3" placeholder="Add follow-up notes, call summary, or customer intent...">${esc(x.admin_notes || '')}</textarea>
     </div>
 
@@ -1749,17 +1865,17 @@ function openFreeAuditLeadDetail(id) {
       if (S.mode === 'demo') {
         Object.assign(x, patch);
       } else {
-        const idToken = S.fb && S.fb.auth.currentUser ? await S.fb.auth.currentUser.getIdToken() : '';
-        await fetch(`/api/admin/free-audit/leads/${x.id || x.visitor_uuid}`, {
+        const token = S.fb && S.fb.auth.currentUser ? await S.fb.auth.currentUser.getIdToken() : '';
+        await fetch(`/api/admin/free-audit/leads/${encodeURIComponent(x.visitor_uuid || x.id)}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + idToken
+            'Authorization': 'Bearer ' + token
           },
           body: JSON.stringify(patch)
         });
       }
-      toast('Lead Updated', x.name || x.visitor_uuid);
+      toast('Lead Updated', leadName);
       closeDrawer();
       render();
     } catch (err) {

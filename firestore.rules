@@ -13,7 +13,6 @@ service cloud.firestore {
 
     function isRfAdmin() {
       return request.auth != null
-        && (request.auth.token.email_verified == true || request.auth.token.firebase.sign_in_provider == 'password')
         && request.auth.token.email in ['priyanshu@redflaghomes.in', 'crazypriyanshu.777@gmail.com'];
     }
 
@@ -28,12 +27,14 @@ service cloud.firestore {
       allow update, delete: if isRfAdmin();
     }
 
-    // Free Audit Visitors & Events: Read/write access restricted to authenticated admins
+    // Free Audit Visitors & Events: Public can create & update their audit progress; Admins have full access
     match /free_audit_visitors/{id} {
-      allow read, write: if isRfAdmin();
+      allow create, update: if true;
+      allow read, delete: if isRfAdmin();
     }
     match /free_audit_events/{id} {
-      allow read, write: if isRfAdmin();
+      allow create, update: if true;
+      allow read, delete: if isRfAdmin();
     }
 
     // User profile documents

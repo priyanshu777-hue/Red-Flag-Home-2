@@ -850,11 +850,43 @@
 
         <form id="fa-multi-step-form" onsubmit="return false;">
 
-          <!-- STEP 1: Location -->
+          <!-- STEP 1: Location & Owner Contact -->
           <div class="fa-step active" data-step="1">
-            <h2 class="fa-step-title">Property Location</h2>
-            <p class="fa-step-desc">Enter where your property is located to pull local short-stay market data.</p>
+            <h2 class="fa-step-title">Property Location & Owner Details</h2>
+            <p class="fa-step-desc">Enter your contact details and where your property is located to get your personalized short-stay earning potential.</p>
             
+            <div class="fa-grid-2" style="margin-bottom: 20px;">
+              <div class="fa-field-group">
+                <label class="fa-label" for="fa-full-name">Full Name *</label>
+                <input type="text" id="fa-full-name" class="fa-input" placeholder="e.g. Priyanshu Sharma" required minlength="2" autocomplete="name">
+                <div id="fa-err-name" style="display:none; color:var(--fa-red); font-size:0.75rem; margin-top:4px; font-weight:500;">Please enter your full name (minimum 2 characters).</div>
+              </div>
+
+              <div class="fa-field-group">
+                <label class="fa-label" for="fa-mobile-number">Mobile / WhatsApp Number *</label>
+                <div style="display: flex; gap: 8px;">
+                  <select id="fa-mobile-country-code" class="fa-select" style="width: 125px; flex-shrink: 0; padding-inline: 8px;" aria-label="Country Code">
+                    <option value="+91" selected>🇮🇳 +91</option>
+                    <option value="+1">🇺🇸 +1</option>
+                    <option value="+44">🇬🇧 +44</option>
+                    <option value="+971">🇦🇪 +971</option>
+                    <option value="+61">🇦🇺 +61</option>
+                    <option value="+1">🇨🇦 +1</option>
+                    <option value="+65">🇸🇬 +65</option>
+                    <option value="+49">🇩🇪 +49</option>
+                    <option value="+33">🇫🇷 +33</option>
+                    <option value="+34">🇪🇸 +34</option>
+                    <option value="+66">🇹🇭 +66</option>
+                    <option value="+62">🇮🇩 +62</option>
+                    <option value="+966">🇸🇦 +966</option>
+                    <option value="+974">🇶🇦 +974</option>
+                  </select>
+                  <input type="tel" id="fa-mobile-number" class="fa-input" placeholder="e.g. 98765 43210" required autocomplete="tel" style="flex: 1;">
+                </div>
+                <div id="fa-err-phone" style="display:none; color:var(--fa-red); font-size:0.75rem; margin-top:4px; font-weight:500;">Please enter a valid mobile number (7 to 15 digits).</div>
+              </div>
+            </div>
+
             <div class="fa-grid-2">
               <div class="fa-field-group">
                 <label class="fa-label" for="fa-country">Country *</label>
@@ -879,6 +911,7 @@
                 <label class="fa-label" for="fa-city">City / Area / Suburb *</label>
                 <input type="text" id="fa-city" class="fa-input" placeholder="e.g. Koramangala, Bengaluru or Goa" autocomplete="off" required>
                 <div id="fa-places-dropdown" class="fa-places-dropdown" hidden></div>
+                <div id="fa-err-city" style="display:none; color:var(--fa-red); font-size:0.75rem; margin-top:4px; font-weight:500;">Please enter your city or property area.</div>
               </div>
             </div>
 
@@ -1311,32 +1344,35 @@
 
       // Multi-Step Form Logic & Full Visitor Tracking System
       (function initFreeAuditSystem() {
-        // Cookie Helpers
+        // Cookie Helpers (180 days for visitor_uuid, session for session_id)
         function getCookie(name) {
           const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-          return v ? v[2] : null;
+          return v ? decodeURIComponent(v[2]) : null;
         }
         function setCookie(name, value, days) {
           const d = new Date();
           d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
-          document.cookie = name + "=" + value + ";path=/;SameSite=Lax;expires=" + d.toUTCString();
+          document.cookie = name + "=" + encodeURIComponent(value) + ";path=/;SameSite=Lax;expires=" + d.toUTCString();
         }
 
-        // Persistent Visitor UUID & Session ID
+        // 1. Persistent Visitor UUID (180 days cookie + localStorage)
         let visitorUuid = localStorage.getItem('rf_fa_uuid') || getCookie('rf_fa_uuid');
+        const isNewVisitor = !visitorUuid;
         if (!visitorUuid) {
           visitorUuid = 'v_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
           localStorage.setItem('rf_fa_uuid', visitorUuid);
-          setCookie('rf_fa_uuid', visitorUuid, 365);
         }
+        setCookie('rf_fa_uuid', visitorUuid, 180);
 
-        let sessionId = sessionStorage.getItem('rf_fa_session');
+        // 2. Session ID (sessionStorage + session cookie)
+        let sessionId = sessionStorage.getItem('rf_fa_session') || getCookie('rf_fa_session');
         if (!sessionId) {
           sessionId = 's_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
           sessionStorage.setItem('rf_fa_session', sessionId);
         }
+        setCookie('rf_fa_session', sessionId, 1);
 
-        // UTM & Ad Click ID Capture
+        // 3. UTM & Ad Click ID Capture from URL
         const urlParams = new URLSearchParams(window.location.search);
         const utmSource = urlParams.get('utm_source') || '';
         const utmMedium = urlParams.get('utm_medium') || '';
@@ -1358,7 +1394,51 @@
           return 'desktop';
         }
 
-        // Sync Visitor Data to Backend
+        function getBrowser() {
+          const ua = navigator.userAgent;
+          if (/chrome|crios/i.test(ua) && !/edge|edg|opr|opera/i.test(ua)) return 'Chrome';
+          if (/safari/i.test(ua) && !/chrome|crios/i.test(ua)) return 'Safari';
+          if (/firefox|fxios/i.test(ua)) return 'Firefox';
+          if (/edg/i.test(ua)) return 'Edge';
+          if (/opr|opera/i.test(ua)) return 'Opera';
+          return 'Browser';
+        }
+
+        function getOS() {
+          const ua = navigator.userAgent;
+          if (/android/i.test(ua)) return 'Android';
+          if (/iphone|ipad|ipod/i.test(ua)) return 'iOS';
+          if (/win/i.test(ua)) return 'Windows';
+          if (/mac/i.test(ua)) return 'macOS';
+          if (/linux/i.test(ua)) return 'Linux';
+          return 'OS';
+        }
+
+        // 4. Funnel Event Dispatcher
+        async function fireFunnelEvent(eventName, eventData = {}) {
+          try {
+            if (typeof window.gtag === 'function') {
+              window.gtag('event', eventName, { event_category: 'freeaudit', ...eventData });
+            }
+            await fetch('/api/free-audit/event', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                visitor_uuid: visitorUuid,
+                session_id: sessionId,
+                event_name: eventName,
+                event_data_json: eventData,
+                page_url: window.location.href,
+                referrer_url: referrerUrl,
+                current_step: currentStep
+              })
+            });
+          } catch (e) {
+            console.warn('[FreeAudit Event Dispatch Error]', e);
+          }
+        }
+
+        // 5. Initial Page View & Visitor Record Sync
         async function syncVisitorProfile() {
           try {
             await fetch('/api/free-audit/visitor', {
@@ -1369,6 +1449,8 @@
                 session_id: sessionId,
                 user_agent: navigator.userAgent,
                 device_type: getDeviceType(),
+                browser: getBrowser(),
+                os: getOS(),
                 screen_width: window.innerWidth,
                 screen_height: window.innerHeight,
                 language: navigator.language || 'en',
@@ -1383,37 +1465,19 @@
                 gclid, fbclid, msclkid, ttclid
               })
             });
+            // Record immediate page view event
+            fireFunnelEvent(isNewVisitor ? 'freeaudit_page_viewed' : 'return_visit', {
+              utm_source: utmSource,
+              utm_campaign: utmCampaign,
+              device: getDeviceType()
+            });
           } catch (err) {
-            console.warn('Visitor sync notice:', err);
+            console.warn('[Visitor sync notice]', err);
           }
         }
         syncVisitorProfile();
 
-        // Funnel Event Dispatcher
-        async function fireFunnelEvent(eventName, eventData = {}) {
-          console.log('[FreeAudit Event]', eventName, eventData);
-          if (typeof window.gtag === 'function') {
-            window.gtag('event', eventName, { event_category: 'freeaudit', ...eventData });
-          }
-          try {
-            await fetch('/api/free-audit/event', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                visitor_uuid: visitorUuid,
-                session_id: sessionId,
-                event_name: eventName,
-                event_data_json: eventData,
-                page_url: window.location.href,
-                referrer_url: referrerUrl
-              })
-            });
-          } catch (e) {
-            console.warn('Event dispatch notice:', e);
-          }
-        }
-
-        // Google Places Autocomplete with Session Tokens (Feature 2)
+        // Google Places Autocomplete with Session Tokens
         let mapsSessionToken = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : ('st_' + Math.random().toString(36).substring(2, 12));
         let selectedLocationData = null;
         const cityInput = document.getElementById('fa-city');
@@ -1432,6 +1496,8 @@
               dropdownEl.innerHTML = '';
               return;
             }
+
+            fireFunnelEvent('location_search_started', { query });
 
             autocompleteDebounceTimer = setTimeout(async () => {
               try {
@@ -1455,7 +1521,7 @@
             }
 
             dropdownEl.innerHTML = predictions.map(p => `
-              <div class="fa-place-item" data-placeid="${p.place_id}" data-desc="${p.description || p.main_text}" data-lat="${p.lat || ''}" data-lng="${p.lng || ''}" data-city="${p.city || ''}">
+              <div class="fa-place-item" data-placeid="${p.place_id}" data-desc="${p.description || p.main_text}" data-lat="${p.lat || ''}" data-lng="${p.lng || ''}" data-city="${p.city || ''}" data-country="${p.country || ''}">
                 <div class="fa-place-main">${p.main_text}</div>
                 <div class="fa-place-sec">${p.secondary_text}</div>
               </div>
@@ -1470,6 +1536,8 @@
                 cityInput.value = item.querySelector('.fa-place-main').textContent;
                 dropdownEl.hidden = true;
 
+                fireFunnelEvent('location_suggestion_selected', { placeId, description: desc });
+
                 try {
                   const res = await fetch('/api/free-audit/place-details', {
                     method: 'POST',
@@ -1480,7 +1548,8 @@
                       description: desc,
                       lat: parseFloat(item.getAttribute('data-lat') || '0'),
                       lng: parseFloat(item.getAttribute('data-lng') || '0'),
-                      city: item.getAttribute('data-city') || ''
+                      city: item.getAttribute('data-city') || '',
+                      country: item.getAttribute('data-country') || ''
                     })
                   });
 
@@ -1504,10 +1573,10 @@
                     })
                   });
 
-                  fireFunnelEvent('location_selected', selectedLocationData);
+                  fireFunnelEvent('location_details_fetched', selectedLocationData);
                   renderMapPreview(selectedLocationData);
 
-                  // Create new session token for subsequent session
+                  // Create new session token for subsequent searches
                   mapsSessionToken = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : ('st_' + Math.random().toString(36).substring(2, 12));
                 } catch (err) {
                   console.warn('Place details error:', err);
@@ -1584,6 +1653,17 @@
           btnNext.textContent = currentStep === totalSteps ? 'Generate Free Audit ✨' : 'Continue →';
         }
 
+        function cleanPhone(raw) {
+          return String(raw || '').replace(/\D/g, '');
+        }
+
+        function formatE164(code, raw) {
+          const digits = cleanPhone(raw);
+          const c = String(code || '+91').trim();
+          const prefix = c.startsWith('+') ? c : ('+' + c);
+          return prefix + digits;
+        }
+
         async function saveStepProgress(stepNum) {
           const formData = collectCurrentFormData();
           try {
@@ -1605,7 +1685,7 @@
                 already_listed: formData.listed
               })
             });
-            fireFunnelEvent('audit_step_completed', { step: stepNum });
+            fireFunnelEvent(`step_${stepNum - 1}_completed`, { step: stepNum - 1 });
           } catch (e) {
             console.warn('Auto-save progress notice:', e);
           }
@@ -1613,6 +1693,9 @@
 
         function collectCurrentFormData() {
           return {
+            fullName: document.getElementById('fa-full-name')?.value?.trim() || '',
+            mobileNumber: document.getElementById('fa-mobile-number')?.value?.trim() || '',
+            countryCode: document.getElementById('fa-mobile-country-code')?.value?.trim() || '+91',
             country: document.getElementById('fa-country')?.value || 'India',
             city: document.getElementById('fa-city')?.value || '',
             address: document.getElementById('fa-address')?.value || '',
@@ -1643,8 +1726,49 @@
         btnNext.addEventListener('click', async () => {
           if (!validateStep(currentStep)) return;
 
+          // STEP 1 SUBMISSION: Save Full Name, Mobile Number immediately!
           if (currentStep === 1) {
+            const fullName = document.getElementById('fa-full-name').value.trim();
+            const rawPhone = document.getElementById('fa-mobile-number').value.trim();
+            const countryCode = document.getElementById('fa-mobile-country-code').value.trim();
+            const mobileE164 = formatE164(countryCode, rawPhone);
+            const city = document.getElementById('fa-city').value.trim();
+            const country = document.getElementById('fa-country').value;
+            const address = document.getElementById('fa-address').value.trim();
+
+            // Prefill PDF lead form at the bottom
+            const leadNameEl = document.getElementById('fa-lead-name');
+            const leadPhoneEl = document.getElementById('fa-lead-phone');
+            if (leadNameEl && !leadNameEl.value) leadNameEl.value = fullName;
+            if (leadPhoneEl && !leadPhoneEl.value) leadPhoneEl.value = mobileE164;
+
+            // Immediately save to free_audit_visitors
+            try {
+              await fetch(`/api/free-audit/visitor/${visitorUuid}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  full_name: fullName,
+                  name: fullName,
+                  mobile_number: rawPhone,
+                  mobile_country_code: countryCode,
+                  mobile_e164: mobileE164,
+                  phone: mobileE164,
+                  phone_verified: false,
+                  property_country: country,
+                  property_city: city,
+                  property_locality: address,
+                  audit_status: 'in_progress',
+                  current_step: 2,
+                  completed_step: 1
+                })
+              });
+            } catch (err) {
+              console.warn('[Step 1 lead save notice]', err);
+            }
+
             fireFunnelEvent('audit_started');
+            fireFunnelEvent('step_1_completed', { full_name: fullName, mobile_e164: mobileE164, city });
           }
 
           if (currentStep < totalSteps) {
@@ -1652,6 +1776,7 @@
             updateStepView();
             saveStepProgress(currentStep);
           } else {
+            fireFunnelEvent('step_5_completed');
             fireFunnelEvent('estimate_requested');
             await runAuditAnalysis();
           }
@@ -1659,18 +1784,47 @@
 
         function validateStep(step) {
           if (step === 1) {
-            const city = document.getElementById('fa-city').value.trim();
-            if (!city) {
-              alert('Please enter your city or property location.');
-              return false;
+            let valid = true;
+            const nameEl = document.getElementById('fa-full-name');
+            const phoneEl = document.getElementById('fa-mobile-number');
+            const cityEl = document.getElementById('fa-city');
+            const errName = document.getElementById('fa-err-name');
+            const errPhone = document.getElementById('fa-err-phone');
+            const errCity = document.getElementById('fa-err-city');
+
+            if (errName) errName.style.display = 'none';
+            if (errPhone) errPhone.style.display = 'none';
+            if (errCity) errCity.style.display = 'none';
+
+            const fullName = nameEl ? nameEl.value.trim() : '';
+            if (!fullName || fullName.length < 2) {
+              if (errName) errName.style.display = 'block';
+              if (nameEl) nameEl.focus();
+              valid = false;
             }
+
+            const phoneDigits = cleanPhone(phoneEl ? phoneEl.value : '');
+            if (!phoneDigits || phoneDigits.length < 7 || phoneDigits.length > 15) {
+              if (errPhone) errPhone.style.display = 'block';
+              if (valid && phoneEl) phoneEl.focus();
+              valid = false;
+            }
+
+            const city = cityEl ? cityEl.value.trim() : '';
+            if (!city) {
+              if (errCity) errCity.style.display = 'block';
+              if (valid && cityEl) cityEl.focus();
+              valid = false;
+            }
+
+            return valid;
           }
           return true;
         }
 
         // Track funnel abandonment
         window.addEventListener('beforeunload', () => {
-          if (currentStep > 1 && currentStep <= totalSteps && (!auditResultData)) {
+          if (currentStep >= 1 && (!auditResultData)) {
             navigator.sendBeacon && navigator.sendBeacon('/api/free-audit/event', JSON.stringify({
               visitor_uuid: visitorUuid,
               session_id: sessionId,

@@ -1,0 +1,91 @@
+{
+  "visitors": {
+    "v_test_1793391048513": {
+      "visitor_uuid": "v_test_1793391048513",
+      "session_id": "s_test_1793391048513",
+      "updated_at": "2026-10-30T20:10:49.005Z",
+      "last_seen_at": "2026-10-30T20:10:49.005Z",
+      "ip_hash": "59829c19928fa3225d23a4da7bc5a77c",
+      "user_agent": "Mozilla/5.0 Test",
+      "device_type": "mobile",
+      "browser": "Chrome",
+      "os": "Android",
+      "screen_width": 390,
+      "screen_height": 844,
+      "language": "en-IN",
+      "country": "",
+      "region": "",
+      "city": "",
+      "referrer_url": "https://facebook.com",
+      "landing_url": "https://redflaghomes.in/freeaudit?utm_source=meta&utm_medium=cpc&utm_campaign=bangalore_leads&fbclid=fb_12345",
+      "current_url": "https://redflaghomes.in/freeaudit",
+      "traffic_source": "meta",
+      "utm_source": "meta",
+      "utm_medium": "cpc",
+      "utm_campaign": "bangalore_leads",
+      "utm_term": "",
+      "utm_content": "",
+      "gclid": "",
+      "fbclid": "fb_12345",
+      "msclkid": "",
+      "ttclid": "",
+      "created_at": "2026-10-30T20:10:48.640Z",
+      "first_seen_at": "2026-10-30T20:10:48.640Z",
+      "audit_status": "in_progress",
+      "current_step": 2,
+      "completed_step": 1,
+      "admin_status": "new",
+      "id": "v_test_1793391048513",
+      "full_name": "Rahul Verma",
+      "name": "Rahul Verma",
+      "mobile_number": "9876543210",
+      "mobile_country_code": "+91",
+      "mobile_e164": "+919876543210",
+      "phone": "+919876543210",
+      "phone_verified": false,
+      "property_country": "India",
+      "property_city": "Bengaluru",
+      "property_locality": "Indiranagar, Bengaluru"
+    },
+    "v_meta_test_999": {
+      "id": "v_meta_test_999",
+      "mobile_e164": "+919876543210",
+      "created_at": "2026-10-30T19:58:32.710Z",
+      "mobile_number": "9876543210",
+      "utm_campaign": "instagram_ads_2026",
+      "full_name": "Priyanshu Test",
+      "visitor_uuid": "v_meta_test_999",
+      "utm_source": "meta",
+      "audit_status": "started",
+      "mobile_country_code": "+91",
+      "session_id": "s_meta_test_999"
+    },
+    "test_visitor_1": {
+      "id": "test_visitor_1",
+      "visitor_uuid": "test_visitor_1",
+      "audit_status": "started"
+    }
+  },
+  "events": [
+    {
+      "visitor_uuid": "v_test_1793391048513",
+      "session_id": "s_test_1793391048513",
+      "event_name": "freeaudit_page_viewed",
+      "event_data_json": "{\"landing_url\":\"https://redflaghomes.in/freeaudit?utm_source=meta&utm_medium=cpc&utm_campaign=bangalore_leads&fbclid=fb_12345\",\"utm_source\":\"meta\"}",
+      "page_url": "https://redflaghomes.in/freeaudit",
+      "referrer_url": "https://facebook.com",
+      "created_at": "2026-10-30T20:10:48.640Z",
+      "id": "ev_c1c3254afa602cde"
+    },
+    {
+      "visitor_uuid": "v_test_1793391048513",
+      "session_id": "s_test_1793391048513",
+      "event_name": "step_1_completed",
+      "event_data_json": "{\"full_name\":\"Rahul Verma\",\"mobile_e164\":\"+919876543210\"}",
+      "page_url": "https://redflaghomes.in/freeaudit",
+      "referrer_url": "",
+      "created_at": "2026-10-30T20:10:49.005Z",
+      "id": "ev_9a4fb665d37cc258"
+    }
+  ]
+}
